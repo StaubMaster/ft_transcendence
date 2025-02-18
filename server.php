@@ -92,7 +92,105 @@ do
 				echo "accelt '$websocket_accept'\n";
 				Respond101($client_socket, $websocket_accept);
 
+				if (socket_set_block($client_socket) === false)
+				{
+					echo "socket_set_block(): " . socket_strerror(socket_last_error($client_socket)) . "\n";
+				}
+
+				if (($str = socket_read($client_socket, 2, PHP_BINARY_READ)) === false)
+				{
+					echo "socket_read(): " . socket_strerror(socket_last_error($client_socket)) . "\n";
+				}
+
+				$byte = ord($str[0]);
+				$fin  = $byte & 0b10000000;
+				$rsv  = $byte & 0b01110000;
+				$code = $byte & 0b00001111;
+				echo "fin  '$fin'\n";
+				echo "rsv  '$rsv'\n";
+				echo "code '$code'\n";
+
+				$byte = ord($str[1]);
+				$mask_bit    = $byte & 0b10000000;
+				$payload_len = $byte & 0b01111111;
+				echo "mask_bit    '$mask_bit'\n";
+				echo "payload_len '$payload_len'\n";
+
+				if ($payload_len == 126)
+				{
+					if (($str = socket_read($client_socket, 2, PHP_BINARY_READ)) === false)
+					{
+						echo "Len16\n";
+						echo "socket_read(): " . socket_strerror(socket_last_error($client_socket)) . "\n";
+					}
+
+					$payload_len = 0;
+					for ($i = 0; $i < 2; $i++)
+					{
+						$byte = ord($str[$i]);
+						echo "[$i] '$byte'\n";
+						$payload_len = ($payload_len << 8) | $byte;
+					}
+					echo "payload_len '$payload_len'\n";
+				}
+				elseif ($payload_len == 127)
+				{
+					if (($str = socket_read($client_socket, 8, PHP_BINARY_READ)) === false)
+					{
+						echo "Len64\n";
+						echo "socket_read(): " . socket_strerror(socket_last_error($client_socket)) . "\n";
+					}
+
+					$payload_len = 0;
+					for ($i = 0; $i < 8; $i++)
+					{
+						$byte = ord($str[$i]);
+						$payload_len = ($payload_len << 8) | $byte;
+					}
+					echo "payload_len '$payload_len'\n";
+				}
+
+				if (($str = socket_read($client_socket, 4, PHP_BINARY_READ)) === false)
+				{
+					echo "Mask\n";
+					echo "socket_read(): " . socket_strerror(socket_last_error($client_socket)) . "\n";
+				}
 				
+				$mask_arr = array(0, 0, 0, 0);
+				for ($i = 0; $i < 4; $i++)
+				{
+					$mask_arr[$i] = ord($str[$i]);
+				}
+
+				if (($str = socket_read($client_socket, $payload_len, PHP_BINARY_READ)) === false)
+				{
+					echo "payload\n";
+					echo "socket_read(): " . socket_strerror(socket_last_error($client_socket)) . "\n";
+				}
+
+				for ($i = 0; $i < $payload_len; $i++)
+				{
+					$byte = ord($str[$i]);
+					$byte = ($byte ^ $mask_arr[$i % 4]);
+					$str[$i] = chr($byte);
+				}
+				echo "'$str'\n";
+
+
+
+				$payload = "hiiiiiiiiii :]";
+				$payload_len = strlen($payload);
+				$str = "";
+
+				$byte = 0b10000000 | 0x1;
+				$str .= chr($byte);
+
+				$byte = $payload_len;
+				$str .= chr($byte);
+
+				$str .= $payload;
+
+				socket_write($client_socket, $str);
 			}
 		}
 		else

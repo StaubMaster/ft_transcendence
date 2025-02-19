@@ -20,6 +20,8 @@ class Frame
 	#ReservedControl    = 0xE
 	#ReservedControl    = 0xF
 
+	private $error = false;
+
 	private $fin = 1;
 	private $rsv = 0;
 	private $code;
@@ -48,18 +50,25 @@ class Frame
 		return $this->payload_str;
 	}
 
+	public function checkError()
+	{
+		return $this->error;
+	}
+
 	public function recv($socket)
 	{
 		if (($buf = socket_read($socket, 2, PHP_BINARY_READ)) === false)
 		{
-			echo "socket_read(): " . socket_strerror(socket_last_error($socket)) . "\n";
+			$errCode = socket_last_error($socket);
+			$this->error = "Header:" . $errCode . ":" . socket_strerror($errCode);
+			return;
 		}
-	
+
 		$byte = ord($buf[0]);
 		$this->fin  = $byte & 0b10000000;
 		$this->rsv  = $byte & 0b01110000;
 		$this->code = $byte & 0b00001111;
-	
+
 		$byte = ord($buf[1]);
 		$this->mask_bit    = $byte & 0b10000000;
 		$this->payload_len = $byte & 0b01111111;
@@ -68,10 +77,11 @@ class Frame
 		{
 			if (($buf = socket_read($socket, 2, PHP_BINARY_READ)) === false)
 			{
-				echo "Len16\n";
-				echo "socket_read(): " . socket_strerror(socket_last_error($socket)) . "\n";
+				$errCode = socket_last_error($socket);
+				$this->error = "Len16:" . $errCode . ":" . socket_strerror($errCode);
+				return;
 			}
-	
+
 			$this->payload_len = 0;
 			for ($i = 0; $i < 2; $i++)
 			{
@@ -83,10 +93,11 @@ class Frame
 		{
 			if (($buf = socket_read($socket, 8, PHP_BINARY_READ)) === false)
 			{
-				echo "Len64\n";
-				echo "socket_read(): " . socket_strerror(socket_last_error($socket)) . "\n";
+				$errCode = socket_last_error($socket);
+				$this->error = "Len64:" . $errCode . ":" . socket_strerror($errCode);
+				return;
 			}
-	
+
 			$this->payload_len = 0;
 			for ($i = 0; $i < 8; $i++)
 			{
@@ -94,37 +105,46 @@ class Frame
 				$this->payload_len = ($this->payload_len << 8) | $byte;
 			}
 		}
-	
-		if (($buf = socket_read($socket, 4, PHP_BINARY_READ)) === false)
+
+		$this->mask_arr = array(0, 0, 0, 0);
+		if ($this->mask_bit != 0)
 		{
-			echo "Mask\n";
-			echo "socket_read(): " . socket_strerror(socket_last_error($socket)) . "\n";
-		}
-		
-		$mask_arr = array(0, 0, 0, 0);
-		for ($i = 0; $i < 4; $i++)
-		{
-			$mask_arr[$i] = ord($buf[$i]);
-		}
-	
-		if (($buf = socket_read($socket, $this->payload_len, PHP_BINARY_READ)) === false)
-		{
-			echo "payload\n";
-			echo "socket_read(): " . socket_strerror(socket_last_error($socket)) . "\n";
+			if (($buf = socket_read($socket, 4, PHP_BINARY_READ)) === false)
+			{
+				$errCode = socket_last_error($socket);
+				$this->error = "Mask:" . $errCode . ":" . socket_strerror($errCode);
+				return;
+			}
+			
+			for ($i = 0; $i < 4; $i++)
+			{
+				$this->mask_arr[$i] = ord($buf[$i]);
+			}
 		}
 
-		for ($i = 0; $i < $this->payload_len; $i++)
+		if ($this->payload_len != 0)
 		{
-			$byte = ord($buf[$i]);
-			$byte = ($byte ^ $mask_arr[$i % 4]);
-			$buf[$i] = chr($byte);
-		}
+			if (($buf = socket_read($socket, $this->payload_len, PHP_BINARY_READ)) === false)
+			{
+				$errCode = socket_last_error($socket);
+				$this->error = "Payload:" . $errCode . ":" . socket_strerror($errCode);
+				return;
+			}
 
-		$this->payload_str = $buf;
+			for ($i = 0; $i < $this->payload_len; $i++)
+			{
+				$byte = ord($buf[$i]);
+				$byte = ($byte ^ $this->mask_arr[$i % 4]);
+				$buf[$i] = chr($byte);
+			}
+
+			$this->payload_str = $buf;
+		}
 	}
 	public function send($socket)
 	{
-		$this->payload_len = strlen($this->payload_str);
+		if ($this->payload_str != null)
+			$this->payload_len = strlen($this->payload_str);
 
 		$buf = "";
 
@@ -168,7 +188,8 @@ class Frame
 			$buf .= chr($byte);
 		}
 
-		$buf .= $this->payload_str;
+		if ($this->payload_len != 0)
+			$buf .= $this->payload_str;
 
 		socket_write($socket, $buf);
 	}
@@ -203,42 +224,41 @@ class WebSocket
 		socket_close($this->socket);
 	}
 
-	public function canRecv()
+	public function recvText()
 	{
 		if ($this->isClose)
 			return false;
 
-		$r = array($this->socket);
-		$w = null;
-		$e = null;
-		if (($num = socket_select($r, $w, $e, 0, 0)) === false)
-		{
-			//echo "socket_select(): " . socket_strerror(socket_last_error($client_socket)) . "\n";
-		}
-		else
-		{
-			if ($num != 0)
-				return true;
-		}
-		return false;
-	}
-
-	public function recvText()
-	{
-		if ($this->isClose)
-			return null;
+		if (!canRecv($this->socket))
+			return false;
 
 		$frame = new Frame();
 		$frame->recv($this->socket);
+
+		if (($err = $frame->checkError()) !== false)
+		{
+			echo "Error: " . $err . "\n";
+			return false;
+		}
+
 		if ($frame->getOpenCode() == Frame::OpenCode_TextFrame)
 		{
 			return $frame->getPayload();
 		}
-		if ($frame->getOpenCode() == Frame::OpenCode_ConnectionClose)
+		elseif ($frame->getOpenCode() == Frame::OpenCode_ConnectionClose)
 		{
+			echo "==== close ====\n";
 			$this->close();
 		}
-		return null;
+		elseif ($frame->getOpenCode() == Frame::OpenCode_Pong)
+		{
+			$this->pongRecv();
+		}
+		else
+		{
+			echo "openCode:" . $frame->getOpenCode() . ":\n";
+		}
+		return false;
 	}
 	public function sendText($payload)
 	{
@@ -249,6 +269,54 @@ class WebSocket
 		$frame->setOpenCode(Frame::OpenCode_TextFrame);
 		$frame->setPayload($payload);
 		$frame->send($this->socket);
+		
+		if (($err = $frame->checkError()) !== false)
+		{
+			echo "Error: " . $err . "\n";
+		}
+	}
+
+
+
+	private $PingPongWait;
+	private $PingPongLast;
+	private function pongRecv()
+	{
+		echo "==== pong ====\n";
+		$this->PingPongWait = false;
+		$this->PingPongLast = hrtime(true);
+	}
+	private function pingSent()
+	{
+		echo "==== ping ====\n";
+		$this->PingPongWait = true;
+		$this->PingPongLast = hrtime(true);
+	}
+	public function checkConnectionUpdate()
+	{
+		if ($this->isClose)
+			return;
+
+		if (!$this->PingPongWait)
+		{
+			$t = hrtime(true);
+			if ($t - $this->PingPongLast > 3000000000)	//	3s
+			{
+				$frame = new Frame();
+				$frame->setOpenCode(Frame::OpenCode_Ping);
+				$frame->send($this->socket);
+				$this->pingSent();
+			}
+		}
+		else
+		{
+			$t = hrtime(true);
+			if ($t - $this->PingPongLast > 3000000000)	//	3s
+			{
+				echo "==== no pong after 3s ====\n";
+				$this->close();
+			}
+		}
 	}
 }
 

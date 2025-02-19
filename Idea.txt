@@ -1,0 +1,16 @@
+
+Match: a Singular Game
+
+Websocket ClientL;
+Websocket ClientR;
+
+constructor(cL, cR);
+- needs WebSocket connections to 2 (how ever many players) Clients
+
+verify_Player_presence():
+- wait certain amount of Time for both players to move
+- if 2 Player dosent move
+- - Math result is null
+- if 1 Player dosent move
+- - other Player wins
+

@@ -136,7 +136,20 @@ class Frame
 		
 		$byte = 0;
 		$byte |= $this->mask_bit << 7;
-		if ($this->payload_len > 127)
+		if ($this->payload_len > 0xFFFF)
+		{
+			$byte |= 127;
+			$buf .= chr($byte);
+			
+			$len = $this->payload_len;
+			for ($i = 0; $i < 4; $i++)
+			{
+				$byte = chr($len >> 24);
+				$buf .= chr($byte);
+				$len = $len << 8;
+			}
+		}
+		elseif ($this->payload_len > 0x7F)
 		{
 			$byte |= 126;
 			$buf .= chr($byte);
@@ -172,28 +185,66 @@ class WebSocket
 	}
 
 	private $socket;
-	private $active;
+	private $isClose;
 
 	function __construct($sock)
 	{
 		$this->socket = $sock;
-		$this->active = true;
+		$this->isClose = false;
 	}
 
-	function isActive()
+	public function isClose()
 	{
-		return $active;
+		return $this->isClose;
 	}
-	
-
-	public function recv()
+	public function close()
 	{
+		$this->isClose = true;
+		socket_close($this->socket);
+	}
+
+	public function canRecv()
+	{
+		if ($this->isClose)
+			return false;
+
+		$r = array($this->socket);
+		$w = null;
+		$e = null;
+		if (($num = socket_select($r, $w, $e, 0, 0)) === false)
+		{
+			//echo "socket_select(): " . socket_strerror(socket_last_error($client_socket)) . "\n";
+		}
+		else
+		{
+			if ($num != 0)
+				return true;
+		}
+		return false;
+	}
+
+	public function recvText()
+	{
+		if ($this->isClose)
+			return null;
+
 		$frame = new Frame();
 		$frame->recv($this->socket);
-		return $frame->getPayload();
+		if ($frame->getOpenCode() == Frame::OpenCode_TextFrame)
+		{
+			return $frame->getPayload();
+		}
+		if ($frame->getOpenCode() == Frame::OpenCode_ConnectionClose)
+		{
+			$this->close();
+		}
+		return null;
 	}
-	public function send($payload)
+	public function sendText($payload)
 	{
+		if ($this->isClose)
+			return;
+
 		$frame = new Frame();
 		$frame->setOpenCode(Frame::OpenCode_TextFrame);
 		$frame->setPayload($payload);

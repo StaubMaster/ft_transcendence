@@ -5,11 +5,12 @@ echo "hellp World?\n";
 error_reporting(E_ALL);
 ob_implicit_flush();
 
+echo "<<<<\n";
 include 'socket_help.php';
 include 'WebSocket.php';
 include 'TimeCheck.php';
 include 'PongMatch.php';
-
+echo ">>>>\n";
 
 function HeaderFindValue($fheader, $fname)
 {
@@ -30,6 +31,7 @@ function HeaderFindValue($fheader, $fname)
 while (true)
 {
 	if (($server_socket = socket_server_create('127.0.0.1', 5000)) === false)
+	//if (($server_socket = socket_server_create('192.168.0.208', 10000)) === false)	//	IP for LAN at home, dosent
 	{
 		sleep(1);
 	}
@@ -45,19 +47,89 @@ if (socket_set_nonblock($server_socket) === false)
 
 
 $tickTimeCheck = new TimeCheck(1);
+$timeStart = hrtime(true);
 
-
-$webSocket0 = null;
-$webSocket1 = null;
 $websocketArr = array();
+$webSocketID = 0;
 $pongMatch = null;
 
 echo "loop\n";
 do
 {
+	//echo "here 1\n";
+	if (($client_socket = socket_server_accept($server_socket)) === false)
+	{
+		echo "socket_server_accept(): " . socket_strerror(socket_last_error($server_socket)) . "\n";
+		break;
+	}
+	//echo "here 2\n";
+
+	if ($client_socket != null)
+	{
+		echo "incomming\n";
+		$header = socket_client_read_header($client_socket);
+		echo "header reading done\n";
+
+		if ($header != null)
+		{
+			$request = explode(" ", $header, 3);
+			$method = $request[0];
+			$path = $request[1];
+
+			//echo "========\n";
+			//echo "$header";
+			//echo "========\n";
+			//echo "method '" . $method . "'\n";
+			//echo "path   '" . $path . "'\n";
+			//echo "========\n";
+
+			if ($method == "GET")
+			{
+				if ($path[0] == '/')
+				{
+					if ($path[-1] == '/')
+					{
+						$path = $path . "index.html";
+					}
+					$path = substr($path, 1, strlen($path) - 1);
+					//echo "path '$path'\n";
+
+					if (($websocket_key = HeaderFindValue($header, "Sec-WebSocket-Key: ")) === false)
+					{
+						if (file_exists($path)) { echo ".... File '$path' found\n"; Respond200($client_socket, file_get_contents($path)); }
+						else { echo "!!!! File '$path' not found\n"; Respond404($client_socket); }
+					}
+					else
+					{
+						echo ".... WebSocket\n";
+						$websocket_accept = WebSocket::HandShake($websocket_key);
+						Respond101($client_socket, $websocket_accept);
+
+						$ws1 = new WebSocket($client_socket);	//	if ws here is the same as the loop above then the last gets overwriten
+						$client_socket = null;
+						$ws1->sendText("ID: " . $webSocketID);	//	make a struct to remember this / put it in the WebSocket class
+						$webSocketID++;
+						$num = array_push($websocketArr, $ws1);
+						echo "==== new Array Len : $num ====\n";
+					}
+				}
+				else { echo "!!!! Not File/Dir '$path'\n"; Respond400($client_socket); }
+			}
+			else { echo "!!!! Unknown Method '$method'\n"; Respond400($client_socket); }
+		}
+		else { echo "!!!! bad header read\n"; Respond400($client_socket); }
+	}
+
+	if ($client_socket != null)
+	{
+		echo "socket_close()\n";
+		socket_close($client_socket);
+	}
+
 	if ($tickTimeCheck->check())
 	{
-		echo "tick\n";
+		$timeSec = round((hrtime(true) - $timeStart) / 1000000000);
+		echo "tick " . $timeSec . "s [" . count($websocketArr) . "]\n";
 
 		$changeArr = false;
 		foreach ($websocketArr as &$ws)
@@ -65,7 +137,7 @@ do
 			if (($message = $ws->recvText()) !== false)
 			{
 				echo "recv ---> '$message'\n";
-				$message = "no";
+				$message = "hi";
 				echo "send <--- '$message'\n";
 				$ws->sendText($message);
 			}
@@ -90,101 +162,16 @@ do
 		}
 	}
 
-	//echo "here 1\n";
-	if (($client_socket = socket_server_accept($server_socket)) === false)
+	$num = count($websocketArr);
+	if ($num >= 2 && $pongMatch == null)
 	{
-		echo "socket_server_accept(): " . socket_strerror(socket_last_error($server_socket)) . "\n";
-		break;
-	}
-	//echo "here 2\n";
-
-	if ($client_socket != null)
-	{
-		echo "incomming\n";
-		$header = socket_client_read_header($client_socket);
-		echo "header reading done\n";
-
-		if ($header != null)
-		{
-			$request = explode(" ", $header, 3);
-			$method = $request[0];
-			$path = $request[1];
-
-			echo "========\n";
-			echo "$header";
-			echo "========\n";
-			//echo "method '" . $method . "'\n";
-			//echo "path   '" . $path . "'\n";
-			//echo "========\n";
-
-			if ($method == "GET")
-			{
-				if ($path[0] == '/')
-				{
-					if ($path[-1] == '/')
-					{
-						$path = $path . "index.html";
-					}
-					$path = substr($path, 1, strlen($path) - 1);
-					//echo "path '$path'\n";
-
-					if (($websocket_key = HeaderFindValue($header, "Sec-WebSocket-Key: ")) === false)
-					{
-						if (file_exists($path))
-						{
-							echo ".... File '$path' found\n";
-							Respond200($client_socket, file_get_contents($path));
-						}
-						else
-						{
-							echo "!!!! File '$path' not found\n";
-							Respond404($client_socket);
-						}
-					}
-					else
-					{
-						echo ".... WebSocket\n";
-						$websocket_accept = WebSocket::HandShake($websocket_key);
-						Respond101($client_socket, $websocket_accept);
-
-						$ws = new WebSocket($client_socket);
-						$client_socket = null;
-						array_push($websocketArr, $ws);
-					}
-				}
-				else
-				{
-					echo "!!!! Not File/Dir '$path'\n";
-					Respond400($client_socket);
-				}
-			}
-			else
-			{
-				echo "!!!! Unknown Method '$method'\n";
-				Respond400($client_socket);
-			}
-		}
-		else
-		{
-			echo "!!!! bad header read\n";
-			Respond400($client_socket);
-		}
-	}
-
-	if ($client_socket != null)
-	{
-		echo "socket_close()\n";
-		socket_close($client_socket);
-	}
-
-	if ($webSocket0 != null && $webSocket1 != null)
-	{
-		$pongMatch = new PongMatch($webSocket0, $webSocket1);
+		$pongMatch = new PongMatch($websocketArr[$num - 1], $websocketArr[$num - 2]);
+		$pongMatch->PresentCheckWait();
 	}
 
 	if ($pongMatch != null)
 	{
-	
+		$pongMatch->Update();
 	}
 
 } while (true);

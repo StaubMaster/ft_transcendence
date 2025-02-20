@@ -10,7 +10,7 @@ function socket_server_create($faddress, $fport)
 		return false;
 	}
 
-	//echo "socket_bind()\n";
+	//echo "socket_set_nonblock()\n";
 	if (socket_set_nonblock($fserver_socket) === false)
 	{
 		echo "socket_set_nonblock(): " . socket_strerror(socket_last_error($fserver_socket)) . "\n";

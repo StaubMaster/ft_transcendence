@@ -10,8 +10,8 @@ function test_func1()
 		ws.binaryType = "arraybuffer";
 		ws.onerror = (event) => { console.log("socket error: ", event); };
 		ws.onclose = (event) => { console.log("socket closed:" + event.code + ":" + event.reason); ws = null; };
-		//ws.onopen = function() { ws.send("hello"); };
-		ws.onopen = function() 
+		ws.onopen = function() { ws.send("hello"); };
+		/*ws.onopen = function() 
 		{
 			ws.send(
 `The length of the "Payload data", in bytes: if 0-125, that is the
@@ -28,7 +28,7 @@ is the length of the "Extension data" + the length of the
 zero, in which case the payload length is the length of the
 "Application data".`
 );
-		};
+		};*/
 		ws.onmessage = function(e) { console.log("message '" + e.data + "'"); };
 	}
 }

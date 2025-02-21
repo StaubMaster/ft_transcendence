@@ -6,8 +6,17 @@
 		<script src="file.js"></script>
 	</head>
 	<body>
-		<button type="button" onclick="test_func1()">Connect</button><br>
-		<button type="button" onclick="test_func2()">Send</button><br>
-		<button type="button" onclick="test_func3()">Disconnect</button><br>
+		<div>
+			<button type="button" onclick="test_func1()">Connect</button><br>
+			<button type="button" onclick="test_func2()">Send</button><br>
+			<button type="button" onclick="test_func3()">Disconnect</button><br>
+		</div>
+		<div>
+			<p id="InviteYourID">Your ID: Not Connected</p>
+			<input type="number" id="InviteOtherID">
+			<button type="button" onclick="InviteFunc()">Send Invite</button><br>
+			<p>Invites</p>
+			<button type="button" onclick="AcceptFunc()">Accept Invite</button><br>
+		</div>
 	</body>
 </html>

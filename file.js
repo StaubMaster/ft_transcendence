@@ -3,7 +3,6 @@ ws = null;
 
 function test_func1()
 {
-	console.log("test 1");
 	if (ws == null)
 	{
 		ws = new WebSocket("ws");
@@ -29,25 +28,64 @@ zero, in which case the payload length is the length of the
 "Application data".`
 );
 		};*/
-		ws.onmessage = function(e) { console.log("message '" + e.data + "'"); };
+		ws.onmessage = function(e)
+		{
+			if (e.data.startsWith("ID: "))
+			{
+				var cut = e.data.substring("ID: ".length);
+				console.log("ID: '" + cut + "'");
+				elem = document.getElementById("InviteYourID");
+				if (elem != null)
+				{
+					elem.textContent = "Your ID: " + cut;
+				}
+			}
+			else if (e.data.startsWith("InviteRequestFrom: "))
+			{
+				var cut = e.data.substring("InviteRequestFrom: ".length);
+				console.log("InviteRequestFrom: '" + cut + "'");
+			}
+			else
+			{
+				console.log("message '" + e.data + "'");
+			}
+		};
 	}
+}
+
+function InviteFunc()
+{
+	if (ws == null)
+		return;
+	elem = document.getElementById("InviteOtherID");
+	if (elem == null)
+		return;
+	var invID = elem.value;
+	ws.send("InviteRequestTo: " + invID);
+}
+
+function AcceptFunc()
+{
+	if (ws == null)
+		return;
+
 }
 
 function test_func2()
 {
-	console.log("test 2");
+	console.log("IAmHere");
 	if (ws != null)
 	{
-		ws.send("test 123");
+		ws.send("IAmHere");
 	}
 }
 
 function test_func3()
 {
-	console.log("test 3");
+	console.log("Bye");
 	if (ws != null)
 	{
-		ws.send("goodbye");
+		ws.send("Bye");
 		ws.close();
 	}
 }

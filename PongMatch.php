@@ -3,6 +3,9 @@
 
 class PongMatch
 {
+	private $plL;
+	private $plR;
+
 	private $wsL;
 	private $wsR;
 
@@ -10,20 +13,27 @@ class PongMatch
 	private $ScoreR;
 	private $isGameOver;
 
-	function __construct($wsL, $wsR)
+	function __construct($plL, $plR)
 	{
-		$this->wsL = $wsL;
-		$this->wsR = $wsR;
+		$this->plL = $plL;
+		$this->plR = $plR;
+		$this->wsL = $plL->joinGame(0);
+		$this->wsR = $plR->joinGame(0);
 
 		//$this->frameTickTime = 0;
 		$this->ScoreL = 0;
 		$this->ScoreR = 0;
 		$this->isGameOver = false;
 	}
+	function removePlayers()
+	{
+		$this->pl->leaveGame();
+		$this->pR->leaveGame();
+	}
 
-	public function isGameOver() { $this->isGameOver; }
-	public function ScoreL() { $this->ScoreL; }
-	public function ScoreR() { $this->ScoreR; }
+	public function isGameOver() { return $this->isGameOver; }
+	public function ScoreL() { return $this->ScoreL; }
+	public function ScoreR() { return $this->ScoreR; }
 
 	function ClientRecv()
 	{
@@ -60,6 +70,7 @@ class PongMatch
 		but then the problem is that a message might be consumed here or the other check
 		so add something to remember the last message and give that when it was "refunded"
 	*/
+
 	private $PresentChecking;
 	private $PresentCheckTime;
 	private $PresentCheckTimeSec;
@@ -88,19 +99,25 @@ class PongMatch
 
 			if (($message = $this->wsL->recvText()) !== false)
 			{
-				$this->wsL->sendText("Presance-Check: Here");
-				$this->PresentL = true;
+				if ($this->PresentL && $message == "IAmHere")
+				{
+					$this->wsL->sendText("Presance-Check: Here");
+					$this->PresentL = true;
+				}
 			}
 			if (($message = $this->wsR->recvText()) !== false)
 			{
-				$this->wsR->sendText("Presance-Check: Here");
-				$this->PresentR = true;
+				if ($this->PresentR && $message == "IAmHere")
+				{
+					$this->wsR->sendText("Presance-Check: Here");
+					$this->PresentR = true;
+				}
 			}
 
-			/*if ($this->PresentR = true && $this->PresentR = true)
+			if ($this->PresentL && $this->PresentR)
 			{
-				$this->PresentCheckingDone = false;
-			}*/
+				$this->PresentCheck();
+			}
 		}
 		else if ($this->PresentCheckTimeSec > 0)
 		{

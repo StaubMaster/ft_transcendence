@@ -141,6 +141,7 @@ class Frame
 			$this->payload_str = $buf;
 		}
 	}
+
 	public function send($socket)
 	{
 		if ($this->payload_str != null)
@@ -269,7 +270,6 @@ class WebSocket
 		$frame->setOpenCode(Frame::OpenCode_TextFrame);
 		$frame->setPayload($payload);
 		$frame->send($this->socket);
-		
 		if (($err = $frame->checkError()) !== false)
 		{
 			echo "Error: " . $err . "\n";
@@ -282,13 +282,13 @@ class WebSocket
 	private $PingPongLast;
 	private function pongRecv()
 	{
-		echo "==== pong ====\n";
+		//echo "==== pong ====\n";
 		$this->PingPongWait = false;
 		$this->PingPongLast = hrtime(true);
 	}
 	private function pingSent()
 	{
-		echo "==== ping ====\n";
+		//echo "==== ping ====\n";
 		$this->PingPongWait = true;
 		$this->PingPongLast = hrtime(true);
 	}

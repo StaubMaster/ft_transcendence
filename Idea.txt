@@ -1,16 +1,64 @@
 
-Match: a Singular Game
+how to connect with other players:
+- Player1 connects to server and gets an ID from the Server
+- Player2 connects to server and gets an ID from the Server
+- Player1 takes the ID from Player2 and sends an Invite
+- Server send the Invite to Player2, where it is Displayed in a List
+- Player2 Accepts Invite from Player1
 
-Websocket ClientL;
-Websocket ClientR;
+each Player (JavaScript) needs to be able to:
+- get an ID from the Server
+- display the ID
+- Acknowladge an Invite and add it to a List
+- Acknowladge an Invite Cancel and remove it from the List
+- Accapt an Invite
 
-constructor(cL, cR);
-- needs WebSocket connections to 2 (how ever many players) Clients
+the Server needs to be able to:
+- keep track of IDs and send them to Players
+- foreward Invites to Players
+ ? keep track of Players?
+  ? this is only really needed for telling others when to remove the Invite from the list
+  ? if the server keeps track of who got an Invite then it just tells those
+ ? otherwise
+  ? tell everyone everytime someone disconnects
+  ? this shouldn't cause security convernes since IDs are reassigned everytime someone reconnects
+  ? might cause spam if some connects and disconnects a lot
+- foreward and Invire Accept to a Player
+ - and start a Game for those Players
 
-verify_Player_presence():
-- wait certain amount of Time for both players to move
-- if 2 Player dosent move
-- - Math result is null
-- if 1 Player dosent move
-- - other Player wins
+
+
+Data on Server-Side:
+- List of Players
+- List of Games
+- Player:
+  - WebSocket
+  - ID
+  - isInAGame
+  - GameID ?
+
+Data on Player-Side:
+- ID
+
+
+
+
+
+
+
+how to handle commands: (this is kind of just approaching GET):
+- socket recieves a Message
+- parse the Message / decide which command it is
+? do an if else ?
+? put each command into its own function so the if else is more organized
+? make an extra class for commands ?
+
+- put command functions into seperate files based on how simmilar they are
+- make a class for commands
+class CCommand
+{
+	string command_Name;
+	function command_func();
+}
+- at the beginning of the program 
 

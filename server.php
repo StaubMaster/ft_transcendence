@@ -9,7 +9,9 @@ echo "<<<<\n";
 include 'socket_help.php';
 include 'WebSocket.php';
 include 'TimeCheck.php';
+include 'Player.php';
 include 'PongMatch.php';
+include 'Command.php';
 echo ">>>>\n";
 
 function HeaderFindValue($fheader, $fname)
@@ -46,12 +48,112 @@ if (socket_set_nonblock($server_socket) === false)
 }
 
 
+//	ticks are slow for debugging purposes
 $tickTimeCheck = new TimeCheck(1);
 $timeStart = hrtime(true);
 
-$websocketArr = array();
-$webSocketID = 0;
-$pongMatch = null;
+$playerArr = array();
+$pongMatchArr = array();
+
+function PlayersUpdate()
+{
+	global $playerArr;
+	$changeArr = false;
+	foreach ($playerArr as &$pl)
+	{
+		$pl->Update();
+		if ($pl->isRemove())
+		{
+			$changeArr = true;
+		}
+	}
+	if ($changeArr)
+	{
+		PlayersTrim();
+	}
+}
+function PlayersTrim()
+{
+	global $playerArr;
+	$newArr = array();
+	foreach ($playerArr as &$pl)
+	{
+		if (!$pl->isRemove())
+		{
+			array_push($newArr, $pl);
+		}
+		else
+		{
+			echo "---- Player ----\n";
+		}
+	}
+	$playerArr = $newArr;
+}
+function PlayersAdd($fsocket)
+{
+	echo "++++ Player ++++\n";
+	global $playerArr;
+	$new_pl = new CPlayer(new WebSocket($fsocket));
+	array_push($playerArr, $new_pl);
+	$client_socket = null;
+}
+function PlayersGetID($id)
+{
+	global $playerArr;
+	foreach ($playerArr as &$pl)
+	{
+		if ($pl->getID() == $id)
+		{
+			return $pl;
+		}
+	}
+	return null;
+}
+
+function PongMatchesUpdate()
+{
+	global $pongMatchArr;
+	$changeArr = false;
+	foreach ($pongMatchArr as &$pm)
+	{
+		$pm->Update();
+		if ($pm->isGameOver())
+		{
+			$changeArr = true;
+		}
+	}
+	if ($changeArr)
+	{
+		PongMatchesTrim();
+	}
+}
+function PongMatchesTrim()
+{
+	global $pongMatchArr;
+	$newArr = array();
+	foreach ($pongMatchArr as &$pm)
+	{
+		if (!$pm->isGameOver())
+		{
+			array_push($newArr, $pm);
+		}
+		else
+		{
+			echo "---- pong Match ----\n";
+			$pm->removePlayers();
+			$pm = null;
+		}
+	}
+	$pongMatchArr = $newArr;
+}
+function PongMatchesAdd($idL, $idR)
+{
+	echo "++++ pong Match ++++\n";
+	global $pongMatchArr;
+	$new_pm = new PongMatch(PlayersGetID($idL), PlayersGetID($idR));
+	$new_pm->PresentCheckWait();
+	array_push($pongMatchArr, $new_pm);
+}
 
 echo "loop\n";
 do
@@ -104,13 +206,8 @@ do
 						echo ".... WebSocket\n";
 						$websocket_accept = WebSocket::HandShake($websocket_key);
 						Respond101($client_socket, $websocket_accept);
-
-						$ws1 = new WebSocket($client_socket);	//	if ws here is the same as the loop above then the last gets overwriten
+						PlayersAdd($client_socket);
 						$client_socket = null;
-						$ws1->sendText("ID: " . $webSocketID);	//	make a struct to remember this / put it in the WebSocket class
-						$webSocketID++;
-						$num = array_push($websocketArr, $ws1);
-						echo "==== new Array Len : $num ====\n";
 					}
 				}
 				else { echo "!!!! Not File/Dir '$path'\n"; Respond400($client_socket); }
@@ -129,10 +226,10 @@ do
 	if ($tickTimeCheck->check())
 	{
 		$timeSec = round((hrtime(true) - $timeStart) / 1000000000);
-		echo "tick " . $timeSec . "s [" . count($websocketArr) . "]\n";
+		echo "tick " . $timeSec . "s [" . count($playerArr) . "] [" . count($pongMatchArr) . "]\n";
 
-		$changeArr = false;
-		foreach ($websocketArr as &$ws)
+		//$changeArr = false;
+		/*foreach ($websocketArr as &$ws)
 		{
 			if (($message = $ws->recvText()) !== false)
 			{
@@ -159,20 +256,61 @@ do
 				}
 			}
 			$websocketArr = $newArr;
+		}*/
+
+		/*foreach ($playerArr as &$pl)
+		{
+			$pl->Update();
+			if ($pl->isRemove())
+			{
+				$changeArr = true;
+			}
+			if (($invID = $pl->CheckInvite()) !== false)
+			{
+				$found = false;
+				foreach ($playerArr as &$pl2)
+				{
+					if ($pl->getID() != $pl2->getID())
+					{
+						$pl2->RequestInvite($pl->getID());
+						$found = true;
+						break;
+					}
+				}
+				if (!$found)
+				{
+					$pl->InviteIDNotFound();
+				}
+			}
+		}
+		if ($changeArr)
+		{
+			PlayersTrim();
+		}*/
+		PlayersUpdate();
+		PongMatchesUpdate();
+	}
+
+	/*if ($pongMatch == null)
+	{
+		$num = count($websocketArr);
+		if ($num >= 2 && !$websocketArr[$num - 1].isClose() && !$websocketArr[$num - 2].isClose())
+		{
+			echo "++++ pong Match ++++\n";
+			$pongMatch = new PongMatch($websocketArr[$num - 1], $websocketArr[$num - 2]);
+			$pongMatch->PresentCheckWait();
 		}
 	}
-
-	$num = count($websocketArr);
-	if ($num >= 2 && $pongMatch == null)
-	{
-		$pongMatch = new PongMatch($websocketArr[$num - 1], $websocketArr[$num - 2]);
-		$pongMatch->PresentCheckWait();
-	}
-
-	if ($pongMatch != null)
+	else
 	{
 		$pongMatch->Update();
-	}
+		//if ($pongMatch->isGameOver()) { echo "isGameOver: true\n"; } else { echo "isGameOver: false\n"; }
+		if ($pongMatch->isGameOver())
+		{
+			echo "---- pong Match ----\n";
+			$pongMatch = null;
+		}
+	}*/
 
 } while (true);
 

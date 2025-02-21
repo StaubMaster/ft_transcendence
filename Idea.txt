@@ -62,3 +62,12 @@ class CCommand
 }
 - at the beginning of the program 
 
+
+
+how to send data recieved from the Player to the Match vs handle in the Player itself:
+- the Player-Instance on the Server recieves a Message from the Client
+- sometimes these should be handled by the Player-Class and sometimes by the Match-Class
+Solution:
+move the handling into the Player-Class ?
+
+

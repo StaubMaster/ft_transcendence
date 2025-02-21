@@ -225,6 +225,8 @@ class WebSocket
 		socket_close($this->socket);
 	}
 
+	//	return Text Message if one was recieved, otherwise returns null
+	//	needs to be called regularly to check for pong
 	public function recvText()
 	{
 		if ($this->isClose)
@@ -276,8 +278,6 @@ class WebSocket
 		}
 	}
 
-
-
 	private $PingPongWait;
 	private $PingPongLast;
 	private function pongRecv()
@@ -313,7 +313,7 @@ class WebSocket
 			$t = hrtime(true);
 			if ($t - $this->PingPongLast > 3000000000)	//	3s
 			{
-				echo "==== no pong after 3s ====\n";
+				echo "!!!! PingPong TimeOut !!!!\n";
 				$this->close();
 			}
 		}

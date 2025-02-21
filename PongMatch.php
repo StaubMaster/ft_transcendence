@@ -6,19 +6,17 @@ class PongMatch
 	private $plL;
 	private $plR;
 
-	private $wsL;
-	private $wsR;
-
 	private $ScoreL;
 	private $ScoreR;
+
 	private $isGameOver;
 
 	function __construct($plL, $plR)
 	{
 		$this->plL = $plL;
 		$this->plR = $plR;
-		$this->wsL = $plL->joinGame(0);
-		$this->wsR = $plR->joinGame(0);
+		$plL->joinGame(0);
+		$plR->joinGame(0);
 
 		//$this->frameTickTime = 0;
 		$this->ScoreL = 0;
@@ -27,24 +25,13 @@ class PongMatch
 	}
 	function removePlayers()
 	{
-		$this->pl->leaveGame();
-		$this->pR->leaveGame();
+		$this->plL->leaveGame();
+		$this->plR->leaveGame();
 	}
 
 	public function isGameOver() { return $this->isGameOver; }
 	public function ScoreL() { return $this->ScoreL; }
 	public function ScoreR() { return $this->ScoreR; }
-
-	function ClientRecv()
-	{
-		//	recieve from Client and update Position
-		//	keep recieving until no more
-
-	}
-	function ClientSend()
-	{
-		
-	}
 
 	function checkSpecialGameOver($l, $r)
 	{
@@ -74,95 +61,88 @@ class PongMatch
 	private $PresentChecking;
 	private $PresentCheckTime;
 	private $PresentCheckTimeSec;
-	private $PresentL;
-	private $PresentR;
 	public function PresentCheckWait()
 	{
 		$this->PresentChecking = true;
 		$this->PresentCheckTime = new TimeCheck(1);
 		$this->PresentCheckTimeSec = 10;
-		$this->PresentL = false;
-		$this->PresentR = false;
+		$this->plL->isPresent = false;
+		$this->plR->isPresent = false;
 	}
 	public function PresentCheckWaitUpdate()
 	{
 		if (!$this->PresentCheckTime->check())
 		{
-			if ($this->wsL->isClose())
+			if ($this->plL->isRemove())
 			{
-				$this->PresentCheck();
+				$this->PresentCheckFinal();
 			}
-			if ($this->wsR->isClose())
+			if ($this->plR->isRemove())
 			{
-				$this->PresentCheck();
-			}
-
-			if (($message = $this->wsL->recvText()) !== false)
-			{
-				if ($this->PresentL && $message == "IAmHere")
-				{
-					$this->wsL->sendText("Presance-Check: Here");
-					$this->PresentL = true;
-				}
-			}
-			if (($message = $this->wsR->recvText()) !== false)
-			{
-				if ($this->PresentR && $message == "IAmHere")
-				{
-					$this->wsR->sendText("Presance-Check: Here");
-					$this->PresentR = true;
-				}
+				$this->PresentCheckFinal();
 			}
 
-			if ($this->PresentL && $this->PresentR)
+			if ($this->plL->isPresent && $this->plR->isPresent)
 			{
-				$this->PresentCheck();
+				$this->PresentCheckFinal();
 			}
 		}
 		else if ($this->PresentCheckTimeSec > 0)
 		{
 			echo "Present Check: " . $this->PresentCheckTimeSec . "\n";
-			$this->wsL->sendText("Presance-Check: " . $this->PresentCheckTimeSec);
-			$this->wsR->sendText("Presance-Check: " . $this->PresentCheckTimeSec);
+			if (!$this->plL->isPresent)
+				$this->plL->sendText("Presance-Check: " . $this->PresentCheckTimeSec);
+			if (!$this->plR->isPresent)
+				$this->plR->sendText("Presance-Check: " . $this->PresentCheckTimeSec);
 			$this->PresentCheckTimeSec--;
 		}
 		else
 		{
-			echo "Present Check: Done\n";
-			$this->wsL->sendText("Presance-Check: Done");
-			$this->wsR->sendText("Presance-Check: Done");
-			$this->PresentCheck();
+			$this->PresentCheckFinal();
 		}
 	}
-	public function PresentCheck()
+	public function PresentCheckFinal()
 	{
 		$this->PresentChecking = false;
 
 		//	check or disconnect
-		$this->checkSpecialGameOver(!$this->wsL->isClose(), !$this->wsR->isClose());
+		$this->checkSpecialGameOver(!$this->plL->isRemove(), !$this->plR->isRemove());
 
 		//	check Present
-		$this->checkSpecialGameOver($this->PresentL, $this->PresentR);
+		$this->checkSpecialGameOver($this->plL->isPresent, $this->plR->isPresent);
+
+		echo "Present Check: Done\n";
+		$this->plL->sendText("Presance-Check: Done");
+		$this->plR->sendText("Presance-Check: Done");
 	}
+
+
+	
+
 
 	private $debug = true;
 	public function Update()
 	{
+		$this->plL->Update();
+		$this->plR->Update();
+
+		$this->checkSpecialGameOver(!$this->plL->isRemove(), !$this->plR->isRemove());
+
 		if ($this->PresentChecking)
 		{
 			$this->PresentCheckWaitUpdate();
 		}
 
-		if (!$this->PresentChecking && $this->debug)
+		/*if (!$this->PresentChecking && $this->debug)
 		{
 			$this->debug = false;
 			if ($this->isGameOver) { echo "isGameOver: true\n"; } else { echo "isGameOver: false\n"; }
 			echo "isGameOver: " . $this->isGameOver . "\n";
 			echo "ScoreL: " . $this->ScoreL . "\n";
 			echo "ScoreR: " . $this->ScoreR . "\n";
-			echo "PresentL: " . $this->PresentL . "\n";
-			echo "PresentR: " . $this->PresentR . "\n";
-		}
+			echo "PresentL: " . $this->plL->isPresent . "\n";
+			echo "PresentR: " . $this->plR->isPresent . "\n";
+		}*/
 
 		/*
 		//	1 000 000 000		1s		1/s

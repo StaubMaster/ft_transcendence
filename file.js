@@ -45,6 +45,11 @@ zero, in which case the payload length is the length of the
 				var cut = e.data.substring("InviteRequestFrom: ".length);
 				console.log("InviteRequestFrom: '" + cut + "'");
 			}
+			else if (e.data.startsWith("Presance-Check: "))
+			{
+				var cut = e.data.substring("Presance-Check: ".length);
+				console.log("Presance-Check: '" + cut + "'");
+			}
 			else
 			{
 				console.log("message '" + e.data + "'");
@@ -73,16 +78,16 @@ function AcceptFunc()
 
 function test_func2()
 {
-	console.log("IAmHere");
+	//console.log("I-Am-Here");
 	if (ws != null)
 	{
-		ws.send("IAmHere");
+		ws.send("I-Am-Here");
 	}
 }
 
 function test_func3()
 {
-	console.log("Bye");
+	//console.log("Bye");
 	if (ws != null)
 	{
 		ws.send("Bye");

@@ -25,6 +25,15 @@ class CPlayer
 	{
 		return $this->ws->isClose();
 	}
+	public function recvText()
+	{
+		return $this->ws->recvText();
+	}
+	public function sendText($text)
+	{
+		$this->ws->sendText($text);
+	}
+
 	public function getID()
 	{
 		return $this->ID;
@@ -39,19 +48,18 @@ class CPlayer
 	{
 		$this->GameID = $gameID;
 		$this->ws->sendText("JoinedGame: " . $this->GameID);
-		return $this->ws;
 	}
+
+	public $isPresent;
 
 	public function Update()
 	{
 		$this->ws->checkConnectionUpdate();
 
-		if ($this->GameID != -1)
-			return;
-
 		if (($message = $this->ws->recvText()) !== false)
 		{
 			$CmdInviteRecv = new Command("InviteRequestTo: ");
+			$CmdIamHere = new Command("I-Am-Here");
 			if (($val = $CmdInviteRecv->value($message)) !== false)
 			{
 				$pl = PlayersGetID($val);
@@ -64,6 +72,11 @@ class CPlayer
 					$pl->ws->sendText("InviteRequestFrom: " . $this->ID);
 					PongMatchesAdd($this->ID, $pl->getID());
 				}
+			}
+			elseif (($val = $CmdIamHere->value($message)) !== false)
+			{
+				$this->isPresent = true;
+				$this->ws->sendText("Presance-Check: Here");
 			}
 			else
 			{

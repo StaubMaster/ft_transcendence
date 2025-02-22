@@ -10,6 +10,11 @@ include 'socket_help.php';
 include 'WebSocket.php';
 include 'TimeCheck.php';
 include 'Player.php';
+
+include 'Point.php';
+include 'Box.php';
+include 'VelBox.php';
+
 include 'PongMatch.php';
 include 'Command.php';
 echo ">>>>\n";

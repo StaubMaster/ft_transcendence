@@ -1,0 +1,24 @@
+
+body {
+	margin: 0;
+	display: block;
+}
+
+div {
+	outline: 1px solid black;
+	margin: 5px;
+	padding: 5px;
+	overflow: hidden;
+}
+
+p {
+	margin: 5px;
+}
+
+canvas {
+	width: 100%;
+	height: auto;
+	aspect-ratio: 2/1;
+	display: block;
+	background-color: gray;
+}

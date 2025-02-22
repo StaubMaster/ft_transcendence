@@ -1,54 +1,81 @@
 
 ws = null;
+ID = -1;
+gameID = -1;
 
-function test_func1()
+function socketConn()
 {
 	if (ws == null)
 	{
 		ws = new WebSocket("ws");
 		ws.binaryType = "arraybuffer";
-		ws.onerror = (event) => { console.log("socket error: ", event); };
-		ws.onclose = (event) => { console.log("socket closed:" + event.code + ":" + event.reason); ws = null; };
-		ws.onopen = function() { ws.send("hello"); };
-		/*ws.onopen = function() 
+		ws.onerror = function(e)
 		{
-			ws.send(
-`The length of the "Payload data", in bytes: if 0-125, that is the
-payload length.  If 126, the following 2 bytes interpreted as a
-16-bit unsigned integer are the payload length.  If 127, the
-following 8 bytes interpreted as a 64-bit unsigned integer (the
-most significant bit MUST be 0) are the payload length.  Multibyte
-length quantities are expressed in network byte order.  Note that
-in all cases, the minimal number of bytes MUST be used to encode
-the length, for example, the length of a 124-byte-long string
-can't be encoded as the sequence 126, 0, 124.  The payload length
-is the length of the "Extension data" + the length of the
-"Application data".  The length of the "Extension data" may be
-zero, in which case the payload length is the length of the
-"Application data".`
-);
-		};*/
+			showWebSocketStatus();
+			console.log("socket error: ", e);
+		};
+		ws.onclose = function(e)
+		{
+			ws = null; showWebSocketStatus();
+			ID = -1; showYourID();
+			console.log("socket closed:" + e.code + ":" + e.reason);
+		};
+		ws.onopen = function()
+		{
+			showWebSocketStatus();
+			showYourID();
+			ws.send("hello");
+		};
 		ws.onmessage = function(e)
 		{
-			if (e.data.startsWith("ID: "))
+			var cmd_ID = "ID: ";
+			var cmd_InviteRequestFrom = "Invite-Request-From: ";
+			var cmd_JoinedGame = "JoinedGame: ";
+			var cmd_LeftGame = "LeftGame: ";
+			var cmd_PlayingWith = "Playing-With: ";
+			var cmd_PresanceCheck = "Presance-Check: ";
+			var cmd_BallData = "Ball-Data: ";
+
+			if (e.data.startsWith(cmd_ID))
 			{
-				var cut = e.data.substring("ID: ".length);
-				console.log("ID: '" + cut + "'");
-				elem = document.getElementById("InviteYourID");
-				if (elem != null)
-				{
-					elem.textContent = "Your ID: " + cut;
-				}
+				var cut = e.data.substring(cmd_ID.length);
+				console.log(cmd_ID + "'" + cut + "'");
+				ID = cut;
+				showYourID();
 			}
-			else if (e.data.startsWith("InviteRequestFrom: "))
+			else if (e.data.startsWith(cmd_InviteRequestFrom))
 			{
-				var cut = e.data.substring("InviteRequestFrom: ".length);
-				console.log("InviteRequestFrom: '" + cut + "'");
+				var cut = e.data.substring(cmd_InviteRequestFrom.length);
+				console.log(cmd_InviteRequestFrom + "'" + cut + "'");
 			}
-			else if (e.data.startsWith("Presance-Check: "))
+			else if (e.data.startsWith(cmd_JoinedGame))
 			{
-				var cut = e.data.substring("Presance-Check: ".length);
-				console.log("Presance-Check: '" + cut + "'");
+				var cut = e.data.substring(cmd_JoinedGame.length);
+				var gameID = document.getElementById("gameID");
+				gameID.textContent = cut;
+			}
+			else if (e.data.startsWith(cmd_LeftGame))
+			{
+				var cut = e.data.substring(cmd_LeftGame.length);
+				var gameID = document.getElementById("gameID");
+				gameID.textContent = -1;
+			}
+			else if (e.data.startsWith(cmd_PlayingWith))
+			{
+				var cut = e.data.substring(cmd_PlayingWith.length);
+				var otherID = document.getElementById("otherID");
+				otherID.textContent = cut;
+			}
+			else if (e.data.startsWith(cmd_PresanceCheck))
+			{
+				var cut = e.data.substring(cmd_PresanceCheck.length);
+				var presanceCheckStatus = document.getElementById("presanceCheckStatus");
+				presanceCheckStatus.textContent = cut;
+			}
+			else if (e.data.startsWith(cmd_BallData))
+			{
+				var cut = e.data.substring(cmd_BallData.length);
+				console.log(cmd_BallData + "'" + cut + "'");
 			}
 			else
 			{
@@ -57,6 +84,42 @@ zero, in which case the payload length is the length of the
 		};
 	}
 }
+
+function socketDisc()
+{
+	if (ws != null)
+	{
+		ws.close();
+	}
+}
+
+
+
+function showWebSocketStatus()
+{
+	var elem = document.getElementById("socketStatus");
+
+	if (ws == null)
+	{
+		elem.textContent = "null";
+	}
+	else
+	{
+		if (ws.readyState == 0) { elem.textContent = "0 (CONNECTING)";}
+		else if (ws.readyState == 1) { elem.textContent = "1 (OPEN)";}
+		else if (ws.readyState == 2) { elem.textContent = "2 (CLOSING)";}
+		else if (ws.readyState == 3) { elem.textContent = "3 (CLOSED)";}
+		else { elem.textContent = ws.readyState + " (UNKNOWN)";}
+	}
+}
+
+function showYourID()
+{
+	var elem = document.getElementById("socketID");
+	elem.textContent = ID;
+}
+
+
 
 function InviteFunc()
 {
@@ -69,6 +132,8 @@ function InviteFunc()
 	ws.send("InviteRequestTo: " + invID);
 }
 
+
+
 function AcceptFunc()
 {
 	if (ws == null)
@@ -76,21 +141,18 @@ function AcceptFunc()
 
 }
 
-function test_func2()
+
+
+function I_Am_Here()
 {
-	//console.log("I-Am-Here");
 	if (ws != null)
 	{
 		ws.send("I-Am-Here");
 	}
 }
 
-function test_func3()
-{
-	//console.log("Bye");
-	if (ws != null)
-	{
-		ws.send("Bye");
-		ws.close();
-	}
-}
+import * as BABYLON from '@babylonjs/core';
+const canvas = document.getElementById('can');
+
+
+

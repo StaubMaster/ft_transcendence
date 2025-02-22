@@ -15,13 +15,17 @@ class PongMatch
 	{
 		$this->plL = $plL;
 		$this->plR = $plR;
-		$plL->joinGame(0);
-		$plR->joinGame(0);
+		$this->plL->joinGame(0);
+		$this->plR->joinGame(0);
+		$this->plL->sendText("Playing-With: " . $this->plR->getID());
+		$this->plR->sendText("Playing-With: " . $this->plL->getID());
 
 		//$this->frameTickTime = 0;
 		$this->ScoreL = 0;
 		$this->ScoreR = 0;
 		$this->isGameOver = false;
+
+		$this->InitBoxes();
 	}
 	function removePlayers()
 	{
@@ -117,7 +121,19 @@ class PongMatch
 	}
 
 
-	
+	public $Wall0;
+	public $Wall1;
+	public $Wall2;
+	public $Wall3;
+	public $Ball;
+	public function InitBoxes()
+	{
+		$this->Wall0 = new Box(new Point(+9, +9), new Point(+10, +10));
+		$this->Wall1 = new Box(new Point(-10, +9), new Point(-9, +10));
+		$this->Wall2 = new Box(new Point(+9, -10), new Point(+10, -9));
+		$this->Wall3 = new Box(new Point(-10, -10), new Point(-9, -9));
+		$this->Ball = new VelBox(new Box(new Point(1, 2), new Point(3, 3)), new Point(0.01, 0.02));
+	}
 
 
 	private $debug = true;
@@ -127,10 +143,15 @@ class PongMatch
 		$this->plR->Update();
 
 		$this->checkSpecialGameOver(!$this->plL->isRemove(), !$this->plR->isRemove());
+		if ($this->isGameOver)
+		{
+			return;
+		}
 
 		if ($this->PresentChecking)
 		{
 			$this->PresentCheckWaitUpdate();
+			return;
 		}
 
 		/*if (!$this->PresentChecking && $this->debug)
@@ -143,6 +164,11 @@ class PongMatch
 			echo "PresentL: " . $this->plL->isPresent . "\n";
 			echo "PresentR: " . $this->plR->isPresent . "\n";
 		}*/
+
+		$this->Ball->Move();
+		$ball_data = "Ball-Data: " . $this->Ball->toString();
+		$this->plL->sendText($ball_data);
+		$this->plR->sendText($ball_data);
 
 		/*
 		//	1 000 000 000		1s		1/s

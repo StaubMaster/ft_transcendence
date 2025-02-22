@@ -62,15 +62,22 @@ class CPlayer
 			$CmdIamHere = new Command("I-Am-Here");
 			if (($val = $CmdInviteRecv->value($message)) !== false)
 			{
-				$pl = PlayersGetID($val);
-				if ($pl == null)
+				if ($val == $this->ID)
 				{
-					$this->ws->sendText("IDNotFound: " . $val);
+					$this->ws->sendText("This-is-You: " . $val);
 				}
 				else
 				{
-					$pl->ws->sendText("InviteRequestFrom: " . $this->ID);
-					PongMatchesAdd($this->ID, $pl->getID());
+					$pl = PlayersGetID($val);
+					if ($pl == null)
+					{
+						$this->ws->sendText("ID-Not-Found: " . $val);
+					}
+					else
+					{
+						$pl->ws->sendText("Invite-Request-From: " . $this->ID);
+						PongMatchesAdd($this->ID, $pl->getID());
+					}
 				}
 			}
 			elseif (($val = $CmdIamHere->value($message)) !== false)

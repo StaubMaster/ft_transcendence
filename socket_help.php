@@ -163,10 +163,12 @@ function Respond101($fsocket, $faccept)
 	if (canSend($fsocket))
 		socket_write($fsocket, $header);
 }
-function Respond200($fsocket, $fbody)
+function Respond200($fsocket, $ftype, $fbody)
 {
 	$header = "";
 	$header .= "HTTP/1.1 200 OK\r\n";
+	if ($ftype != null)
+		$header .= "Content-Type: " . $ftype . "\r\n";
 	$header .= "\r\n";
 	$header .= $fbody;
 	if (canSend($fsocket))

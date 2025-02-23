@@ -151,8 +151,3 @@ function I_Am_Here()
 	}
 }
 
-import * as BABYLON from '@babylonjs/core';
-const canvas = document.getElementById('can');
-
-
-

@@ -203,7 +203,16 @@ do
 
 					if (($websocket_key = HeaderFindValue($header, "Sec-WebSocket-Key: ")) === false)
 					{
-						if (file_exists($path)) { echo ".... File '$path' found\n"; Respond200($client_socket, file_get_contents($path)); }
+						if (file_exists($path))
+						{
+							echo ".... File '$path' found\n";
+							$type = null;
+							if (str_ends_with($path, ".html")) { $type = "text/html"; }
+							if (str_ends_with($path, ".js")) { $type = "text/javascript"; }
+							if (str_contains($path, "@babylon")) { $type = "text/javascript"; }
+							//Content-Type: text/html
+							Respond200($client_socket, $type, file_get_contents($path));
+						}
 						else { echo "!!!! File '$path' not found\n"; Respond404($client_socket); }
 					}
 					else

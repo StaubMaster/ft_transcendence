@@ -194,6 +194,7 @@ do
 			{
 				if ($path[0] == '/')
 				{
+					echo "GET '" . $path . "'\n";
 					if ($path[-1] == '/')
 					{
 						$path = $path . "index.html";
@@ -205,7 +206,7 @@ do
 					{
 						if (file_exists($path))
 						{
-							echo ".... File '$path' found\n";
+							echo ".... File '$path' found 200\n";
 							$type = null;
 							if (str_ends_with($path, ".html")) { $type = "text/html"; }
 							if (str_ends_with($path, ".js")) { $type = "text/javascript"; }
@@ -213,7 +214,7 @@ do
 							//Content-Type: text/html
 							Respond200($client_socket, $type, file_get_contents($path));
 						}
-						else { echo "!!!! File '$path' not found\n"; Respond404($client_socket); }
+						else { echo "!!!! File '$path' not found 404\n"; Respond404($client_socket); }
 					}
 					else
 					{
@@ -224,11 +225,11 @@ do
 						$client_socket = null;
 					}
 				}
-				else { echo "!!!! Not File/Dir '$path'\n"; Respond400($client_socket); }
+				else { echo "!!!! Not File/Dir '$path' 400\n"; Respond400($client_socket); }
 			}
-			else { echo "!!!! Unknown Method '$method'\n"; Respond400($client_socket); }
+			else { echo "!!!! Unknown Method '$method' 400\n"; Respond400($client_socket); }
 		}
-		else { echo "!!!! bad header read\n"; Respond400($client_socket); }
+		else { echo "!!!! bad header read 400\n"; Respond400($client_socket); }
 	}
 
 	if ($client_socket != null)

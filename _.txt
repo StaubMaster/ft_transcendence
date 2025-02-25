@@ -1,0 +1,130 @@
+a lot of the things we need arent on the school computers
+installing them requires admin
+so i guess this needs to be done in a virtual machine
+
+
+
+
+
+==== Max% :::: Live Chat ====
+do as frontend
+just send all normal chat text to everyone
+and the frontend can remember who to block
+see others profiles ?
+so if youre in a game have a seperate div to the side to show the profile ?
+or hide the game to show the profile
+guess thats what the back and foreward buttons in the browser are for ?
+
+
+
+
+
+==== Min% :::: Dashboards ====
+store all kinds of stuff on in the database
+"user-friendly"
+
+"game statistics":
+Total Games played :
+Win/Loss :
+
+"game sessions":
+	"detailed statistics" "historical data for each match"
+	so how long it took between each point ?
+#-----------#----------#-----------#----------#----------#
+| SessionID | Duration | Score L/R | Player-L | Player-R |
+#-----------#----------#-----------#----------#----------#
+#---------#-----------------#-----------------#---------------------#---------------#---------------#
+| Point n | Time from Start | Time from Serve | Bounces until Point | Served By L/R | Missed by L/R |
+#---------#-----------------#-----------------#---------------------#---------------#---------------#
+only show the top thing in a table
+when you click on one the bottom one gets shown
+put a graph ?
+
+sort Sessions ?
+by Recent (high/low)
+by Duration (high/low)
+by Time per Point (high/low)
+by user
+
+show in user profile
+
+
+
+
+
+==== Tournament ====
+- create a Lobby, creator is "Host"
+  - Lobby ID
+- public / hidden / private
+  public: Lobbys are show in a "Lobby-Browser", anyone can join
+  hidden: not shown in "Lobby-Browser", you need the Lobby ID to join
+  private: you need to be Invited to join
+hidden and private are kind of the same:
+
+- Host control over Lobby during creation:
+	- show in Lobby-browser: bool
+	- allow others to invite: bool
+	- join by ID: bool
+	- user Limit: int
+- Host control over Lobby when active:
+	- kick users
+	- force Tournament start
+	- close Tournament
+
+Div for active Users:
+#------------------------------------------#
+| ID: 0                                    |
+| Users: 1      [refresh]                  |
+| #------#----#---------#----------------# |
+| | User | ID | Status  | Invite         | |
+| #------#----#---------#----------------# |
+| | usr1 |  1 | in game | none           | |
+| | usr2 |  2 | in game | invited by you | |
+| | usr3 |  3 | in game | invites you    | |
+| #------#----#---------#----------------# |
+| [Invite selected]                        |
+#------------------------------------------#
+when a lot of people are on the server this could be a lot of data ?
+in practice there wont be that many so ignore the problem
+only send data when refresh is hit
+unselect by clicking next to table
+
+
+Div for Invites (Recieved):
+#-------------------------------------#
+| Invites (#number of invites#)       |
+| #----------------#------#           |
+| | Invite By User | Type |           |
+| #----------------#------#           |
+| | user1          | 1v1  |           |
+| | user1          | Tour |           |
+| #----------------#------#           |
+| [Reject All]     [Accept selected]  |
+#-------------------------------------#
+
+Div for Tournament (as Host):
+#--------------------------------#
+| Tour ID: 0                     |
+| Starting in : 123s [start now] |
+| Users: 2                       |
+| #-------#-----#                |
+| | User  | W/L |                |
+| #-------#-----#                |
+| | user1 | 1/2 |                |
+| | user2 | 0/9 |                |
+| #-------#-----#                |
+| [kick selected]                |
+| #----------------------------# |
+| | chat ?                     | |
+| #----------------------------# |
+#--------------------------------#
+
+Div for Lobby-Browser:
+#------------------------#
+| Lobbys: 123            |
+| #-----#--------------# |
+| | ID  | num of Users | |
+| #-----#--------------# |
+| | 101 | 3/256        | |
+| #-----#--------------# |
+#------------------------#

@@ -155,6 +155,8 @@ function I_Am_Here()
 
 
 
+var userTableID = -1;
+var userTableStatus = "";
 function table_users_refresh()
 {
 	var table = document.getElementById("table-users");
@@ -164,8 +166,10 @@ function table_users_refresh()
 		table.deleteRow(1);
 	}
 
+	var url = "http://localhost:5000/UserTable";
+	if (ID != -1) { url += "%" + ID; }
 	var xhl_req = new XMLHttpRequest();
-	xhl_req.open("GET", "http://localhost:5000/UserTable", false);	//	gives console warning
+	xhl_req.open("GET", url, false);	//	gives console warning
 	xhl_req.send(null);
 
 	var data = JSON.parse(xhl_req.responseText);
@@ -184,23 +188,49 @@ function table_users_refresh()
 		cell_status.textContent = data[i].Status;
 	}
 }
-function table_users_row_func(row)
+function table_users_row_func(rowIdx)
 {
-	console.log(row);
 	var table = document.getElementById("table-users");
 	var rows = table.rows;
 	for (var i = 0; i < rows.length; i++)
 	{
-		if (i == row)
-		{
+		if (i == rowIdx)
 			rows[i].style.backgroundColor = "#777777";
+		else if (i % 2 == 0)
+			rows[i].style.backgroundColor = "#DDDDDD";
+		else
+			rows[i].style.backgroundColor = "#EEEEEE";
+	}
+
+	var button = document.getElementById("users-invite-button");
+	if (rowIdx != -1)
+	{
+		var row = table.rows[rowIdx];
+		userTableID = row.cells[0].textContent;
+		userTableStatus = row.cells[2].textContent;
+		if (userTableID != ID)
+		{
+			button.disabled = false;
 		}
 		else
 		{
-			if (i % 2 == 0)
-				rows[i].style.backgroundColor = "#DDDDDD";
-			else
-				rows[i].style.backgroundColor = "#EEEEEE";
+			userTableID = -1;
+			userTableStatus = "";
+			button.disabled = true;
 		}
 	}
+	else
+	{
+		userTableID = -1;
+		userTableStatus = "";
+		button.disabled = true;
+	}
+}
+function table_users_invite()
+{
+	if (userTableID == -1)
+		return;
+	if (ws == null)
+		return;
+	ws.send("InviteRequestTo: " + userTableID);
 }

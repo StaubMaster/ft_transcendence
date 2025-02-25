@@ -32,24 +32,9 @@
 					<th>User</th>
 					<th>Status</th>
 				</tr>
-				<tr onclick="table_users_row_func(1)">
-					<td>1</td>
-					<td>user1</td>
-					<td>free</td>
-				</tr>
-				<tr onclick="table_users_row_func(2)">
-					<td>2</td>
-					<td>LongNameForTheTable</td>
-					<td>free</td>
-				</tr>
-				<tr onclick="table_users_row_func(3)">
-					<td>2</td>
-					<td>01234567890123456789</td>
-					<td>busy</td>
-				</tr>
 			</table>
 			<button type="button" onclick="table_users_refresh()">Refresh</button>
-			<button type="button" disabled="disabled">Accept</button>
+			<button type="button" id="users-invite-button" onclick="table_users_invite()" disabled="disabled">Invite/Accept</button>
 			<br>
 		</div>
 

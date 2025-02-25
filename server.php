@@ -216,17 +216,19 @@ do
 							//Content-Type: text/html
 							Respond200($client_socket, $type, file_get_contents($path));
 						}
-						else if ($path == "UserTable")
+						else if (str_starts_with($path, "UserTable"))
 						{
+							$id = -1;
+							if (($pos = strpos($path, "%")) !== false)
+							{
+								$id = substr($path, $pos + 1);
+							}
+
 							$table_users = '[';
 							for ($i = 0; $i < count($playerArr); $i++)
 							{
 								if ($i != 0) { $table_users .= ','; }
-								$table_users .= '{';
-								$table_users .= '"ID":' . $playerArr[$i]->getID() . ',';
-								$table_users .= '"User":"' . 'placeholder' . '",';
-								$table_users .= '"Status":"' . 'free' . '"';
-								$table_users .= '}';
+								$table_users .= $playerArr[$i]->getTableUser($id);
 							}
 							$table_users .= ']';
 							Respond200($client_socket, "text/html", $table_users);

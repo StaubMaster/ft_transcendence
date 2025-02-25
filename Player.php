@@ -38,6 +38,25 @@ class CPlayer
 	{
 		return $this->ID;
 	}
+	public function getTableUser($id)
+	{
+		$str = '{';
+		$str .= '"ID":' . $this->ID . ',';
+		$str .= '"User":"' . 'placeholder' . '",';
+
+		$str .= '"Status":"';
+		if ($this->ID == $id)
+		{
+			$str .= "self";
+		}
+		else
+		{
+			$str .= "free";
+		}
+		$str .= '"';
+
+		return $str . "}";
+	}
 
 	public function leaveGame()
 	{

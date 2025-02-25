@@ -174,6 +174,8 @@ do
 	if ($client_socket != null)
 	{
 		echo "incomming\n";
+		/*if (!socket_getpeername($client_socket, $addr, $port)) { echo "ERR\n"; }
+		echo "addr '$addr' port '$port'\n";*/
 		$header = socket_client_read_header($client_socket);
 		echo "header reading done\n";
 
@@ -213,6 +215,21 @@ do
 							if (str_contains($path, "@babylon")) { $type = "text/javascript"; }
 							//Content-Type: text/html
 							Respond200($client_socket, $type, file_get_contents($path));
+						}
+						else if ($path == "UserTable")
+						{
+							$table_users = '[';
+							for ($i = 0; $i < count($playerArr); $i++)
+							{
+								if ($i != 0) { $table_users .= ','; }
+								$table_users .= '{';
+								$table_users .= '"ID":' . $playerArr[$i]->getID() . ',';
+								$table_users .= '"User":"' . 'placeholder' . '",';
+								$table_users .= '"Status":"' . 'free' . '"';
+								$table_users .= '}';
+							}
+							$table_users .= ']';
+							Respond200($client_socket, "text/html", $table_users);
 						}
 						else { echo "!!!! File '$path' not found 404\n"; Respond404($client_socket); }
 					}

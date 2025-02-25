@@ -72,22 +72,53 @@ hidden and private are kind of the same:
 	- close Tournament
 
 Div for active Users:
-#------------------------------------------#
-| ID: 0                                    |
-| Users: 1      [refresh]                  |
-| #------#----#---------#----------------# |
-| | User | ID | Status  | Invite         | |
-| #------#----#---------#----------------# |
-| | usr1 |  1 | in game | none           | |
-| | usr2 |  2 | in game | invited by you | |
-| | usr3 |  3 | in game | invites you    | |
-| #------#----#---------#----------------# |
-| [Invite selected]                        |
-#------------------------------------------#
+#-------------------------------#
+| ID: 0                         |
+| Users: 1            [refresh] |
+| #------#----#---------------# |
+| | User | ID | Status        | |
+| #------#----#---------------# |
+| | usr1 |  1 | in game       | |
+| | usr2 |  2 | invite by you | |
+| | usr3 |  3 | invite to you | |
+| | usr4 |  3 | none          | |
+| #------#----#---------------# |
+| [Invite selected]             |
+#-------------------------------#
 when a lot of people are on the server this could be a lot of data ?
 in practice there wont be that many so ignore the problem
 only send data when refresh is hit
 unselect by clicking next to table
+? send this stuff over websocket or with GET Request
+I think websocket should be used for Game Sessions
+and for stuff like this, use HTTP
+? but what if I want it to Live Update
+the Use is still connected over WebSocket so just use that to call the refresh function
+? how to send this Data
+as JSON ?
+? how does the Server remember Invites
+every User has 2 Arrays for gotten and sent Invites
+. show seperatly
+if I show everything in one then the server would go over each User on the Server
+then for the current User go over both Arrays to check for Invite Status
+this could be time consuming
+. just ignore
+since the Server wont have that many Users on it
+and each User wont send that many Invites
+this is the kind of optimization that is not needed for this project
+and that just wastes time
+? if I use GET, how does the Server know what user sent the request
+. use address
+maybe, but with localhost the address is just localhost
+how would the server know if your logged in anyway
+. when you sign in / first connect, the Server sends you a PassCode thing
+when you send a get you need to send this too
+now there is a cyber issue
+for testing just make the client send the user ID
+later on make the Server retrieve the ID itself
+
+
+
 
 
 Div for Invites (Recieved):

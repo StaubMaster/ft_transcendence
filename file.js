@@ -151,3 +151,56 @@ function I_Am_Here()
 	}
 }
 
+
+
+
+
+function table_users_refresh()
+{
+	var table = document.getElementById("table-users");
+	var rows = table.rows;
+	while (rows.length > 1)
+	{
+		table.deleteRow(1);
+	}
+
+	var xhl_req = new XMLHttpRequest();
+	xhl_req.open("GET", "http://localhost:5000/UserTable", false);	//	gives console warning
+	xhl_req.send(null);
+
+	var data = JSON.parse(xhl_req.responseText);
+	for (var i = 0; i < data.length; i++)
+	{
+		var row = table.insertRow(i + 1);
+		var cell_id = row.insertCell(0);
+		var cell_user = row.insertCell(1);
+		var cell_status = row.insertCell(2);
+
+		var func = new Function("table_users_row_func(" + (i + 1) + ");");
+		row.onclick = func;
+
+		cell_id.textContent = data[i].ID;
+		cell_user.textContent = data[i].User;
+		cell_status.textContent = data[i].Status;
+	}
+}
+function table_users_row_func(row)
+{
+	console.log(row);
+	var table = document.getElementById("table-users");
+	var rows = table.rows;
+	for (var i = 0; i < rows.length; i++)
+	{
+		if (i == row)
+		{
+			rows[i].style.backgroundColor = "#777777";
+		}
+		else
+		{
+			if (i % 2 == 0)
+				rows[i].style.backgroundColor = "#DDDDDD";
+			else
+				rows[i].style.backgroundColor = "#EEEEEE";
+		}
+	}
+}

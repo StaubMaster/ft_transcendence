@@ -22,3 +22,27 @@ canvas {
 	display: block;
 	background-color: gray;
 }
+
+table {
+	border-collapse: collapse;
+}
+td, th {
+	border: 1px solid #000000;
+	text-align: left;
+	padding: 0px 8px;
+}
+th {
+	cursor: default;
+}
+td {
+	cursor: pointer;
+}
+tr:nth-child(even) {
+	background-color: #EEEEEE;
+}
+tr:nth-child(odd) {
+	background-color: #DDDDDD;
+}
+.selected {
+	background-color: #777777;
+}

@@ -7,6 +7,7 @@ class CPlayer
 
 	private $ws;
 	private $ID;
+	private $Name;
 
 	private $InvitesSendArr;
 	private $InvitesRecvArr;
@@ -18,6 +19,7 @@ class CPlayer
 		$this->ws = $ws;
 
 		$this->ID = self::$GlobalID;
+		$this->Name = "<<placeholder>>";
 		$this->ws->sendText("ID: " . self::$GlobalID);
 		self::$GlobalID++;
 
@@ -76,7 +78,7 @@ class CPlayer
 	{
 		$str = '{';
 		$str .= '"ID":' . $this->ID . ',';
-		$str .= '"User":"' . 'placeholder' . '",';
+		$str .= '"User":"' . $this->Name . '",';
 
 		$str .= '"Status":"';
 		if ($this->ID == $id)
@@ -88,7 +90,7 @@ class CPlayer
 			$invS = $this->InviteSendCheck($id);
 			$invR = $this->InviteRecvCheck($id);
 			if ($invS == false && $invR == false)
-				$str .= "free";
+				$str .= "none";
 			else if ($invS == true && $invR == false)
 				$str .= "invites you";
 			else if ($invS == false && $invR == true)
@@ -119,9 +121,14 @@ class CPlayer
 
 		if (($message = $this->ws->recvText()) !== false)
 		{
+			$CmdChangeName = new Command("Change-Name: ");
 			$CmdInviteRecv = new Command("InviteRequestTo: ");
 			$CmdIamHere = new Command("I-Am-Here");
-			if (($val = $CmdInviteRecv->value($message)) !== false)
+			if (($val = $CmdChangeName->value($message)) !== false)
+			{
+				$this->Name = $val;
+			}
+			else if (($val = $CmdInviteRecv->value($message)) !== false)
 			{
 				if ($val == $this->ID)
 				{

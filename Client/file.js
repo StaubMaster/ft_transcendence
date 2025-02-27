@@ -1,10 +1,15 @@
 
 ws = null;
 ID = -1;
+Name = "";
 gameID = -1;
 
 function socketConn()
 {
+	var nameField = document.getElementById("connection-name-field");
+	Name = nameField.value;
+	console.log(Name);
+
 	if (ws == null)
 	{
 		ws = new WebSocket("ws");
@@ -24,7 +29,7 @@ function socketConn()
 		{
 			showWebSocketStatus();
 			showYourID();
-			ws.send("hello");
+			ws.send("Change-Name: " + Name);
 		};
 		ws.onmessage = function(e)
 		{
@@ -187,6 +192,11 @@ function browse_users_table_refresh()
 		cell_user.textContent = data[i].User;
 		cell_status.textContent = data[i].Status;
 	}
+
+	var label_your_ID = document.getElementById("browse-users-your-ID");
+	var label_count = document.getElementById("browse-users-count");
+	label_your_ID.textContent = ID;
+	label_count.textContent = data.length;
 
 	browse_users_table_row_func(-1);
 }

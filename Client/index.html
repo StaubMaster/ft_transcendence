@@ -11,6 +11,7 @@
 	<body>
 
 		<div>
+			<input type="text" id="connection-name-field" placeholder="UserName"><br>
 			<button type="button" onclick="socketConn()">Connect</button>
 			<button type="button" onclick="socketDisc()">Disconnect</button>
 			<button type="button" onclick="socketCheck()">Check</button>
@@ -24,8 +25,8 @@
 		</div>
 
 		<div id="browse-users">
-			<label>ID: </label><label>0</label><br>
-			<label>Users: </label><label>0</label><br>
+			<label>ID: </label><label id="browse-users-your-ID">0</label><br>
+			<label>Users: </label><label id="browse-users-count">0</label><br>
 			<table id="browse-users-table">
 				<tr onclick="browse_users_table_row_func(-1)">
 					<th>ID</th>

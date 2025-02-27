@@ -36,12 +36,15 @@ function HeaderFindValue($fheader, $fname)
 	}
 }
 
+$timeStart = hrtime(true);
 
 while (true)
 {
 	if (($server_socket = socket_server_create('127.0.0.1', 5000)) === false)
 	//if (($server_socket = socket_server_create('192.168.0.208', 10000)) === false)	//	IP for LAN at home, dosent
 	{
+		$timeSec = round((hrtime(true) - $timeStart) / 1000000000);
+		echo "${timeSec}s\n";
 		sleep(1);
 	}
 	else
@@ -57,63 +60,6 @@ if (socket_set_nonblock($server_socket) === false)
 
 //	ticks are slow for debugging purposes
 $tickTimeCheck = new TimeCheck(1);
-$timeStart = hrtime(true);
-
-/*$UserArr = array();
-function PlayersUpdate()
-{
-	global $UserArr;
-	$changeArr = false;
-	foreach ($UserArr as &$pl)
-	{
-		$pl->Update();
-		if ($pl->isRemove())
-		{
-			$changeArr = true;
-		}
-	}
-	if ($changeArr)
-	{
-		PlayersTrim();
-	}
-}
-function PlayersTrim()
-{
-	global $UserArr;
-	$newArr = array();
-	foreach ($UserArr as &$pl)
-	{
-		if (!$pl->isRemove())
-		{
-			array_push($newArr, $pl);
-		}
-		else
-		{
-			echo "---- Player ----\n";
-		}
-	}
-	$UserArr = $newArr;
-}
-function PlayersAdd($fsocket)
-{
-	echo "++++ Player ++++\n";
-	global $UserArr;
-	$new_pl = new CPlayer(new WebSocket($fsocket));
-	array_push($UserArr, $new_pl);
-	$client_socket = null;
-}
-function PlayersGetID($id)
-{
-	global $UserArr;
-	foreach ($UserArr as &$pl)
-	{
-		if ($pl->getID() == $id)
-		{
-			return $pl;
-		}
-	}
-	return null;
-}*/
 
 $SessionPongArr = array();
 function SessionPongUpdate()
@@ -164,13 +110,11 @@ function SessionPongAdd($usrL, $usrR)
 echo "loop\n";
 do
 {
-	//echo "here 1\n";
 	if (($client_socket = socket_server_accept($server_socket)) === false)
 	{
 		echo "socket_server_accept(): " . socket_strerror(socket_last_error($server_socket)) . "\n";
 		break;
 	}
-	//echo "here 2\n";
 
 	if ($client_socket != null)
 	{
@@ -195,7 +139,6 @@ do
 					echo ".... WebSocket\n";
 					$websocket_accept = WebSocket::HandShake($websocket_key);
 					Respond101($client_socket, $websocket_accept);
-					//PlayersAdd($client_socket);
 					UsersArray_AddBySocket($client_socket);
 					$client_socket = null;
 				}
@@ -245,10 +188,8 @@ do
 	if ($tickTimeCheck->check())
 	{
 		$timeSec = round((hrtime(true) - $timeStart) / 1000000000);
-		//echo "tick " . $timeSec . "s [" . count($UserArr) . "] [" . count($SessionPongArr) . "]\n";
 		echo "tick " . $timeSec . "s [" . count($UsersArray) . "] [" . count($SessionPongArr) . "]\n";
 
-		//PlayersUpdate();
 		UsersArray_Update();
 		SessionPongUpdate();
 	}

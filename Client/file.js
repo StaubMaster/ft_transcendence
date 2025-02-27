@@ -8,7 +8,6 @@ function socketConn()
 {
 	var nameField = document.getElementById("connection-name-field");
 	Name = nameField.value;
-	console.log(Name);
 
 	if (ws == null)
 	{
@@ -37,100 +36,48 @@ function socketConn()
 
 			var cmd_BallData = "Ball-Data: ";
 
-			var cmd_SessionID = "Session-ID: ";
-			var cmd_SessionState = "Session-State: ";
+			var message_to_element = [
+				["Session-ID: "     , "session-ID"],
+				["Session-State: "  , "session-state"],
+				["Session-L-ID: "   , "session-L-ID"],
+				["Session-L-Name: " , "session-L-name"],
+				["Session-L-Score: ", "session-L-score"],
+				["Session-L-State: ", "session-L-state"],
+				["Session-R-ID: "   , "session-R-ID"],
+				["Session-R-Name: " , "session-R-name"],
+				["Session-R-Score: ", "session-R-score"],
+				["Session-R-State: ", "session-R-state"],
+			];
 
-			var cmd_SessionLID = "Session-L-ID: ";
-			var cmd_SessionLName = "Session-L-Name: ";
-			var cmd_SessionLScore = "Session-L-Score: ";
-			var cmd_SessionLState = "Session-L-State: ";
-
-			var cmd_SessionRID = "Session-R-ID: ";
-			var cmd_SessionRName = "Session-R-Name: ";
-			var cmd_SessionRScore = "Session-R-Score: ";
-			var cmd_SessionRState = "Session-R-State: ";
+			var found = false;
+			for (var i = 0; i < message_to_element.length; i++)
+			{
+				var header = message_to_element[i][0];
+				var element = message_to_element[i][1];
+				if (e.data.startsWith(header))
+				{
+					var cut = e.data.substring(header.length);
+					var elem = document.getElementById(element);
+					elem.textContent = cut;
+					found = true;
+				}
+			}
+			if (found)
+			{
+				return;
+			}
 
 			if (e.data.startsWith(cmd_ID))
 			{
 				var cut = e.data.substring(cmd_ID.length);
-				console.log(cmd_ID + "'" + cut + "'");
 				ID = cut;
 				showYourID();
 			}
-
 			else if (e.data.startsWith(cmd_BallData))
 			{
 				var cut = e.data.substring(cmd_BallData.length);
 				console.log(cmd_BallData + "'" + cut + "'");
 			}
-
-
-
-			else if (e.data.startsWith(cmd_SessionID))
-			{
-				var cut = e.data.substring(cmd_SessionID.length);
-				var elem = document.getElementById("session-ID");
-				elem.textContent = cut;
-			}
-			else if (e.data.startsWith(cmd_SessionState))
-			{
-				var cut = e.data.substring(cmd_SessionState.length);
-				var elem = document.getElementById("session-state");
-				elem.textContent = cut;
-			}
-
-			else if (e.data.startsWith(cmd_SessionLID))
-			{
-				var cut = e.data.substring(cmd_SessionLID.length);
-				var elem = document.getElementById("session-L-ID");
-				elem.textContent = cut;
-			}
-			else if (e.data.startsWith(cmd_SessionLName))
-			{
-				var cut = e.data.substring(cmd_SessionLName.length);
-				var elem = document.getElementById("session-L-name");
-				elem.textContent = cut;
-			}
-			else if (e.data.startsWith(cmd_SessionLScore))
-			{
-				var cut = e.data.substring(cmd_SessionLScore.length);
-				var elem = document.getElementById("session-L-score");
-				elem.textContent = cut;
-			}
-			else if (e.data.startsWith(cmd_SessionLState))
-			{
-				var cut = e.data.substring(cmd_SessionLState.length);
-				var elem = document.getElementById("session-L-state");
-				elem.textContent = cut;
-			}
-
-			else if (e.data.startsWith(cmd_SessionRID))
-			{
-				var cut = e.data.substring(cmd_SessionRID.length);
-				var elem = document.getElementById("session-R-ID");
-				elem.textContent = cut;
-			}
-			else if (e.data.startsWith(cmd_SessionRName))
-			{
-				var cut = e.data.substring(cmd_SessionRName.length);
-				var elem = document.getElementById("session-R-name");
-				elem.textContent = cut;
-			}
-			else if (e.data.startsWith(cmd_SessionRScore))
-			{
-				var cut = e.data.substring(cmd_SessionRScore.length);
-				var elem = document.getElementById("session-R-score");
-				elem.textContent = cut;
-			}
-			else if (e.data.startsWith(cmd_SessionRState))
-			{
-				var cut = e.data.substring(cmd_SessionRState.length);
-				var elem = document.getElementById("session-R-state");
-				elem.textContent = cut;
-			}
-
-
-
 			else
 			{
 				console.log("message '" + e.data + "'");

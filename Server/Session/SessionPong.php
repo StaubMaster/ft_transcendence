@@ -16,8 +16,6 @@ class SessionPong
 	const Header_SessionRScore = "Session-R-Score: ";
 	const Header_SessionRState = "Session-R-State: ";
 
-
-
 	private $plL;
 	private $plR;
 
@@ -76,51 +74,38 @@ class SessionPong
 	{
 		$this->SendAllPlayers(self::Header_SessionLScore . $this->ScoreL);
 		$this->SendAllPlayers(self::Header_SessionRScore . $this->ScoreR);
-
 	}
 
-	function checkSpecialGameOver($l, $r)
-	{
-		if ($l == false || $r == false)
-		{
-			$this->isGameOver = true;
-			if ($l == false)
-				$this->ScoreL = -1;
-			if ($r == false)
-				$this->ScoreR = -1;
-		}
-	}
-	function returnScoreWithText($good, $bad)
-	{
-		$this->SendScore();
-
-		$l = self::Header_SessionLState;
-		if ($this->ScoreL == -1) { $l .= $bad; } else { $l .= $good; }
-
-		$r = self::Header_SessionRState;
-		if ($this->ScoreR == -1) { $r .= $bad; } else { $r .= $good; }
-
-		$this->SendAllPlayers($l);
-		$this->SendAllPlayers($r);
-	}
 	function checkPlayersPresance()
 	{
-		$this->checkSpecialGameOver($this->plL->isPresent, $this->plR->isPresent);
-		if ($this->isGameOver)
+		if (!$this->plL->isPresent || !$this->plR->isPresent)
 		{
+			$this->isGameOver = true;
+			$this->SendScore();
 			$this->SendAllPlayers(self::Header_SessionState . "Presance Check Failed");
-			$this->returnScoreWithText("was here", "wasn't here");
+			$l = self::Header_SessionLState;
+			$r = self::Header_SessionRState;
+			if ($this->plL->isPresent) { $l .= "was here"; } else { $l .= "wasn't here"; }
+			if ($this->plR->isPresent) { $r .= "was here"; } else { $r .= "wasn't here"; }
+			$this->SendAllPlayers($l);
+			$this->SendAllPlayers($r);
 			return true;
 		}
 		return false;
 	}
 	function checkPlayersConnected()
 	{
-		$this->checkSpecialGameOver(!$this->plL->isRemove(), !$this->plR->isRemove());
-		if ($this->isGameOver)
+		if ($this->plL->isRemove() || $this->plR->isRemove())
 		{
+			$this->isGameOver = true;
+			$this->SendScore();
 			$this->SendAllPlayers(self::Header_SessionState . "Disconnection");
-			$this->returnScoreWithText("default", "disconnected");
+			$l = self::Header_SessionLState;
+			$r = self::Header_SessionRState;
+			if ($this->plL->isRemove()) { $l .= "disconnected"; } else { $l .= "default"; }
+			if ($this->plR->isRemove()) { $r .= "disconnected"; } else { $r .= "default"; }
+			$this->SendAllPlayers($l);
+			$this->SendAllPlayers($r);
 			return true;
 		}
 		return false;

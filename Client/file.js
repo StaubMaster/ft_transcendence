@@ -34,12 +34,21 @@ function socketConn()
 		ws.onmessage = function(e)
 		{
 			var cmd_ID = "ID: ";
-			var cmd_InviteRequestFrom = "Invite-Request-From: ";
-			var cmd_JoinedGame = "JoinedGame: ";
-			var cmd_LeftGame = "LeftGame: ";
-			var cmd_PlayingWith = "Playing-With: ";
-			var cmd_PresanceCheck = "Presance-Check: ";
+
 			var cmd_BallData = "Ball-Data: ";
+
+			var cmd_SessionID = "Session-ID: ";
+			var cmd_SessionState = "Session-State: ";
+
+			var cmd_SessionLID = "Session-L-ID: ";
+			var cmd_SessionLName = "Session-L-Name: ";
+			var cmd_SessionLScore = "Session-L-Score: ";
+			var cmd_SessionLState = "Session-L-State: ";
+
+			var cmd_SessionRID = "Session-R-ID: ";
+			var cmd_SessionRName = "Session-R-Name: ";
+			var cmd_SessionRScore = "Session-R-Score: ";
+			var cmd_SessionRState = "Session-R-State: ";
 
 			if (e.data.startsWith(cmd_ID))
 			{
@@ -48,40 +57,80 @@ function socketConn()
 				ID = cut;
 				showYourID();
 			}
-			else if (e.data.startsWith(cmd_InviteRequestFrom))
-			{
-				var cut = e.data.substring(cmd_InviteRequestFrom.length);
-				console.log(cmd_InviteRequestFrom + "'" + cut + "'");
-			}
-			else if (e.data.startsWith(cmd_JoinedGame))
-			{
-				var cut = e.data.substring(cmd_JoinedGame.length);
-				var gameID = document.getElementById("gameID");
-				gameID.textContent = cut;
-			}
-			else if (e.data.startsWith(cmd_LeftGame))
-			{
-				var cut = e.data.substring(cmd_LeftGame.length);
-				var gameID = document.getElementById("gameID");
-				gameID.textContent = -1;
-			}
-			else if (e.data.startsWith(cmd_PlayingWith))
-			{
-				var cut = e.data.substring(cmd_PlayingWith.length);
-				var otherID = document.getElementById("otherID");
-				otherID.textContent = cut;
-			}
-			else if (e.data.startsWith(cmd_PresanceCheck))
-			{
-				var cut = e.data.substring(cmd_PresanceCheck.length);
-				var presanceCheckStatus = document.getElementById("presanceCheckStatus");
-				presanceCheckStatus.textContent = cut;
-			}
+
 			else if (e.data.startsWith(cmd_BallData))
 			{
 				var cut = e.data.substring(cmd_BallData.length);
 				console.log(cmd_BallData + "'" + cut + "'");
 			}
+
+
+
+			else if (e.data.startsWith(cmd_SessionID))
+			{
+				var cut = e.data.substring(cmd_SessionID.length);
+				var elem = document.getElementById("session-ID");
+				elem.textContent = cut;
+			}
+			else if (e.data.startsWith(cmd_SessionState))
+			{
+				var cut = e.data.substring(cmd_SessionState.length);
+				var elem = document.getElementById("session-state");
+				elem.textContent = cut;
+			}
+
+			else if (e.data.startsWith(cmd_SessionLID))
+			{
+				var cut = e.data.substring(cmd_SessionLID.length);
+				var elem = document.getElementById("session-L-ID");
+				elem.textContent = cut;
+			}
+			else if (e.data.startsWith(cmd_SessionLName))
+			{
+				var cut = e.data.substring(cmd_SessionLName.length);
+				var elem = document.getElementById("session-L-name");
+				elem.textContent = cut;
+			}
+			else if (e.data.startsWith(cmd_SessionLScore))
+			{
+				var cut = e.data.substring(cmd_SessionLScore.length);
+				var elem = document.getElementById("session-L-score");
+				elem.textContent = cut;
+			}
+			else if (e.data.startsWith(cmd_SessionLState))
+			{
+				var cut = e.data.substring(cmd_SessionLState.length);
+				var elem = document.getElementById("session-L-state");
+				elem.textContent = cut;
+			}
+
+			else if (e.data.startsWith(cmd_SessionRID))
+			{
+				var cut = e.data.substring(cmd_SessionRID.length);
+				var elem = document.getElementById("session-R-ID");
+				elem.textContent = cut;
+			}
+			else if (e.data.startsWith(cmd_SessionRName))
+			{
+				var cut = e.data.substring(cmd_SessionRName.length);
+				var elem = document.getElementById("session-R-name");
+				elem.textContent = cut;
+			}
+			else if (e.data.startsWith(cmd_SessionRScore))
+			{
+				var cut = e.data.substring(cmd_SessionRScore.length);
+				var elem = document.getElementById("session-R-score");
+				elem.textContent = cut;
+			}
+			else if (e.data.startsWith(cmd_SessionRState))
+			{
+				var cut = e.data.substring(cmd_SessionRState.length);
+				var elem = document.getElementById("session-R-state");
+				elem.textContent = cut;
+			}
+
+
+
 			else
 			{
 				console.log("message '" + e.data + "'");
@@ -154,112 +203,4 @@ function I_Am_Here()
 	{
 		ws.send("I-Am-Here");
 	}
-}
-
-
-
-
-
-var BrowseUsersSelectedID = -1;
-var BrowseUsersSelectedStatus = "";
-function browse_users_table_refresh()
-{
-	var table = document.getElementById("browse-users-table");
-	var rows = table.rows;
-	while (rows.length > 1)
-	{
-		table.deleteRow(1);
-	}
-
-	var url = "http://localhost:5000/BrowseUsersTable";
-	if (ID != -1) { url += "%" + ID; }
-	var xhl_req = new XMLHttpRequest();
-	xhl_req.open("GET", url, false);	//	gives console warning
-	xhl_req.send(null);
-
-	var data = JSON.parse(xhl_req.responseText);
-	for (var i = 0; i < data.length; i++)
-	{
-		var row = table.insertRow(i + 1);
-		var cell_id = row.insertCell(0);
-		var cell_user = row.insertCell(1);
-		var cell_status = row.insertCell(2);
-
-		var func = new Function("browse_users_table_row_func(" + (i + 1) + ");");
-		row.onclick = func;
-
-		cell_id.textContent = data[i].ID;
-		cell_user.textContent = data[i].User;
-		cell_status.textContent = data[i].Status;
-	}
-
-	var label_your_ID = document.getElementById("browse-users-your-ID");
-	var label_count = document.getElementById("browse-users-count");
-	label_your_ID.textContent = ID;
-	label_count.textContent = data.length;
-
-	browse_users_table_row_func(-1);
-}
-function browse_users_table_row_func(rowIdx)
-{
-	var table = document.getElementById("browse-users-table");
-	var rows = table.rows;
-	for (var i = 0; i < rows.length; i++)
-	{
-		if (i == rowIdx)
-			rows[i].style.backgroundColor = "#777777";
-		else if (rows[i].cells[0].textContent == ID)
-			rows[i].style.backgroundColor = "#00FF00";
-		else if (i % 2 == 0)
-			rows[i].style.backgroundColor = "#DDDDDD";
-		else
-			rows[i].style.backgroundColor = "#EEEEEE";
-	}
-
-	var button_invite = document.getElementById("browse-users-button-invite");
-	var button_accept = document.getElementById("browse-users-button-accept");
-	if (rowIdx != -1)
-	{
-		var row = table.rows[rowIdx];
-		BrowseUsersSelectedID = row.cells[0].textContent;
-		BrowseUsersSelectedStatus = row.cells[2].textContent;
-		if (BrowseUsersSelectedID != ID)
-		{
-			//	different user selected
-			button_invite.disabled = false;
-			button_accept.disabled = true;
-		}
-		else
-		{
-			//	self selected
-			BrowseUsersSelectedID = -1;
-			BrowseUsersSelectedStatus = "";
-			button_invite.disabled = true;
-			button_accept.disabled = true;
-		}
-	}
-	else
-	{
-		//	nothing selected
-		BrowseUsersSelectedID = -1;
-		BrowseUsersSelectedStatus = "";
-		button_invite.disabled = true;
-		button_accept.disabled = true;
-	}
-}
-function browse_users_invite()
-{
-	if (ws == null)
-		return;
-	if (BrowseUsersSelectedID == -1)
-		return;
-	ws.send("InviteRequestTo: " + BrowseUsersSelectedID);
-}
-function browse_users_accept()
-{
-	if (ws == null)
-		return;
-	if (BrowseUsersSelectedID == -1)
-		return;
-
 }

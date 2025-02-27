@@ -46,6 +46,10 @@ class CPlayer
 	{
 		return $this->ID;
 	}
+	public function getName()
+	{
+		return $this->Name;
+	}
 
 
 	private function InviteSend($other)
@@ -105,13 +109,11 @@ class CPlayer
 
 	public function leaveGame()
 	{
-		$this->ws->sendText("LeftGame: " . $this->GameID);
 		$this->GameID = -1;
 	}
 	public function joinGame($gameID)
 	{
 		$this->GameID = $gameID;
-		$this->ws->sendText("JoinedGame: " . $this->GameID);
 	}
 
 	public $isPresent;
@@ -146,7 +148,7 @@ class CPlayer
 						if ($this->InviteRecvCheck($other->getID()))
 						{
 							$other->ws->sendText("Invite-Request-From: " . $this->ID);
-							SessionPongAdd($this, $other);
+							SessionPongArray_AddByUsers($this, $other);
 						}
 						else
 						{
@@ -158,7 +160,6 @@ class CPlayer
 			elseif (($val = $CmdIamHere->value($message)) !== false)
 			{
 				$this->isPresent = true;
-				$this->ws->sendText("Presance-Check: Here");
 			}
 			else
 			{

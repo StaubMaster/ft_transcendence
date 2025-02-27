@@ -6,6 +6,8 @@
 		<link rel="stylesheet" href="style.css">
  
 		<script src="/file.js"></script>
+		<script src="/browse_table.js"></script>
+
 		<script type="module" src="/baby.js"></script>
 	</head>
 	<body>
@@ -40,6 +42,58 @@
 			<br>
 		</div>
 
+		<div id="session">
+			<label>Session ID: </label>
+			<label id="session-ID">-1</label>
+			<br>
+
+			<label>Session State: </label>
+			<label id="session-state">none</label>
+			<br>
+
+			<table>
+				<tr>
+					<th>Side</th>
+					<th>ID</th>
+					<th>Name</th>
+					<th>Score</th>
+					<th>State</th>
+				</tr>
+				<tr>
+					<td>L</td>
+					<td id="session-L-ID"></td>
+					<td id="session-L-name"></td>
+					<td id="session-L-score"></td>
+					<td id="session-L-state"></td>
+				</tr>
+				<tr>
+					<td>R</td>
+					<td id="session-R-ID"></td>
+					<td id="session-R-name"></td>
+					<td id="session-R-score"></td>
+					<td id="session-R-state"></td>
+				</tr>
+			</table>
+
+			<button type="button" id="session-presance-check-button" onclick="I_Am_Here()">I Am Here</button>
+			<br>
+
+			<!--
+			<label>L: </label>
+			<label id="session-L-name">placeholder (0)</label>
+			<label id="session-L-state">not here</label>
+			<br>
+
+			<label>R: </label>
+			<label id="session-R-name">placeholder (0)</label>
+			<label id="session-R-state">not here</label>
+			<br>
+			-->
+
+			<canvas id="session-canvas"></canvas>
+		</div>
+
+		<!--OLD
 		<div>
 			<input type="number" id="InviteOtherID">
 			<button type="button" onclick="InviteFunc()">Send Invite</button><br>
@@ -58,10 +112,7 @@
 			<button type="button" onclick="I_Am_Here()">I Am Here</button>
 			<br>
 		</div>
-
-		<div>
-			<canvas id="can"></canvas>
-		</div>
+		-->
 
 	</body>
 </html>

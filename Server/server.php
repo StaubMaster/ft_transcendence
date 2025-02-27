@@ -15,6 +15,7 @@ include 'UsersArray.php';
 include 'Command.php';
 
 include 'Session/SessionPong.php';
+include 'Session/SessionPongArray.php';
 
 include 'Simulation/Point.php';
 include 'Simulation/Box.php';
@@ -32,7 +33,6 @@ function HeaderFindValue($fheader, $fname)
 		$a = strpos($fheader, " ", $fvalue) + 1;
 		$b = strpos($fheader, "\r\n", $fvalue);
 		return substr($fheader, $a, $b - $a);
-		//echo "key '$websocket_key' " . strlen($websocket_key) . "\n";
 	}
 }
 
@@ -58,54 +58,9 @@ if (socket_set_nonblock($server_socket) === false)
 }
 
 
-//	ticks are slow for debugging purposes
-$tickTimeCheck = new TimeCheck(1);
-
-$SessionPongArr = array();
-function SessionPongUpdate()
-{
-	global $SessionPongArr;
-	$changeArr = false;
-	foreach ($SessionPongArr as &$pm)
-	{
-		$pm->Update();
-		if ($pm->isGameOver())
-		{
-			$changeArr = true;
-		}
-	}
-	if ($changeArr)
-	{
-		SessionPongTrim();
-	}
-}
-function SessionPongTrim()
-{
-	global $SessionPongArr;
-	$newArr = array();
-	foreach ($SessionPongArr as &$pm)
-	{
-		if (!$pm->isGameOver())
-		{
-			array_push($newArr, $pm);
-		}
-		else
-		{
-			echo "---- pong Match ----\n";
-			$pm->removePlayers();
-			$pm = null;
-		}
-	}
-	$SessionPongArr = $newArr;
-}
-function SessionPongAdd($usrL, $usrR)
-{
-	echo "++++ pong Match ++++\n";
-	global $SessionPongArr;
-	$new_pm = new SessionPong($usrL, $usrR);
-	$new_pm->PresentCheckWait();
-	array_push($SessionPongArr, $new_pm);
-}
+//	ticks are slow for debugging
+//$tickTimeCheck = new TimeCheck(1);
+$tickTimeCheck = new TimeCheck(0.1);
 
 echo "loop\n";
 do
@@ -168,6 +123,7 @@ do
 						if (str_ends_with($path, ".html")) { $type = "text/html"; }
 						if (str_ends_with($path, ".js")) { $type = "text/javascript"; }
 						if (str_contains($path, "@babylon")) { $type = "text/javascript"; }
+						echo "type: $type\n";
 						Respond200($client_socket, $type, file_get_contents($path));
 					}
 					else { echo "!!!! File '$path' not found 404\n"; Respond404($client_socket); }
@@ -187,11 +143,11 @@ do
 
 	if ($tickTimeCheck->check())
 	{
-		$timeSec = round((hrtime(true) - $timeStart) / 1000000000);
-		echo "tick " . $timeSec . "s [" . count($UsersArray) . "] [" . count($SessionPongArr) . "]\n";
+		//$timeSec = round((hrtime(true) - $timeStart) / 1000000000);
+		//echo "tick " . $timeSec . "s [" . count($UsersArray) . "] [" . count($SessionPongArray) . "]\n";
 
 		UsersArray_Update();
-		SessionPongUpdate();
+		SessionPongArray_Update();
 	}
 
 } while (true);

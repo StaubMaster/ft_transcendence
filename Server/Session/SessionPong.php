@@ -1,7 +1,7 @@
 
 <?php
 
-class PongMatch
+class SessionPong
 {
 	private $plL;
 	private $plR;

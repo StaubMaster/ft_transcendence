@@ -8,6 +8,9 @@ class CPlayer
 	private $ws;
 	private $ID;
 
+	private $InvitesSendArr;
+	private $InvitesRecvArr;
+
 	private $GameID;
 
 	public function __construct($ws)
@@ -17,6 +20,9 @@ class CPlayer
 		$this->ID = self::$GlobalID;
 		$this->ws->sendText("ID: " . self::$GlobalID);
 		self::$GlobalID++;
+
+		$this->InvitesSendArr = array();
+		$this->InvitesRecvArr = array();
 
 		$this->GameID = -1;
 	}
@@ -38,6 +44,34 @@ class CPlayer
 	{
 		return $this->ID;
 	}
+
+
+	private function InviteSend($other)
+	{
+		array_push($this->InvitesSendArr, $other->ID);
+		$other->InviteRecv($this);
+	}
+	private function InviteRecv($other)
+	{
+		array_push($this->InvitesRecvArr, $other->ID);
+	}
+	private function InviteSendCheck($id)
+	{
+		foreach ($this->InvitesSendArr as $elem)
+		{
+			if ($elem == $id) { return true; }
+		}
+		return false;
+	}
+	private function InviteRecvCheck($id)
+	{
+		foreach ($this->InvitesRecvArr as $elem)
+		{
+			if ($elem == $id) { return true; }
+		}
+		return false;
+	}
+
 	public function getTableUser($id)
 	{
 		$str = '{';
@@ -47,11 +81,20 @@ class CPlayer
 		$str .= '"Status":"';
 		if ($this->ID == $id)
 		{
-			$str .= "self";
+			$str .= "this is you";
 		}
 		else
 		{
-			$str .= "free";
+			$invS = $this->InviteSendCheck($id);
+			$invR = $this->InviteRecvCheck($id);
+			if ($invS == false && $invR == false)
+				$str .= "free";
+			else if ($invS == true && $invR == false)
+				$str .= "invites you";
+			else if ($invS == false && $invR == true)
+				$str .= "you invited";
+			else
+				$str .= "mutual invite";
 		}
 		$str .= '"';
 
@@ -70,7 +113,6 @@ class CPlayer
 	}
 
 	public $isPresent;
-
 	public function Update()
 	{
 		$this->ws->checkConnectionUpdate();
@@ -87,15 +129,22 @@ class CPlayer
 				}
 				else
 				{
-					$pl = PlayersGetID($val);
-					if ($pl == null)
+					$other = UsersArray_GetByID($val);
+					if ($other == null)
 					{
 						$this->ws->sendText("ID-Not-Found: " . $val);
 					}
 					else
 					{
-						$pl->ws->sendText("Invite-Request-From: " . $this->ID);
-						PongMatchesAdd($this->ID, $pl->getID());
+						if ($this->InviteRecvCheck($other->getID()))
+						{
+							$other->ws->sendText("Invite-Request-From: " . $this->ID);
+							SessionPongAdd($this, $other);
+						}
+						else
+						{
+							$this->InviteSend($other);
+						}
 					}
 				}
 			}

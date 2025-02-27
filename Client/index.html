@@ -23,18 +23,19 @@
 			<br>
 		</div>
 
-		<div>
+		<div id="browse-users">
 			<label>ID: </label><label>0</label><br>
 			<label>Users: </label><label>0</label><br>
-			<table id="table-users">
-				<tr onclick="table_users_row_func(-1)">
+			<table id="browse-users-table">
+				<tr onclick="browse_users_table_row_func(-1)">
 					<th>ID</th>
 					<th>User</th>
 					<th>Status</th>
 				</tr>
 			</table>
-			<button type="button" onclick="table_users_refresh()">Refresh</button>
-			<button type="button" id="users-invite-button" onclick="table_users_invite()" disabled="disabled">Invite/Accept</button>
+			<button type="button" onclick="browse_users_table_refresh()">Refresh</button>
+			<button type="button" id="browse-users-button-invite" onclick="browse_users_invite()" disabled="disabled">Invite</button>
+			<button type="button" id="browse-users-button-accept" onclick="browse_users_accept()" disabled="disabled">Accept</button>
 			<br>
 		</div>
 

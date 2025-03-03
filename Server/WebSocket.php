@@ -57,10 +57,21 @@ class Frame
 
 	public function recv($socket)
 	{
+		//if (canRecv($socket))
+		//	echo ".... can Recv\n";
+		//else
+		//	echo ".... cant Recv\n";
 		if (($buf = socket_read($socket, 2, PHP_BINARY_READ)) === false)
 		{
 			$errCode = socket_last_error($socket);
 			$this->error = "Header:" . $errCode . ":" . socket_strerror($errCode);
+			return;
+		}
+		//echo ".... recv() done\n";
+
+		if ($buf == null || strlen($buf) == 0)
+		{
+			echo "!!!! read Buffer is empty or null\n";
 			return;
 		}
 
@@ -154,18 +165,19 @@ class Frame
 		$byte |= $this->rsv << 4;
 		$byte |= $this->code;
 		$buf .= chr($byte);
-		
+
 		$byte = 0;
 		$byte |= $this->mask_bit << 7;
 		if ($this->payload_len > 0xFFFF)
 		{
 			$byte |= 127;
 			$buf .= chr($byte);
-			
+
 			$len = $this->payload_len;
 			for ($i = 0; $i < 4; $i++)
 			{
-				$byte = chr($len >> 24);
+				//$byte = chr($len >> 24);
+				$byte = $len >> 24;
 				$buf .= chr($byte);
 				$len = $len << 8;
 			}
@@ -174,11 +186,12 @@ class Frame
 		{
 			$byte |= 126;
 			$buf .= chr($byte);
-			
+
 			$len = $this->payload_len;
 			for ($i = 0; $i < 2; $i++)
 			{
-				$byte = chr($len >> 8);
+				//$byte = chr($len >> 8);
+				$byte = $len >> 8;
 				$buf .= chr($byte);
 				$len = $len << 8;
 			}
@@ -192,7 +205,12 @@ class Frame
 		if ($this->payload_len != 0)
 			$buf .= $this->payload_str;
 
+		//if (canRecv($socket))
+		//	echo ".... can Send\n";
+		//else
+		//	echo ".... cant Send\n";
 		socket_write($socket, $buf);
+		//echo ".... send() done\n";
 	}
 }
 
@@ -240,7 +258,8 @@ class WebSocket
 
 		if (($err = $frame->checkError()) !== false)
 		{
-			echo "Error: " . $err . "\n";
+			//echo "Error: " . $err . "\n";
+			Log::ToFile("Error: " . $err . "\n");
 			return false;
 		}
 
@@ -268,13 +287,17 @@ class WebSocket
 		if ($this->isClose)
 			return;
 
+		if (!canSend($this->socket))
+			return;
+
 		$frame = new Frame();
 		$frame->setOpenCode(Frame::OpenCode_TextFrame);
 		$frame->setPayload($payload);
 		$frame->send($this->socket);
 		if (($err = $frame->checkError()) !== false)
 		{
-			echo "Error: " . $err . "\n";
+			//echo "Error: " . $err . "\n";
+			Log::ToFile("Error: " . $err . "\n");
 		}
 	}
 

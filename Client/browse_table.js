@@ -16,7 +16,7 @@ function browse_users_table_refresh()
 	xhl_req.open("GET", url, false);	//	gives console warning
 	xhl_req.send(null);
 
-	console.log("'" + xhl_req.responseText + "'");
+	//console.log("'" + xhl_req.responseText + "'");
 	var data = JSON.parse(xhl_req.responseText);
 	for (var i = 0; i < data.length; i++)
 	{

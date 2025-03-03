@@ -6,7 +6,10 @@ error_reporting(E_ALL);
 ob_implicit_flush();
 
 echo "<<<<\n";
+include 'Log.php';
+
 include 'socket_help.php';
+include 'HTTP_Respond.php';
 include 'TimeCheck.php';
 
 include 'WebSocket.php';
@@ -60,7 +63,10 @@ if (socket_set_nonblock($server_socket) === false)
 
 //	ticks are slow for debugging
 //$tickTimeCheck = new TimeCheck(1);
-$tickTimeCheck = new TimeCheck(0.1);
+//$tickTimeCheck = new TimeCheck(0.1);
+$tickTimeCheck = new TimeCheck(0);
+
+Log::NewFile();
 
 echo "loop\n";
 do
@@ -87,7 +93,7 @@ do
 
 			if ($method == "GET")
 			{
-				//echo "GET '" . $path . "'\n";
+				Log::ToFile("GET $path\n");
 
 				if (($websocket_key = HeaderFindValue($header, "Sec-WebSocket-Key: ")) !== false)
 				{
@@ -148,7 +154,7 @@ do
 			}
 			else { echo "!!!! Unknown Method '$method' 400\n"; Respond400($client_socket); }
 		}
-		else { echo "!!!! bad header read 400\n"; Respond400($client_socket); }
+		else { echo "!!!! bad header read 500\n"; Respond500($client_socket); }
 	}
 
 	if ($client_socket != null)

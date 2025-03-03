@@ -34,7 +34,7 @@ function socketConn()
 		{
 			var cmd_ID = "ID: ";
 
-			var cmd_BallData = "Ball-Data: ";
+			var cmd_SessionData = "Session-Data: ";
 
 			var message_to_element = [
 				["Session-ID: "     , "session-ID"],
@@ -73,11 +73,11 @@ function socketConn()
 				ID = cut;
 				showYourID();
 			}
-			else if (e.data.startsWith(cmd_BallData))
+			else if (e.data.startsWith(cmd_SessionData))
 			{
-				var cut = e.data.substring(cmd_BallData.length);
-				//console.log(cmd_BallData + "'" + cut + "'");
-				BallFunc(cut);
+				var cut = e.data.substring(cmd_SessionData.length);
+				//console.log(cmd_SessionData + "'" + cut + "'");
+				SessionDataChangeFunc(cut);
 			}
 			else
 			{

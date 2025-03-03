@@ -25,6 +25,7 @@ class SessionPong
 	private $isGameOver;
 
 	private $frameTicker;
+	private $frameTime;
 
 	function __construct($plL, $plR)
 	{
@@ -53,7 +54,10 @@ class SessionPong
 		//	0.050	=	0.05s	20/s
 		//	0.025	=	0.025s	40/s
 		//$this->frameTicker = new TimeCheck(1);
+		//$this->frameTicker = new TimeCheck(0.25);
+		//$this->frameTicker = new TimeCheck(0.1);
 		$this->frameTicker = new TimeCheck(0.025);
+		$this->frameTime = hrtime(true);
 
 		$this->InitBoxes();
 	}
@@ -233,6 +237,11 @@ class SessionPong
 		$this->SendAllPlayers(self::Header_SessionState . "Playing");
 		$this->SendAllPlayers(self::Header_SessionLState . "");
 		$this->SendAllPlayers(self::Header_SessionRState . "");
+
+		$this->SendAllPlayers('Session-Data: { "name": "Wall0", "data": ' . $this->Wall0->toString() . ' }');
+		$this->SendAllPlayers('Session-Data: { "name": "Wall1", "data": ' . $this->Wall1->toString() . ' }');
+		$this->SendAllPlayers('Session-Data: { "name": "Wall2", "data": ' . $this->Wall2->toString() . ' }');
+		$this->SendAllPlayers('Session-Data: { "name": "Wall3", "data": ' . $this->Wall3->toString() . ' }');
 	}
 
 
@@ -248,7 +257,7 @@ class SessionPong
 		$this->Wall2 = new Box(new Point(-1.0, +0.9), new Point(+1.0, +1.0));
 		$this->Wall3 = new Box(new Point(-1.0, -1.0), new Point(+1.0, -0.9));
 
-		$this->Ball = new VelBox(new Box(new Point(0.01, 0.02), new Point(0.03, 0.03)), new Point(0.01, 0.02));
+		$this->Ball = new VelBox(new Box(new Point(-0.025, -0.025), new Point(+0.025, +0.025)), new Point(0.02, 0.01));
 	}
 
 
@@ -283,31 +292,37 @@ class SessionPong
 
 		if ($this->frameTicker->check())
 		{
+			//$t = hrtime(true);
+			//echo "Frame-Time: (should/is): "
+			//	. $this->frameTicker->ToString()
+			//	. "/"
+			//	. (($t - $this->frameTime) / 1000000000) . "s"
+			//	. "\n";
+			//$this->frameTime = $t;
+
 			if ($this->Wall0->Intersect($this->Ball->Box))
 			{
 				$this->Ball->Vel->X = -abs($this->Ball->Vel->X);
-				echo "-X\n";
+				//echo "-X\n";
 			}
 			if ($this->Wall1->Intersect($this->Ball->Box))
 			{
 				$this->Ball->Vel->X = +abs($this->Ball->Vel->X);
-				echo "+X\n";
+				//echo "+X\n";
 			}
 			if ($this->Wall2->Intersect($this->Ball->Box))
 			{
 				$this->Ball->Vel->Y = -abs($this->Ball->Vel->Y);
-				echo "-Y\n";
+				//echo "-Y\n";
 			}
 			if ($this->Wall3->Intersect($this->Ball->Box))
 			{
 				$this->Ball->Vel->Y = +abs($this->Ball->Vel->Y);
-				echo "+Y\n";
+				//echo "+Y\n";
 			}
 
 			$this->Ball->Move();
-			$ball_data = "Ball-Data: " . $this->Ball->toString();
-			//echo "$ball_data\n";
-			$this->SendAllPlayers($ball_data);
+			$this->SendAllPlayers('Session-Data: { "name": "Ball", "data": ' . $this->Ball->toString() . ' }');
 		}
 	}
 }

@@ -33,7 +33,7 @@ function BoxToScale(box)
 	return new BABYLON.Vector3(
 		box.max.x - box.min.x,
 		box.max.y - box.min.y,
-		0.01
+		0.1
 	);
 }
 function BoxToPos(box)
@@ -87,11 +87,59 @@ export function SessionDataChangeFunc(str)
 }
 window.SessionDataChangeFunc = SessionDataChangeFunc;
 
-
 const scene = createScene();
+
+var MoveUpKeyPressed = false;
+var MoveDwKeyPressed = false;
+
+scene.onKeyboardObservable.add(function(key_info)
+{
+	if (key_info.type == BABYLON.KeyboardEventTypes.KEYDOWN)
+	{
+		if (key_info.event.key == "w")
+		{
+			if (!MoveUpKeyPressed)
+			{
+				MoveUpKeyPressed = true;
+				console.log("UP");
+			}
+		}
+		if (key_info.event.key == "s")
+		{
+			if (!MoveDwKeyPressed)
+			{
+				MoveDwKeyPressed = true;
+				console.log("DW");
+			}
+		}
+	}
+	else if (key_info.type == BABYLON.KeyboardEventTypes.KEYUP)
+	{
+		if (key_info.event.key == "w")
+		{
+			if (MoveUpKeyPressed)
+			{
+				MoveUpKeyPressed = false;
+				console.log("!UP");
+			}
+		}
+		if (key_info.event.key == "s")
+		{
+			if (MoveDwKeyPressed)
+			{
+				MoveDwKeyPressed = false;
+				console.log("!DW");
+			}
+		}
+	}
+});
 
 engine.runRenderLoop(function()
 {
 	scene.render();
 });
 
+window.addEventListener('resize', function()
+{
+	engine.resize();
+});

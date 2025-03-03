@@ -87,6 +87,10 @@ class SessionPong
 		$this->SendAllPlayers(self::Header_SessionLScore . $this->ScoreL);
 		$this->SendAllPlayers(self::Header_SessionRScore . $this->ScoreR);
 	}
+	private function SendSessionData($name, $data)
+	{
+		$this->SendAllPlayers('Session-Data: { "name": "' . $name . '", "data": ' . $data . ' }');
+	}
 
 	function checkPlayersPresance()
 	{
@@ -238,10 +242,10 @@ class SessionPong
 		$this->SendAllPlayers(self::Header_SessionLState . "");
 		$this->SendAllPlayers(self::Header_SessionRState . "");
 
-		$this->SendAllPlayers('Session-Data: { "name": "Wall0", "data": ' . $this->Wall0->toString() . ' }');
-		$this->SendAllPlayers('Session-Data: { "name": "Wall1", "data": ' . $this->Wall1->toString() . ' }');
-		$this->SendAllPlayers('Session-Data: { "name": "Wall2", "data": ' . $this->Wall2->toString() . ' }');
-		$this->SendAllPlayers('Session-Data: { "name": "Wall3", "data": ' . $this->Wall3->toString() . ' }');
+		$this->SendSessionData("Wall0", $this->Wall0->toString());
+		$this->SendSessionData("Wall1", $this->Wall1->toString());
+		$this->SendSessionData("Wall2", $this->Wall2->toString());
+		$this->SendSessionData("Wall3", $this->Wall3->toString());
 	}
 
 
@@ -261,7 +265,6 @@ class SessionPong
 	}
 
 
-	private $debug = true;
 	public function Update()
 	{
 		if ($this->isGameOver)
@@ -278,17 +281,6 @@ class SessionPong
 			$this->PresentCheckWaitUpdate();
 			return;
 		}
-
-		/*if (!$this->PresentChecking && $this->debug)
-		{
-			$this->debug = false;
-			if ($this->isGameOver) { echo "isGameOver: true\n"; } else { echo "isGameOver: false\n"; }
-			echo "isGameOver: " . $this->isGameOver . "\n";
-			echo "ScoreL: " . $this->ScoreL . "\n";
-			echo "ScoreR: " . $this->ScoreR . "\n";
-			echo "PresentL: " . $this->plL->isPresent . "\n";
-			echo "PresentR: " . $this->plR->isPresent . "\n";
-		}*/
 
 		if ($this->frameTicker->check())
 		{
@@ -322,7 +314,7 @@ class SessionPong
 			}
 
 			$this->Ball->Move();
-			$this->SendAllPlayers('Session-Data: { "name": "Ball", "data": ' . $this->Ball->toString() . ' }');
+			$this->SendSessionData("Ball", $this->Ball->toString());
 		}
 	}
 }

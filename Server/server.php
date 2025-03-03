@@ -73,11 +73,11 @@ do
 
 	if ($client_socket != null)
 	{
-		echo "====    ====    ====    ====\n";
+		//echo "====    ====    ====    ====\n";
 		/*if (!socket_getpeername($client_socket, $addr, $port)) { echo "ERR\n"; }
 		echo "addr '$addr' port '$port'\n";*/
 		$header = socket_client_read_header($client_socket);
-		echo "header reading done\n";
+		//echo "header reading done\n";
 
 		if ($header != null)
 		{
@@ -87,7 +87,7 @@ do
 
 			if ($method == "GET")
 			{
-				echo "GET '" . $path . "'\n";
+				//echo "GET '" . $path . "'\n";
 
 				if (($websocket_key = HeaderFindValue($header, "Sec-WebSocket-Key: ")) !== false)
 				{
@@ -111,24 +111,40 @@ do
 				{
 					if ($path[-1] == "/")
 					{
-						$path = $path . "index.html";
+						$referer = HeaderFindValue($header, "Referer: ");
+						if ($referer == null)
+						{
+							$index_extention = ".html";
+						}
+						else
+						{
+							$pos = strrpos($referer, ".");
+							$index_extention = substr($referer, $pos);
+						}
+						$path .= "index" . $index_extention;
 					}
 					$path = "Client" . $path;
-					echo "path '$path'\n";
 
+					/*if (str_ends_with($path, "/core/"))
+					{
+						echo "... Module\n";
+						$path = $path . "/index.js";
+						$type = "text/javascript";
+						echo "path: $path\n";
+						echo "type: $type\n";
+						Respond200($client_socket, $type, file_get_contents($path));
+					}*/
 					if (file_exists($path))
 					{
-						echo ".... File '$path' found 200\n";
+						//echo ".... File '$path' found 200\n";
 						$type = null;
 						if (str_ends_with($path, ".html")) { $type = "text/html"; }
 						if (str_ends_with($path, ".js")) { $type = "text/javascript"; }
-						if (str_contains($path, "@babylon")) { $type = "text/javascript"; }
-						echo "type: $type\n";
-						Respond200($client_socket, $type, file_get_contents($path));
+						//echo "type: $type\n";
+						Respond200File($client_socket, $type, $path);
 					}
 					else { echo "!!!! File '$path' not found 404\n"; Respond404($client_socket); }
 				}
-
 			}
 			else { echo "!!!! Unknown Method '$method' 400\n"; Respond400($client_socket); }
 		}
@@ -137,7 +153,7 @@ do
 
 	if ($client_socket != null)
 	{
-		echo "socket_close()\n";
+		//echo "socket_close()\n";
 		socket_close($client_socket);
 	}
 

@@ -14,7 +14,7 @@ class Point
 
 	public function toString()
 	{
-		return $this->X . " " . $this->Y;
+		return "[ " . $this->X . ", " . $this->Y . " ]";
 	}
 }
 

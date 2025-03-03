@@ -16,6 +16,7 @@ function browse_users_table_refresh()
 	xhl_req.open("GET", url, false);	//	gives console warning
 	xhl_req.send(null);
 
+	console.log("'" + xhl_req.responseText + "'");
 	var data = JSON.parse(xhl_req.responseText);
 	for (var i = 0; i < data.length; i++)
 	{
@@ -47,8 +48,8 @@ function browse_users_table_row_func(rowIdx)
 	{
 		if (i == rowIdx)
 			rows[i].style.backgroundColor = "#777777";
-		else if (rows[i].cells[0].textContent == ID)
-			rows[i].style.backgroundColor = "#00FF00";
+		//else if (rows[i].cells[0].textContent == ID)
+		//	rows[i].style.backgroundColor = "#00FF00";
 		else if (i % 2 == 0)
 			rows[i].style.backgroundColor = "#DDDDDD";
 		else
@@ -62,20 +63,20 @@ function browse_users_table_row_func(rowIdx)
 		var row = table.rows[rowIdx];
 		BrowseUsersSelectedID = row.cells[0].textContent;
 		BrowseUsersSelectedStatus = row.cells[2].textContent;
-		if (BrowseUsersSelectedID != ID)
+		//if (BrowseUsersSelectedID != ID)
 		{
 			//	different user selected
 			button_invite.disabled = false;
 			button_accept.disabled = true;
 		}
-		else
+		/*else
 		{
 			//	self selected
 			BrowseUsersSelectedID = -1;
 			BrowseUsersSelectedStatus = "";
 			button_invite.disabled = true;
 			button_accept.disabled = true;
-		}
+		}*/
 	}
 	else
 	{

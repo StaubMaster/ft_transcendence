@@ -1,2 +1,21 @@
 
+how to import module ?
+
+files have index files
+I want the index.js ?
+http Request has "Referer" in header that says the requesting file
+there it says the file is .js so look for index.js
+
+
+it seems to have worked
+so everytime something asks for a directory, just look for an index file with the correct extention
+but it was kinda slow because the server prints a lot
+
+
+
+the site now takes a long time to load
+
+made load a bit faster by not appending the file content to the header
+and just writing it directly
+
 

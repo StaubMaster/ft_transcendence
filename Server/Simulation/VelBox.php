@@ -14,7 +14,10 @@ class VelBox
 
 	public function toString()
 	{
-		return $this->Box->toString() . " " . $this->Vel->toString();
+		return "{ "
+			. '"box": ' . $this->Box->toString() . ", "
+			. '"vel": ' . $this->Vel->toString() .
+			" }";
 	}
 
 	public function Move()

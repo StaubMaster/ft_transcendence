@@ -132,9 +132,11 @@ class CPlayer
 			}
 			else if (($val = $CmdInviteRecv->value($message)) !== false)
 			{
+				//	Allow Self Invite for Testing
 				if ($val == $this->ID)
 				{
 					$this->ws->sendText("This-is-You: " . $val);
+					SessionPongArray_AddByUsers($this, $this);
 				}
 				else
 				{

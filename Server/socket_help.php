@@ -65,6 +65,7 @@ function socket_client_read_header($fclient_socket)
 		if ($timeCheck->check())
 		{
 			echo "==== read TimeOut afer " . $timeCheck->toString() . " ====\n";
+			echo "<<<<\n$msg\n>>>>\n";
 			return null;
 		}
 
@@ -92,7 +93,7 @@ function socket_client_read_header($fclient_socket)
 			break;
 		}
 		//echo "here 3\n";
-		$msg = $msg . $buf;
+		$msg .= $buf;
 
 		//echo "<<<<<<<<$buf>>>>>>>>\n";
 
@@ -174,7 +175,19 @@ function Respond200($fsocket, $ftype, $fbody)
 	if (canSend($fsocket))
 		socket_write($fsocket, $header);
 }
-function Respond400($fsocket)
+function Respond200File($fsocket, $ftype, $fpath)
+{
+	$header = "";
+	$header .= "HTTP/1.1 200 OK\r\n";
+	if ($ftype != null)
+		$header .= "Content-Type: " . $ftype . "\r\n";
+	$header .= "\r\n";
+	if (canSend($fsocket))
+	{
+		socket_write($fsocket, $header);
+		socket_write($fsocket, file_get_contents($fpath));
+	}
+}function Respond400($fsocket)
 {
 	$header = "";
 	$header .= "HTTP/1.1 400 Bad Request\r\n";
@@ -193,7 +206,7 @@ function Respond404($fsocket)
 
 
 
-function str_starts_with($str, $match)
+/*function str_starts_with($str, $match)
 {
 	return substr($str, 0, strlen($match)) === $match;
 }
@@ -206,6 +219,6 @@ function str_ends_with($str, $match)
 function str_contains($str, $match)
 {
 	return strpos($str, $match) !== false;
-}
+}*/
 
 ?>

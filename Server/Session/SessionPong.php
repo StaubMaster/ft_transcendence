@@ -52,7 +52,8 @@ class SessionPong
 		//	0.100	=	0.1s	10/s
 		//	0.050	=	0.05s	20/s
 		//	0.025	=	0.025s	40/s
-		$this->frameTicker = new TimeCheck(1);
+		//$this->frameTicker = new TimeCheck(1);
+		$this->frameTicker = new TimeCheck(0.025);
 
 		$this->InitBoxes();
 	}
@@ -67,8 +68,15 @@ class SessionPong
 	public function ScoreR() { return $this->ScoreR; }
 	private function SendAllPlayers($text)
 	{
-		$this->plL->sendText($text);
-		$this->plR->sendText($text);
+		if ($this->plL->getID() != $this->plR->getID())
+		{
+			$this->plL->sendText($text);
+			$this->plR->sendText($text);
+		}
+		else
+		{
+			$this->plL->sendText($text);
+		}
 	}
 	private function SendScore()
 	{
@@ -235,11 +243,12 @@ class SessionPong
 	public $Ball;
 	public function InitBoxes()
 	{
-		$this->Wall0 = new Box(new Point(+9, +9), new Point(+10, +10));
-		$this->Wall1 = new Box(new Point(-10, +9), new Point(-9, +10));
-		$this->Wall2 = new Box(new Point(+9, -10), new Point(+10, -9));
-		$this->Wall3 = new Box(new Point(-10, -10), new Point(-9, -9));
-		$this->Ball = new VelBox(new Box(new Point(1, 2), new Point(3, 3)), new Point(0.01, 0.02));
+		$this->Wall0 = new Box(new Point(+0.9, -1.0), new Point(+1.0, +1.0));
+		$this->Wall1 = new Box(new Point(-1.0, -1.0), new Point(-0.9, +1.0));
+		$this->Wall2 = new Box(new Point(-1.0, +0.9), new Point(+1.0, +1.0));
+		$this->Wall3 = new Box(new Point(-1.0, -1.0), new Point(+1.0, -0.9));
+
+		$this->Ball = new VelBox(new Box(new Point(0.01, 0.02), new Point(0.03, 0.03)), new Point(0.01, 0.02));
 	}
 
 
@@ -274,8 +283,30 @@ class SessionPong
 
 		if ($this->frameTicker->check())
 		{
+			if ($this->Wall0->Intersect($this->Ball->Box))
+			{
+				$this->Ball->Vel->X = -abs($this->Ball->Vel->X);
+				echo "-X\n";
+			}
+			if ($this->Wall1->Intersect($this->Ball->Box))
+			{
+				$this->Ball->Vel->X = +abs($this->Ball->Vel->X);
+				echo "+X\n";
+			}
+			if ($this->Wall2->Intersect($this->Ball->Box))
+			{
+				$this->Ball->Vel->Y = -abs($this->Ball->Vel->Y);
+				echo "-Y\n";
+			}
+			if ($this->Wall3->Intersect($this->Ball->Box))
+			{
+				$this->Ball->Vel->Y = +abs($this->Ball->Vel->Y);
+				echo "+Y\n";
+			}
+
 			$this->Ball->Move();
 			$ball_data = "Ball-Data: " . $this->Ball->toString();
+			//echo "$ball_data\n";
 			$this->SendAllPlayers($ball_data);
 		}
 	}

@@ -21,15 +21,18 @@ class Box
 
 	public function toString()
 	{
-		return $this->Min->toString() . " " . $this->Max->toString();
+		return "{ "
+			. '"min": ' . $this->Min->toString() . ", "
+			. '"max": ' . $this->Max->toString() .
+			" }";
 	}
 
-	public static function Intersect($other)
+	public function Intersect($other)
 	{
-		return	($this->Min.X < $other->Max.X) &&
-				($this->Max.X > $other->Min.X) &&
-				($this->Min.Y < $other->Max.Y) &&
-				($this->Max.Y > $other->Min.Y);
+		return	($this->Min->X < $other->Max->X) &&
+				($this->Max->X > $other->Min->X) &&
+				($this->Min->Y < $other->Max->Y) &&
+				($this->Max->Y > $other->Min->Y);
 	}
 }
 

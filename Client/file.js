@@ -76,7 +76,8 @@ function socketConn()
 			else if (e.data.startsWith(cmd_BallData))
 			{
 				var cut = e.data.substring(cmd_BallData.length);
-				console.log(cmd_BallData + "'" + cut + "'");
+				//console.log(cmd_BallData + "'" + cut + "'");
+				BallFunc(cut);
 			}
 			else
 			{

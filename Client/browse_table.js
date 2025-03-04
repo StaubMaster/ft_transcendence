@@ -10,6 +10,13 @@ function browse_users_table_refresh()
 		table.deleteRow(1);
 	}
 
+	var button_invite = document.getElementById("browse-users-button-invite");
+	var button_accept = document.getElementById("browse-users-button-accept");
+	BrowseUsersSelectedID = -1;
+	BrowseUsersSelectedStatus = "";
+	button_invite.disabled = true;
+	button_accept.disabled = true;
+
 	var url = "http://localhost:5000/BrowseUsersTable";
 	if (ID != -1) { url += "%" + ID; }
 	var xhl_req = new XMLHttpRequest();

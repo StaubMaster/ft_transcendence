@@ -56,7 +56,7 @@ class PresanceCheck
 		{
 			$this->isDone = true;
 			$this->isFailed = true;
-			$this->Session->SendAllPlayers(self::Header_SessionState . "Disconnection");
+			$this->Session->SendAllPlayers(SessionPong::Header_SessionState . "Disconnection");
 			$l = SessionPong::Header_SessionLState;
 			$r = SessionPong::Header_SessionRState;
 			if ($this->plL->isRemove()) { $l .= "disconnected"; } else { $l .= "default"; }

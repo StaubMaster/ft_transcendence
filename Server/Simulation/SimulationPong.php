@@ -19,10 +19,8 @@ class SimulationPong
 	private $Wall3;
 
 	private $Ball;
-	
+
 	private $PaddleL;
-	private $PaddleL_UP;
-	private $PaddleL_DW;
 
 	function __construct($session)
 	{
@@ -38,18 +36,17 @@ class SimulationPong
 		$this->frameTicker = new TimeCheck(0.025);
 		$this->frameTime = hrtime(true);
 
-		$this->LimitBox = new Box(new Point(-1.0, -0.5), new Point(+1.0, +0.5));
+		$this->LimitBox = new Box(new Point(-1.0 + self::WallTickness, -0.5 + self::WallTickness), new Point(+1.0 - self::WallTickness, +0.5 - self::WallTickness));
 
 		$this->Wall0 = new Box(new Point(+1.0 - self::WallTickness, -0.5), new Point(+1.0, +0.5));
 		$this->Wall1 = new Box(new Point(-1.0, -0.5), new Point(-1.0 + self::WallTickness, +0.5));
-		$this->Wall2 = new Box(new Point(-1.0, +0.5  -self::WallTickness), new Point(+1.0, +0.5));
+		$this->Wall2 = new Box(new Point(-1.0, +0.5 - self::WallTickness), new Point(+1.0, +0.5));
 		$this->Wall3 = new Box(new Point(-1.0, -0.5), new Point(+1.0, -0.5 + self::WallTickness));
 
 		$this->Ball = new VelBox(new Box(new Point(-0.01, -0.01), new Point(+0.01, +0.01)), new Point(0.01, 0.005));
 
 		$this->PaddleL = new Paddle(-0.8, 0.01, 0.1, self::PaddleSpeedAccel, self::PaddleSpeedLimit);
-		$this->PaddleL_UP = false;
-		$this->PaddleL_DW = false;
+		$this->PaddleL->setUser($this->Session->getUserL());
 
 		$this->SendFunc("Wall0", $this->Wall0->ToJSON());
 		$this->SendFunc("Wall1", $this->Wall1->ToJSON());
@@ -101,8 +98,18 @@ class SimulationPong
 				//echo "+Y\n";
 			}
 
+			if ($this->PaddleL->Intersect($this->Ball->Box))
+			{
+				$this->Ball->Vel->X = +abs($this->Ball->Vel->Y);
+			}
+
+			$this->PaddleL->UpdateInput();
+			$this->PaddleL->LimitVel();
+
 			$this->Ball->Move();
-			$this->Ball->Move();
+			$this->PaddleL->Move();
+
+			$this->PaddleL->LimitBox($this->LimitBox);
 
 			$this->SendFunc("Ball", $this->Ball->ToJSON());
 			$this->SendFunc("PaddleL", $this->PaddleL->ToJSON());

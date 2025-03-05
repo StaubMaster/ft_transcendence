@@ -12,7 +12,7 @@ class CPlayer
 	private $InvitesSendArr;
 	private $InvitesRecvArr;
 
-	private $GameID;
+	private $SimInput;
 
 	public function __construct($ws)
 	{
@@ -26,7 +26,7 @@ class CPlayer
 		$this->InvitesSendArr = array();
 		$this->InvitesRecvArr = array();
 
-		$this->GameID = -1;
+		$this->Session = null;
 	}
 
 	public function isRemove()
@@ -50,7 +50,10 @@ class CPlayer
 	{
 		return $this->Name;
 	}
-
+	public function setSimInput($simInput)
+	{
+		$this->SimInput = $simInput;
+	}
 
 	private function InviteSend($other)
 	{
@@ -107,15 +110,6 @@ class CPlayer
 		return $str . "}";
 	}
 
-	public function leaveGame()
-	{
-		$this->GameID = -1;
-	}
-	public function joinGame($gameID)
-	{
-		$this->GameID = $gameID;
-	}
-
 	public $isPresent;
 	public function Update()
 	{
@@ -126,6 +120,7 @@ class CPlayer
 			$CmdChangeName = new Command("Change-Name: ");
 			$CmdInviteRecv = new Command("InviteRequestTo: ");
 			$CmdIamHere = new Command("I-Am-Here");
+			$CmdSimInput = new Command("Session-Simulation-Input: ");
 			if (($val = $CmdChangeName->value($message)) !== false)
 			{
 				$this->Name = $val;
@@ -135,7 +130,7 @@ class CPlayer
 				//	Allow Self Invite for Testing
 				if ($val == $this->ID)
 				{
-					$this->ws->sendText("This-is-You: " . $val);
+					//$this->ws->sendText("This-is-You: " . $val);
 					SessionPongArray_AddByUsers($this, $this);
 				}
 				else
@@ -162,6 +157,17 @@ class CPlayer
 			elseif (($val = $CmdIamHere->value($message)) !== false)
 			{
 				$this->isPresent = true;
+			}
+			elseif (($val = $CmdSimInput->value($message)) !== false)
+			{
+				if ($this->SimInput != null)
+				{
+					$this->SimInput->Update($val);
+				}
+				else
+				{
+					echo "no input\n";
+				}
 			}
 			else
 			{

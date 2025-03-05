@@ -25,14 +25,13 @@ class SessionPong
 	private $isGameOver;
 
 	private $PresanceCheck;
+
 	private $Simulation;
 
 	function __construct($plL, $plR)
 	{
 		$this->plL = $plL;
 		$this->plR = $plR;
-		$this->plL->joinGame(0);
-		$this->plR->joinGame(0);
 
 		$this->SendAllPlayers(self::Header_SessionID . "0");
 		$this->SendAllPlayers(self::Header_SessionState . "none");
@@ -54,8 +53,8 @@ class SessionPong
 	}
 	function removePlayers()
 	{
-		$this->plL->leaveGame();
-		$this->plR->leaveGame();
+		$this->plL->setSimInput(null);
+		$this->plR->setSimInput(null);
 	}
 
 	public function isGameOver() { return $this->isGameOver; }
@@ -81,6 +80,14 @@ class SessionPong
 	public function SendSimData($name, $data)
 	{
 		$this->SendAllPlayers('Simulation-Data: { "name": "' . $name . '", "data": ' . $data . ' }');
+	}
+	public function getUserL()
+	{
+		return $this->plL;
+	}
+	public function getUserR()
+	{
+		return $this->plR;
 	}
 
 	public function Update()

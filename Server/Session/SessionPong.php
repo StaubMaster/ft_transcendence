@@ -24,8 +24,7 @@ class SessionPong
 
 	private $isGameOver;
 
-	private $frameTicker;
-	private $frameTime;
+	private $Simulation;
 
 	function __construct($plL, $plR)
 	{
@@ -49,17 +48,7 @@ class SessionPong
 
 		$this->isGameOver = false;
 
-		//	1.000	=	1s		1/s
-		//	0.100	=	0.1s	10/s
-		//	0.050	=	0.05s	20/s
-		//	0.025	=	0.025s	40/s
-		//$this->frameTicker = new TimeCheck(1);
-		//$this->frameTicker = new TimeCheck(0.25);
-		//$this->frameTicker = new TimeCheck(0.1);
-		$this->frameTicker = new TimeCheck(0.025);
-		$this->frameTime = hrtime(true);
-
-		$this->InitBoxes();
+		$this->Simulation = null;
 	}
 	function removePlayers()
 	{
@@ -87,9 +76,9 @@ class SessionPong
 		$this->SendAllPlayers(self::Header_SessionLScore . $this->ScoreL);
 		$this->SendAllPlayers(self::Header_SessionRScore . $this->ScoreR);
 	}
-	private function SendSessionData($name, $data)
+	public function SendSimData($name, $data)
 	{
-		$this->SendAllPlayers('Session-Data: { "name": "' . $name . '", "data": ' . $data . ' }');
+		$this->SendAllPlayers('Simulation-Data: { "name": "' . $name . '", "data": ' . $data . ' }');
 	}
 
 	function checkPlayersPresance()
@@ -242,28 +231,8 @@ class SessionPong
 		$this->SendAllPlayers(self::Header_SessionLState . "");
 		$this->SendAllPlayers(self::Header_SessionRState . "");
 
-		$this->SendSessionData("Wall0", $this->Wall0->toString());
-		$this->SendSessionData("Wall1", $this->Wall1->toString());
-		$this->SendSessionData("Wall2", $this->Wall2->toString());
-		$this->SendSessionData("Wall3", $this->Wall3->toString());
+		$this->Simulation = new SimulationPong($this);
 	}
-
-
-	public $Wall0;
-	public $Wall1;
-	public $Wall2;
-	public $Wall3;
-	public $Ball;
-	public function InitBoxes()
-	{
-		$this->Wall0 = new Box(new Point(+0.9, -1.0), new Point(+1.0, +1.0));
-		$this->Wall1 = new Box(new Point(-1.0, -1.0), new Point(-0.9, +1.0));
-		$this->Wall2 = new Box(new Point(-1.0, +0.9), new Point(+1.0, +1.0));
-		$this->Wall3 = new Box(new Point(-1.0, -1.0), new Point(+1.0, -0.9));
-
-		$this->Ball = new VelBox(new Box(new Point(-0.025, -0.025), new Point(+0.025, +0.025)), new Point(0.02, 0.01));
-	}
-
 
 	public function Update()
 	{
@@ -282,40 +251,7 @@ class SessionPong
 			return;
 		}
 
-		if ($this->frameTicker->check())
-		{
-			//$t = hrtime(true);
-			//echo "Frame-Time: (should/is): "
-			//	. $this->frameTicker->ToString()
-			//	. "/"
-			//	. (($t - $this->frameTime) / 1000000000) . "s"
-			//	. "\n";
-			//$this->frameTime = $t;
-
-			if ($this->Wall0->Intersect($this->Ball->Box))
-			{
-				$this->Ball->Vel->X = -abs($this->Ball->Vel->X);
-				//echo "-X\n";
-			}
-			if ($this->Wall1->Intersect($this->Ball->Box))
-			{
-				$this->Ball->Vel->X = +abs($this->Ball->Vel->X);
-				//echo "+X\n";
-			}
-			if ($this->Wall2->Intersect($this->Ball->Box))
-			{
-				$this->Ball->Vel->Y = -abs($this->Ball->Vel->Y);
-				//echo "-Y\n";
-			}
-			if ($this->Wall3->Intersect($this->Ball->Box))
-			{
-				$this->Ball->Vel->Y = +abs($this->Ball->Vel->Y);
-				//echo "+Y\n";
-			}
-
-			$this->Ball->Move();
-			$this->SendSessionData("Ball", $this->Ball->toString());
-		}
+		$this->Simulation->Update();
 	}
 }
 

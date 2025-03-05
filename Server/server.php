@@ -8,6 +8,7 @@ ob_implicit_flush();
 echo "<<<<\n";
 include 'Log.php';
 
+include 'php8_str.php';
 include 'socket_help.php';
 include 'HTTP_Respond.php';
 include 'TimeCheck.php';
@@ -23,6 +24,8 @@ include 'Session/SessionPongArray.php';
 include 'Simulation/Point.php';
 include 'Simulation/Box.php';
 include 'Simulation/VelBox.php';
+include 'Simulation/Paddle.php';
+include 'Simulation/SimulationPong.php';
 echo ">>>>\n";
 
 function HeaderFindValue($fheader, $fname)

@@ -12,11 +12,11 @@ class VelBox
 		$this->Vel = $vel;
 	}
 
-	public function toString()
+	public function ToJSON()
 	{
 		return "{ "
-			. '"box": ' . $this->Box->toString() . ", "
-			. '"vel": ' . $this->Vel->toString() .
+			. '"box": ' . $this->Box->ToJSON() . ", "
+			. '"vel": ' . $this->Vel->ToJSON() .
 			" }";
 	}
 

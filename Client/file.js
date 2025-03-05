@@ -26,14 +26,14 @@ function WebSocket_ShowStatus()
 		else { elem.textContent = ws.readyState + " (UNKNOWN)";}
 	}
 }
-WebSocket_ShowStatus();
+//WebSocket_ShowStatus();
 
 function WebSocket_ShowID()
 {
 	var elem = document.getElementById("socketID");
 	elem.textContent = ID;
 }
-WebSocket_ShowID();
+//WebSocket_ShowID();
 
 function WebSocket_Connect()
 {
@@ -121,7 +121,7 @@ function WebSocket_Message(text)
 	}
 
 	var cmd_ID = "ID: ";
-	var cmd_SessionData = "Session-Data: ";
+	var cmd_SimulationData = "Simulation-Data: ";
 
 	if (text.startsWith(cmd_ID))
 	{
@@ -129,10 +129,10 @@ function WebSocket_Message(text)
 		ID = cut;
 		WebSocket_ShowID();
 	}
-	else if (text.startsWith(cmd_SessionData))
+	else if (text.startsWith(cmd_SimulationData))
 	{
-		var cut = text.substring(cmd_SessionData.length);
-		SessionDataChangeFunc(cut);
+		var cut = text.substring(cmd_SimulationData.length);
+		SimulationDataChangeFunc(cut);
 	}
 	else
 	{

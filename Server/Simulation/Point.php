@@ -12,7 +12,7 @@ class Point
 		$this->Y = $y;
 	}
 
-	public function toString()
+	public function ToJSON()
 	{
 		//return "{ "
 		//	. '"x": ' . $this->X . ", "

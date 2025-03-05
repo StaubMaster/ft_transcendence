@@ -3,12 +3,13 @@ import * as BABYLON from './node_modules/@babylonjs/core/';
 const canvas = document.getElementById('session-canvas');
 
 const engine = new BABYLON.Engine(canvas);
-var box;
 var ball;
 var wall0;
 var wall1;
 var wall2;
 var wall3;
+var paddleL;
+var paddleR;
 
 const createScene = function()
 {
@@ -16,14 +17,21 @@ const createScene = function()
 
 	scene.createDefaultCameraOrLight(true, false, true);
 
-	box = new BABYLON.MeshBuilder.CreateBox();
-	box.position.x = 3;
-
 	ball = new BABYLON.MeshBuilder.CreateBox();
 	wall0 = new BABYLON.MeshBuilder.CreateBox();
 	wall1 = new BABYLON.MeshBuilder.CreateBox();
 	wall2 = new BABYLON.MeshBuilder.CreateBox();
 	wall3 = new BABYLON.MeshBuilder.CreateBox();
+	paddleL = new BABYLON.MeshBuilder.CreateBox();
+	paddleR = new BABYLON.MeshBuilder.CreateBox();
+
+	ball.scaling = new BABYLON.Vector3(0.01, 0.01, 0.01);
+	wall0.scaling = new BABYLON.Vector3(0.01, 0.01, 0.01);
+	wall1.scaling = new BABYLON.Vector3(0.01, 0.01, 0.01);
+	wall2.scaling = new BABYLON.Vector3(0.01, 0.01, 0.01);
+	wall3.scaling = new BABYLON.Vector3(0.01, 0.01, 0.01);
+	paddleL.scaling = new BABYLON.Vector3(0.01, 0.01, 0.01);
+	paddleR.scaling = new BABYLON.Vector3(0.01, 0.01, 0.01);
 
 	return scene;
 }
@@ -45,7 +53,7 @@ function BoxToPos(box)
 	);
 }
 
-export function SessionDataChangeFunc(str)
+export function SimulationDataChangeFunc(str)
 {
 	//console.log("'" + str + "'");
 	var full_data = JSON.parse(str);
@@ -80,12 +88,24 @@ export function SessionDataChangeFunc(str)
 		wall3.scaling = BoxToScale(data);
 		wall3.position = BoxToPos(data);
 	}
+	else if (full_data.name == "PaddleL")
+	{
+		var data = full_data.data;
+		paddleL.scaling = BoxToScale(data.box);
+		paddleL.position = BoxToPos(data.box);
+	}
+	else if (full_data.name == "PaddleR")
+	{
+		var data = full_data.data;
+		paddleR.scaling = BoxToScale(data.box);
+		paddleR.position = BoxToPos(data.box);
+	}
 	else
 	{
 		console.log(full_data);
 	}
 }
-window.SessionDataChangeFunc = SessionDataChangeFunc;
+window.SimulationDataChangeFunc = SimulationDataChangeFunc;
 
 const scene = createScene();
 

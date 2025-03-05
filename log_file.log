@@ -4,7 +4,7 @@ GET /ws
 HTTP/1.1 101 Switching Protocols
 Upgrade: websocket
 Connection: Upgrade
-Sec-WebSocket-Accept: PsMex8cQoRa0V5+a0l3G73ToVBs=
+Sec-WebSocket-Accept: HlfPChlhQ6Q9XkG0BVAe9ekckk0=
 
 GET /BrowseUsersTable%0
 HTTP/1.1 200 OK

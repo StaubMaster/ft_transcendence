@@ -44,7 +44,6 @@ function SessionPongArray_AddByUsers($usrL, $usrR)
 	echo "++++ pong Match ++++\n";
 	global $SessionPongArray;
 	$new_ses = new SessionPong($usrL, $usrR);
-	$new_ses->PresentCheckWait();
 	array_push($SessionPongArray, $new_ses);
 }
 

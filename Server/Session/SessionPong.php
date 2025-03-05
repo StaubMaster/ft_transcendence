@@ -24,6 +24,7 @@ class SessionPong
 
 	private $isGameOver;
 
+	private $PresanceCheck;
 	private $Simulation;
 
 	function __construct($plL, $plR)
@@ -48,6 +49,7 @@ class SessionPong
 
 		$this->isGameOver = false;
 
+		$this->PresanceCheck = new PresanceCheck($this, $this->plL, $this->plR);
 		$this->Simulation = null;
 	}
 	function removePlayers()
@@ -59,7 +61,7 @@ class SessionPong
 	public function isGameOver() { return $this->isGameOver; }
 	public function ScoreL() { return $this->ScoreL; }
 	public function ScoreR() { return $this->ScoreR; }
-	private function SendAllPlayers($text)
+	public function SendAllPlayers($text)
 	{
 		if ($this->plL->getID() != $this->plR->getID())
 		{
@@ -81,159 +83,6 @@ class SessionPong
 		$this->SendAllPlayers('Simulation-Data: { "name": "' . $name . '", "data": ' . $data . ' }');
 	}
 
-	function checkPlayersPresance()
-	{
-		if (!$this->plL->isPresent || !$this->plR->isPresent)
-		{
-			$this->isGameOver = true;
-			$this->SendScore();
-			$this->SendAllPlayers(self::Header_SessionState . "Presance Check Failed");
-			$l = self::Header_SessionLState;
-			$r = self::Header_SessionRState;
-			if ($this->plL->isPresent) { $l .= "was here"; } else { $l .= "wasn't here"; }
-			if ($this->plR->isPresent) { $r .= "was here"; } else { $r .= "wasn't here"; }
-			$this->SendAllPlayers($l);
-			$this->SendAllPlayers($r);
-			return true;
-		}
-		return false;
-	}
-	function checkPlayersConnected()
-	{
-		if ($this->plL->isRemove() || $this->plR->isRemove())
-		{
-			$this->isGameOver = true;
-			$this->SendScore();
-			$this->SendAllPlayers(self::Header_SessionState . "Disconnection");
-			$l = self::Header_SessionLState;
-			$r = self::Header_SessionRState;
-			if ($this->plL->isRemove()) { $l .= "disconnected"; } else { $l .= "default"; }
-			if ($this->plR->isRemove()) { $r .= "disconnected"; } else { $r .= "default"; }
-			$this->SendAllPlayers($l);
-			$this->SendAllPlayers($r);
-			return true;
-		}
-		return false;
-	}
-
-
-
-	/*
-		right now this is a bit too fast
-		the websocket onOpen() sends only after this
-		so the last ws will immediatly be recognized as here
-		but for manual connections there would be some time between these
-		but still fix these maybe,
-		like only recognize certain messages
-		but then the problem is that a message might be consumed here or the other check
-		so add something to remember the last message and give that when it was "refunded"
-	*/
-
-	/*
-		i want the session to give more info to each player
-		at start of session:
-		- session ID
-		- username and ID of each User
-		Presance check:
-		- is Happaning
-		- waiting for you / other (put this at the end of usernames ?)
-		Session Simulation:
-		- Score
-		Session End:
-		- Score (put with username ?)
-		- Who Won (put with username ?)
-		- Why it Ended
-			- someone wasn't present (put with username ?)
-			- someone disconnected (put with Username ?)
-			- someone lost
-
-		with all this stuff for the usernames, I could just make a Scoreboard
-		the problem with this is that it might be a lot of information during the game
-		maybe during the game you have big numbers for the score
-		and the rest of the data is below
-		that is the only information you get in the original pong
-
-		but most of this info is only ever once important so show all at once would be stupid
-		- when the Session start show the username and ID
-		- during the Presance Check the valid info is: "not here" "here", thats kind of it
-		- during the Session the info is maybe the score
-		- after the Session in info is score followed by: "won" "lost" "disconnected" "default"
-
-		Session-ID: 0
-		Session-State: "checking Presance"
-		Session-L-Name: 0 "UserName"
-		Session-R-Name: 1 "CoolerUserName"
-		Session-L-State: "lost"
-		Session-R-State: "won"
-	*/
-
-	private $PresentChecking;
-	private $PresentCheckTime;
-	private $PresentCheckTimeSec;
-	public function PresentCheckWait()
-	{
-		$this->PresentChecking = true;
-		$this->PresentCheckTime = new TimeCheck(1);
-		$this->PresentCheckTimeSec = 10;
-		$this->plL->isPresent = false;
-		$this->plR->isPresent = false;
-		$this->SendAllPlayers(self::Header_SessionState . "Waiting for Presance");
-		$this->SendAllPlayers(self::Header_SessionLState . "...");
-		$this->SendAllPlayers(self::Header_SessionRState . "...");
-	}
-	public function PresentCheckWaitUpdate()
-	{
-		if (!$this->PresentCheckTime->check())
-		{
-			if ($this->plL->isRemove())
-			{
-				$this->PresentCheckFinal();
-			}
-			if ($this->plR->isRemove())
-			{
-				$this->PresentCheckFinal();
-			}
-
-			if ($this->plL->isPresent && $this->plR->isPresent)
-			{
-				$this->PresentCheckFinal();
-			}
-		}
-		else if ($this->PresentCheckTimeSec > 0)
-		{
-			echo "Present Check: " . $this->PresentCheckTimeSec . "\n";
-
-			if ($this->plL->isPresent)
-				$this->SendAllPlayers(self::Header_SessionLState . "here");
-
-			if ($this->plR->isPresent)
-				$this->SendAllPlayers(self::Header_SessionRState . "here");
-
-			$this->SendAllPlayers(self::Header_SessionState . "Waiting for Presance " . $this->PresentCheckTimeSec . "s");
-			$this->PresentCheckTimeSec--;
-		}
-		else
-		{
-			$this->PresentCheckFinal();
-		}
-	}
-	public function PresentCheckFinal()
-	{
-		$this->PresentChecking = false;
-
-		if ($this->checkPlayersPresance())
-		{
-			return;
-		}
-
-		echo "Present Check: Done\n";
-		$this->SendAllPlayers(self::Header_SessionState . "Playing");
-		$this->SendAllPlayers(self::Header_SessionLState . "");
-		$this->SendAllPlayers(self::Header_SessionRState . "");
-
-		$this->Simulation = new SimulationPong($this);
-	}
-
 	public function Update()
 	{
 		if ($this->isGameOver)
@@ -242,12 +91,23 @@ class SessionPong
 		$this->plL->Update();
 		$this->plR->Update();
 
-		if ($this->checkPlayersConnected())
-			return;
-
-		if ($this->PresentChecking)
+		if ($this->PresanceCheck->Connected())
 		{
-			$this->PresentCheckWaitUpdate();
+			return;
+		}
+
+		if ($this->PresanceCheck->isFailed)
+		{
+			$this->isGameOver = true;
+			return;
+		}
+		if (!$this->PresanceCheck->isDone)
+		{
+			$this->PresanceCheck->WaitUpdate();
+			if ($this->PresanceCheck->isDone && !$this->PresanceCheck->isFailed)
+			{
+				$this->Simulation = new SimulationPong($this);
+			}
 			return;
 		}
 

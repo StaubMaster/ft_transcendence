@@ -20,6 +20,7 @@ include 'Command.php';
 
 include 'Session/SessionPong.php';
 include 'Session/SessionPongArray.php';
+include 'Session/PresanceCheck.php';
 
 include 'Simulation/Point.php';
 include 'Simulation/Box.php';

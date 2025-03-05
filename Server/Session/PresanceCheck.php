@@ -4,8 +4,8 @@
 class PresanceCheck
 {
 	private $Session;
-	private $plL;
-	private $plR;
+	private $userL;
+	private $userR;
 
 	public $isDone;
 	public $isFailed;
@@ -13,11 +13,11 @@ class PresanceCheck
 	private	$TimeSecTick;
 	private	$TimeSeconds;
 
-	function __construct($session, $plL, $plR)
+	function __construct($session, $userL, $userR)
 	{
 		$this->Session = $session;
-		$this->plL = $plL;
-		$this->plR = $plR;
+		$this->userL = $userL;
+		$this->userR = $userR;
 
 		$this->isDone = false;
 		$this->isFailed = false;
@@ -25,44 +25,44 @@ class PresanceCheck
 		$this->PresentCheckTime = new TimeCheck(1);
 		$this->PresentCheckTimeSec = 10;
 
-		$this->plL->isPresent = false;
-		$this->plR->isPresent = false;
+		$this->userL->isPresent = false;
+		$this->userR->isPresent = false;
 
-		$this->Session->SendAllPlayers(SessionPong::Header_SessionState . "Waiting for Presance");
-		$this->Session->SendAllPlayers(SessionPong::Header_SessionLState . "...");
-		$this->Session->SendAllPlayers(SessionPong::Header_SessionRState . "...");
+		$this->Session->SendAll(SessionPong::Header_SessionState . "Waiting for Presance");
+		$this->Session->SendAll(SessionPong::Header_SessionLState . "...");
+		$this->Session->SendAll(SessionPong::Header_SessionRState . "...");
 	}
 
 	public function Presance()
 	{
-		if (!$this->plL->isPresent || !$this->plR->isPresent)
+		if (!$this->userL->isPresent || !$this->userR->isPresent)
 		{
 			$this->isDone = true;
 			$this->isFailed = true;
-			$this->Session->SendAllPlayers(SessionPong::Header_SessionState . "Presance Check Failed");
+			$this->Session->SendAll(SessionPong::Header_SessionState . "Presance Check Failed");
 			$l = SessionPong::Header_SessionLState;
 			$r = SessionPong::Header_SessionRState;
-			if ($this->plL->isPresent) { $l .= "was here"; } else { $l .= "wasn't here"; }
-			if ($this->plR->isPresent) { $r .= "was here"; } else { $r .= "wasn't here"; }
-			$this->Session->SendAllPlayers($l);
-			$this->Session->SendAllPlayers($r);
+			if ($this->userL->isPresent) { $l .= "was here"; } else { $l .= "wasn't here"; }
+			if ($this->userR->isPresent) { $r .= "was here"; } else { $r .= "wasn't here"; }
+			$this->Session->SendAll($l);
+			$this->Session->SendAll($r);
 			return true;
 		}
 		return false;
 	}
 	public function Connected()
 	{
-		if ($this->plL->isRemove() || $this->plR->isRemove())
+		if ($this->userL->isRemove() || $this->userR->isRemove())
 		{
 			$this->isDone = true;
 			$this->isFailed = true;
-			$this->Session->SendAllPlayers(SessionPong::Header_SessionState . "Disconnection");
+			$this->Session->SendAll(SessionPong::Header_SessionState . "Disconnection");
 			$l = SessionPong::Header_SessionLState;
 			$r = SessionPong::Header_SessionRState;
-			if ($this->plL->isRemove()) { $l .= "disconnected"; } else { $l .= "default"; }
-			if ($this->plR->isRemove()) { $r .= "disconnected"; } else { $r .= "default"; }
-			$this->Session->SendAllPlayers($l);
-			$this->Session->SendAllPlayers($r);
+			if ($this->userL->isRemove()) { $l .= "disconnected"; } else { $l .= "default"; }
+			if ($this->userR->isRemove()) { $r .= "disconnected"; } else { $r .= "default"; }
+			$this->Session->SendAll($l);
+			$this->Session->SendAll($r);
 			return true;
 		}
 		return false;
@@ -72,16 +72,16 @@ class PresanceCheck
 	{
 		if (!$this->PresentCheckTime->check())
 		{
-			if ($this->plL->isRemove())
+			if ($this->userL->isRemove())
 			{
 				$this->WaitFinal();
 			}
-			if ($this->plR->isRemove())
+			if ($this->userR->isRemove())
 			{
 				$this->WaitFinal();
 			}
 
-			if ($this->plL->isPresent && $this->plR->isPresent)
+			if ($this->userL->isPresent && $this->userR->isPresent)
 			{
 				$this->WaitFinal();
 			}
@@ -90,13 +90,13 @@ class PresanceCheck
 		{
 			echo "Present Check: " . $this->PresentCheckTimeSec . "\n";
 
-			if ($this->plL->isPresent)
-				$this->Session->SendAllPlayers(SessionPong::Header_SessionLState . "here");
+			if ($this->userL->isPresent)
+				$this->Session->SendAll(SessionPong::Header_SessionLState . "here");
 
-			if ($this->plR->isPresent)
-				$this->Session->SendAllPlayers(SessionPong::Header_SessionRState . "here");
+			if ($this->userR->isPresent)
+				$this->Session->SendAll(SessionPong::Header_SessionRState . "here");
 
-			$this->Session->SendAllPlayers(SessionPong::Header_SessionState . "Waiting for Presance " . $this->PresentCheckTimeSec . "s");
+			$this->Session->SendAll(SessionPong::Header_SessionState . "Waiting for Presance " . $this->PresentCheckTimeSec . "s");
 			$this->PresentCheckTimeSec--;
 		}
 		else
@@ -115,9 +115,9 @@ class PresanceCheck
 		}
 
 		echo "Present Check: Done\n";
-		$this->Session->SendAllPlayers(SessionPong::Header_SessionState . "Playing");
-		$this->Session->SendAllPlayers(SessionPong::Header_SessionLState . "");
-		$this->Session->SendAllPlayers(SessionPong::Header_SessionRState . "");
+		$this->Session->SendAll(SessionPong::Header_SessionState . "Playing");
+		$this->Session->SendAll(SessionPong::Header_SessionLState . "");
+		$this->Session->SendAll(SessionPong::Header_SessionRState . "");
 	}
 };
 

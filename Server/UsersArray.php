@@ -41,7 +41,7 @@ function UsersArray_AddBySocket($fsocket)
 {
 	echo "++++ User ++++\n";
 	global $UsersArray;
-	$new_pl = new CPlayer(new WebSocket($fsocket));
+	$new_pl = new User(new WebSocket($fsocket));
 	array_push($UsersArray, $new_pl);
 	$client_socket = null;
 }

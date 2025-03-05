@@ -121,7 +121,7 @@ scene.onKeyboardObservable.add(function(key_info)
 			if (!MoveUpKeyPressed)
 			{
 				MoveUpKeyPressed = true;
-				Websocket_Send("Session-Simulation-Input: UP");
+				WebSocket_Send("Session-Simulation-Input: UP");
 			}
 		}
 		if (key_info.event.key == "s")
@@ -129,7 +129,7 @@ scene.onKeyboardObservable.add(function(key_info)
 			if (!MoveDwKeyPressed)
 			{
 				MoveDwKeyPressed = true;
-				Websocket_Send("Session-Simulation-Input: DW");
+				WebSocket_Send("Session-Simulation-Input: DW");
 			}
 		}
 	}
@@ -140,7 +140,7 @@ scene.onKeyboardObservable.add(function(key_info)
 			if (MoveUpKeyPressed)
 			{
 				MoveUpKeyPressed = false;
-				Websocket_Send("Session-Simulation-Input: !UP");
+				WebSocket_Send("Session-Simulation-Input: !UP");
 			}
 		}
 		if (key_info.event.key == "s")
@@ -148,7 +148,7 @@ scene.onKeyboardObservable.add(function(key_info)
 			if (MoveDwKeyPressed)
 			{
 				MoveDwKeyPressed = false;
-				Websocket_Send("Session-Simulation-Input: !DW");
+				WebSocket_Send("Session-Simulation-Input: !DW");
 			}
 		}
 	}

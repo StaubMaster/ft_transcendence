@@ -27,6 +27,38 @@ class Box
 			" }";
 	}
 
+	public function GetCenter()
+	{
+		return new Point(
+			($this->Max->X + $this->Min->X) * 0.5,
+			($this->Max->Y + $this->Min->Y) * 0.5
+		);
+	}
+	public function GetSizeFull()
+	{
+		return new Point(
+			($this->Max->X - $this->Min->X),
+			($this->Max->Y - $this->Min->Y)
+		);
+	}
+	public function GetSizeHalf()
+	{
+		return new Point(
+			($this->Max->X - $this->Min->X) * 0.5,
+			($this->Max->Y - $this->Min->Y) * 0.5
+		);
+	}
+	public function SetCenter($center)
+	{
+		$size = $this->GetSizeHalf();
+
+		$this->Min->X = $center->X - $size->X;
+		$this->Min->Y = $center->Y - $size->Y;
+
+		$this->Max->X = $center->X + $size->X;
+		$this->Max->Y = $center->Y + $size->Y;
+	}
+
 	public function Intersect($other)
 	{
 		return	($this->Min->X < $other->Max->X) &&
@@ -42,10 +74,7 @@ class Box
 	*/
 	public function Limit($limitBox)
 	{
-		$size = new Point(
-			$this->Max->X - $this->Min->X,
-			$this->Max->Y - $this->Min->Y
-		);
+		$size = $this->GetSizeFull();
 
 		if ($this->Min->X < $limitBox->Min->X)
 		{

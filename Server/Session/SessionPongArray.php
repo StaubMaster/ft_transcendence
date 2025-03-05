@@ -33,7 +33,7 @@ function SessionPongArray_Trim()
 		else
 		{
 			echo "---- pong Match ----\n";
-			$ses->removePlayers();
+			$ses->removeUsersPaddle();
 			$ses = null;
 		}
 	}

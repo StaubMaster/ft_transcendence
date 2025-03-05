@@ -16,11 +16,11 @@ class SessionPong
 	const Header_SessionRScore = "Session-R-Score: ";
 	const Header_SessionRState = "Session-R-State: ";
 
-	private $plL;
-	private $plR;
+	private $userL;
+	private $userR;
 
-	private $ScoreL;
-	private $ScoreR;
+	public $ScoreL;
+	public $ScoreR;
 
 	private $isGameOver;
 
@@ -28,19 +28,19 @@ class SessionPong
 
 	private $Simulation;
 
-	function __construct($plL, $plR)
+	function __construct($userL, $userR)
 	{
-		$this->plL = $plL;
-		$this->plR = $plR;
+		$this->userL = $userL;
+		$this->userR = $userR;
 
-		$this->SendAllPlayers(self::Header_SessionID . "0");
-		$this->SendAllPlayers(self::Header_SessionState . "none");
-		$this->SendAllPlayers(self::Header_SessionLID . $this->plL->getID());
-		$this->SendAllPlayers(self::Header_SessionRID . $this->plR->getID());
-		$this->SendAllPlayers(self::Header_SessionLName . $this->plL->getName());
-		$this->SendAllPlayers(self::Header_SessionRName . $this->plR->getName());
-		$this->SendAllPlayers(self::Header_SessionLState . "none");
-		$this->SendAllPlayers(self::Header_SessionRState . "none");
+		$this->SendAll(self::Header_SessionID . "0");
+		$this->SendAll(self::Header_SessionState . "none");
+		$this->SendAll(self::Header_SessionLID . $this->userL->getID());
+		$this->SendAll(self::Header_SessionRID . $this->userR->getID());
+		$this->SendAll(self::Header_SessionLName . $this->userL->getName());
+		$this->SendAll(self::Header_SessionRName . $this->userR->getName());
+		$this->SendAll(self::Header_SessionLState . "none");
+		$this->SendAll(self::Header_SessionRState . "none");
 
 		$this->ScoreL = 0;
 		$this->ScoreR = 0;
@@ -48,46 +48,44 @@ class SessionPong
 
 		$this->isGameOver = false;
 
-		$this->PresanceCheck = new PresanceCheck($this, $this->plL, $this->plR);
+		$this->PresanceCheck = new PresanceCheck($this, $this->userL, $this->userR);
 		$this->Simulation = null;
 	}
-	function removePlayers()
+	function removeUsersPaddle()
 	{
-		$this->plL->setSimInput(null);
-		$this->plR->setSimInput(null);
+		$this->userL->setPaddle(null);
+		$this->userR->setPaddle(null);
 	}
 
 	public function isGameOver() { return $this->isGameOver; }
-	public function ScoreL() { return $this->ScoreL; }
-	public function ScoreR() { return $this->ScoreR; }
-	public function SendAllPlayers($text)
+	public function SendAll($text)
 	{
-		if ($this->plL->getID() != $this->plR->getID())
+		if ($this->userL->getID() != $this->userR->getID())
 		{
-			$this->plL->sendText($text);
-			$this->plR->sendText($text);
+			$this->userL->sendText($text);
+			$this->userR->sendText($text);
 		}
 		else
 		{
-			$this->plL->sendText($text);
+			$this->userL->sendText($text);
 		}
 	}
-	private function SendScore()
+	public function SendScore()
 	{
-		$this->SendAllPlayers(self::Header_SessionLScore . $this->ScoreL);
-		$this->SendAllPlayers(self::Header_SessionRScore . $this->ScoreR);
+		$this->SendAll(self::Header_SessionLScore . $this->ScoreL);
+		$this->SendAll(self::Header_SessionRScore . $this->ScoreR);
 	}
 	public function SendSimData($name, $data)
 	{
-		$this->SendAllPlayers('Simulation-Data: { "name": "' . $name . '", "data": ' . $data . ' }');
+		$this->SendAll('Simulation-Data: { "name": "' . $name . '", "data": ' . $data . ' }');
 	}
 	public function getUserL()
 	{
-		return $this->plL;
+		return $this->userL;
 	}
 	public function getUserR()
 	{
-		return $this->plR;
+		return $this->userR;
 	}
 
 	public function Update()
@@ -95,8 +93,8 @@ class SessionPong
 		if ($this->isGameOver)
 			return;
 
-		$this->plL->Update();
-		$this->plR->Update();
+		$this->userL->Update();
+		$this->userR->Update();
 
 		if ($this->PresanceCheck->Connected())
 		{
@@ -119,6 +117,31 @@ class SessionPong
 		}
 
 		$this->Simulation->Update();
+
+		if ($this->ScoreL >= 3 || $this->ScoreR >= 3)
+		{
+			$this->isGameOver = true;
+			$this->SendAll(SessionPong::Header_SessionState . "Game Over");
+			$l = SessionPong::Header_SessionLState;
+			$r = SessionPong::Header_SessionRState;
+			if ($this->ScoreL > $this->ScoreR)
+			{
+				$l .= "winner";
+				$r .= "loser";
+			}
+			else if ($this->ScoreL < $this->ScoreR)
+			{
+				$l .= "loser";
+				$r .= "winner";
+			}
+			else
+			{
+				$l .= "tie";
+				$r .= "tie";
+			}
+			$this->SendAll($l);
+			$this->SendAll($r);
+		}
 	}
 }
 

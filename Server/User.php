@@ -1,7 +1,7 @@
 
 <?php
 
-class CPlayer
+class User
 {
 	private static $GlobalID = 0;
 
@@ -12,7 +12,7 @@ class CPlayer
 	private $InvitesSendArr;
 	private $InvitesRecvArr;
 
-	private $SimInput;
+	private $Paddle;
 
 	public function __construct($ws)
 	{
@@ -50,9 +50,9 @@ class CPlayer
 	{
 		return $this->Name;
 	}
-	public function setSimInput($simInput)
+	public function setPaddle($paddle)
 	{
-		$this->SimInput = $simInput;
+		$this->Paddle= $paddle;
 	}
 
 	private function InviteSend($other)
@@ -160,9 +160,9 @@ class CPlayer
 			}
 			elseif (($val = $CmdSimInput->value($message)) !== false)
 			{
-				if ($this->SimInput != null)
+				if ($this->Paddle != null)
 				{
-					$this->SimInput->Update($val);
+					$this->Paddle->InputStr($val);
 				}
 				else
 				{

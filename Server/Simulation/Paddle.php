@@ -3,30 +3,32 @@
 
 class Paddle
 {
-	private $SimInput;
+	private	$MoveUP;
+	private	$MoveDW;
 
 	private $VelBox;
 
 	private $SpeedAccel;
 	private $SpeedLimit;
 
+	public $isServing;
+
 	function __construct($x, $sizeX, $sizeY, $speedAccel, $speedLimit)
 	{
-		$this->SimInput = new SimInput();
+		$this->MoveUP = false;
+		$this->MoveDW = false;
 
 		$this->VelBox = new VelBox(new Box(new Point($x - $sizeX, -$sizeY), new Point($x + $sizeX, +$sizeY)), new Point(0, 0));
 
 		$this->SpeedAccel = $speedAccel;
 		$this->SpeedLimit = $speedLimit;
+
+		$this->isServing = false;
 	}
 
 	public function ToJSON()
 	{
 		return $this->VelBox->ToJSON();
-	}
-	public function setUser($usr)
-	{
-		$usr->setSimInput($this->SimInput);
 	}
 
 	function Intersect($other)
@@ -34,9 +36,25 @@ class Paddle
 		return $this->VelBox->Box->Intersect($other);
 	}
 
+	function GetCenter()
+	{
+		return $this->VelBox->Box->GetCenter();
+	}
+	function GetVel()
+	{
+		return $this->VelBox->Vel;
+	}
+
+	function InputStr($str)
+	{
+		if ($str == "UP") { $this->MoveUP = true; }
+		if ($str == "DW") { $this->MoveDW = true; }
+		if ($str == "!UP") { $this->MoveUP = false; }
+		if ($str == "!DW") { $this->MoveDW = false; }
+	}
 	function UpdateInput()
 	{
-		if ($this->SimInput->isUP)
+		if ($this->MoveUP)
 		{
 			$this->VelBox->Vel->Y += $this->SpeedAccel;
 		}
@@ -45,7 +63,7 @@ class Paddle
 			$this->VelBox->Vel->Y -= $this->SpeedAccel;
 		}
 
-		if ($this->SimInput->isDW)
+		if ($this->MoveDW)
 		{
 			$this->VelBox->Vel->Y -= $this->SpeedAccel;
 		}

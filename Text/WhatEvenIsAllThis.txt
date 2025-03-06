@@ -1,0 +1,109 @@
+
+Mandatory:
+Play against another Player:
+#	theoretically, when the other one conencts it would work, but right now you can only connect with localhost
+#	which makes it so you have to click back and forth
+#	also having both on one keyboard would be bad because the school keyboard dont like multiple button presses (last time I tested)
+Tournament:
+#	currently there is no tournament system
+#	the simplest solution would be:
+##	1.	a list with an add button, when adding you need to put in a name
+##	2.	randomly/systematically assign pairs
+##	3.	say the names of who should play against who and have a button to start the match
+##	4.	all the winners get put into a new list, repeat from 2. until only 1 player remains
+##	what do when odd number of player
+##		randomly/systematically pick from the winners list
+
+
+
+
+
+Modules:
+
+Web
+++++	Major module: Use a framework to build the backend.
+----	Minor module: Use a framework or a toolkit to build the frontend.
+----	Minor module: Use a database for the backend.
+++++	Major module: Store the score of a tournament in the Blockchain.
+
+User Management
+++++	Major module: Standard user management, authentication, users across tournaments.
+	the server can remember player through multiple matches, but forgets when stopped
+	also it only remembers the name
+	"Users can securely subscribe to the website."
+		so just save the users when shutting down and load them when starting
+		when someone connects: ask for a password / username / ID
+	"Registered users can securely log in."
+		use a password, and also https ?
+	"Users can select a unique display name to participate in tournaments."
+		have a unique username per account but also allow an alias in the tournament
+		allow anon users to also play ?
+	"Users can update their information."
+		change password / username, ID cant be changed
+	"Users can upload an avatar, with a default option if none is provided."
+		profile picture ?
+	"Users can add others as friends and view their online status."
+		list of friends, show list with weather the friend user is connected
+	"User profiles display stats, such as wins and losses."
+		remember win/losses
+	"Each user has a Match History including 1v1 games, dates, and relevant details, accessible to logged-in users."
+		remember a bunch of game telemetry
+++++	Major module: Implementing a remote authentication.
+
+
+Gameplay and user experience
+++++	Major module: Remote players
+	I understand this as connecting one computer running the website and the other to see the same website
+	I currently do ServerSide Simulation so I guess this dosent work
+++++	Major module: Multiplayer (more than 2 players in the same game).
+++++	Major module: Add another game with user history and matchmaking.
+----	Minor module: Game customization options.
+++++	Major module: Live chat.
+
+AI-Algo
+++++	Major module: Introduce an AI opponent.
+----	Minor module: User and game stats dashboards
+	isnt this like the last part of Standard User Management
+
+Cybersecurity
+++++	Major module: Implement WAF/ModSecurity with a hardened configuration and HashiCorp Vault for secrets management.
+----	Minor module: GDPR compliance options with user anonymization, local data management, and Account Deletion.
+++++	Major module: Implement Two-Factor Authentication (2FA) and JWT.
+
+Devops
+++++	Major module: Infrastructure setup for log management.
+	debug log ?
+	for Dashboards ?
+----	Minor module: Monitoring system.
+++++	Major module: Designing the backend as microservices.
+	I have Simulation and Session and such in seperate classes, does that count ?
+
+Graphics
+++++	Major module: Use advanced 3D techniques.
+	right now its very basic
+
+Accessibility
+----	Minor module: Support on all devices.
+----	Minor module: Expanding browser compatibility.
+----	Minor module: Supports multiple languages.
+----	Minor module: Add accessibility features for visually impaired users.
+----	Minor module: Server-Side Rendering (SSR) integration.
+
+Server-Side Pong
+++++	Major module: Replace basic Pong with server-side Pong and implement an API.
+	"Develop server-side logic for the Pong game to handle gameplay, ball movement, scoring, and player interactions."
+		have: Simulation
+	"Create an API that exposes the necessary resources and endpoints to interact with the Pong game, allowing partial usage of the game via the Command-Line Interface (CLI) and web interface."
+		it ineracts with the website, I dont do anything with the command line currently
+	"Design and implement the API endpoints to support game initialization, player controls, and game state updates."
+		have: the little table that shows score
+	"Ensure that the server-side Pong game is responsive, providing an engaging and enjoyable gaming experience."
+		it updates at 40 UPS, feels good, but when loading another page it slows down because I'm using a single thread
+	"Integrate the server-side Pong game with the web application, allowing users to play the game directly on the website"
+		"Integrate", so I also need the others ?
+++++	Major module: Enabling Pong gameplay via CLI against web users with API integration
+	how do you play anything with the command line
+	does this mean show the game with ascii ?
+	who has access to the CLI, realisticly only the one that the server is running on has access
+	because someone on another computer dosent have any access to the server
+	or does it mean in the debug console of the browser, thats even dumber

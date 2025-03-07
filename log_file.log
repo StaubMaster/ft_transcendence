@@ -1,12 +1,2 @@
 new Log File
 
-GET /ws
-HTTP/1.1 101 Switching Protocols
-Upgrade: websocket
-Connection: Upgrade
-Sec-WebSocket-Accept: RN6kAovB6TAeVaBtNc8XI6H1tSM=
-
-GET /BrowseUsersTable%0
-HTTP/1.1 200 OK
-Content-Type: text/html
-

@@ -85,6 +85,7 @@ function socket_client_read_header($fclient_socket)
 		if ($buf != null)
 		{
 			//echo "spam '" . $buf . "':" . strlen($buf) . ":" . $len . "\n";
+			Log::ToFile($buf);
 		}
 		//echo "here 2\n";
 		if ($buf == "")

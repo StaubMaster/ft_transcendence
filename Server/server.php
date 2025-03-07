@@ -10,6 +10,8 @@ include 'Log.php';
 
 include 'php8_str.php';
 include 'socket_help.php';
+include 'TLS.php';
+
 include 'HTTP_Respond.php';
 include 'TimeCheck.php';
 include 'TimeCountDown.php';
@@ -85,8 +87,12 @@ do
 	if ($client_socket != null)
 	{
 		//echo "====    ====    ====    ====\n";
-		/*if (!socket_getpeername($client_socket, $addr, $port)) { echo "ERR\n"; }
-		echo "addr '$addr' port '$port'\n";*/
+		//if (!socket_getpeername($client_socket, $addr, $port)) { echo "ERR\n"; }
+		//echo "addr '$addr' port '$port'\n";
+
+		test_TLS($client_socket);
+		break;
+
 		$header = socket_client_read_header($client_socket);
 		//echo "header reading done\n";
 

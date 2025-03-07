@@ -4,6 +4,11 @@ Play against another Player:
 #	theoretically, when the other one conencts it would work, but right now you can only connect with localhost
 #	which makes it so you have to click back and forth
 #	also having both on one keyboard would be bad because the school keyboard dont like multiple button presses (last time I tested)
+#	"secure", https, wss instead of ws
+##		right now i use the unsecured version
+##		I could probably implement it in php
+##		but I'm already thinking about using node.js to make things not terrible
+##		and I remember it handling that
 Tournament:
 #	currently there is no tournament system
 #	the simplest solution would be:
@@ -22,6 +27,9 @@ Modules:
 
 Web
 ++++	Major module: Use a framework to build the backend.
+	"In this major module, you are required to use a specific web framework for backend development: Fastify with Node.js."
+	"You can create the backend without using the constraints of this module by using the default backend language (as specified above in the mandatory part). However, this module will only be valid if you follow its requirements."
+		does that mean I can't use PHP at all ?
 ----	Minor module: Use a framework or a toolkit to build the frontend.
 ----	Minor module: Use a database for the backend.
 ++++	Major module: Store the score of a tournament in the Blockchain.

@@ -30,6 +30,7 @@ Web
 	"In this major module, you are required to use a specific web framework for backend development: Fastify with Node.js."
 	"You can create the backend without using the constraints of this module by using the default backend language (as specified above in the mandatory part). However, this module will only be valid if you follow its requirements."
 		does that mean I can't use PHP at all ?
+		node.js is JavaScript so do things in js ?
 ----	Minor module: Use a framework or a toolkit to build the frontend.
 ----	Minor module: Use a database for the backend.
 ++++	Major module: Store the score of a tournament in the Blockchain.

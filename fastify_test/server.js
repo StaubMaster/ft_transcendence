@@ -3,10 +3,10 @@ const fastify = require('fastify')(
 {
 	logger: true
 })
+fastify.register(require('@fastify/websocket'))
+fastify.register(require('./route'))
 
-fastify.register(require('./test_route'))
-
-fastify.listen({ port:3000 }, function (err, address)
+fastify.listen({ port:5000 }, function (err, address)
 {
 	if (err)
 	{

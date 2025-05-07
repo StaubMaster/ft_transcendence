@@ -1,16 +1,18 @@
 
-//import * as sesPong from './Session/SesPong.js';
-//const sesPong = require('./Session/SesPong.js');
-//import { SessionPong } from './Session/SesPong.js';
 const sesPong = require('./Session/SesPong.js');
-setInterval(ticker, 10);
+setInterval(function ()
+{
+	sesPong.SessionPong.All_Update();
+}, 1);
+
+
 
 const fastify = require('fastify')(
 {
 	logger: true
-})
-fastify.register(require('@fastify/websocket'))
-fastify.register(require('./route.js'))
+});
+fastify.register(require('@fastify/websocket'));
+fastify.register(require('./route.js'));
 
 //	use ipconfig to get local IP
 //	e.g.:	192.168.0.208
@@ -22,10 +24,23 @@ function (err, address)
 		fastify.log.error("!!!!>" + err + "<!!!!");
 		process.exit(1)
 	}
-})
+});
 
-function ticker()
-{
-	//sesPong.AllSesPongs_Update();
-	sesPong.SessionPong.All_Update();
-}
+
+
+console.log("DATABASE");
+const SQLite = require('node:sqlite');
+const database = new SQLite.DatabaseSync(':memory:');
+
+database.exec(`
+  CREATE TABLE data(
+    key INTEGER PRIMARY KEY,
+    value TEXT
+  ) STRICT
+`);
+const insert = database.prepare('INSERT INTO data (key, value) VALUES (?, ?)');
+insert.run(1, 'hello');
+insert.run(2, 'world');
+
+const query = database.prepare('SELECT * FROM data ORDER BY key');
+console.log(query.all());

@@ -1,0 +1,12 @@
+
+services:
+  server:
+    image: node-server
+    build: .
+    ports:
+      - "5000:5000"
+
+#docker compose up -d
+#docker compose ps
+#docker compose stop
+#docker compose down

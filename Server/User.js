@@ -39,7 +39,7 @@ export class User
 		{
 			console.log(user.ID + " socket closed:" + e.code + ":" + e.reason);
 			user.DisConnect = true;
-			AllUsers_Remove(user.ID);
+			User.All_Remove(user.ID);
 		};
 		//this.ws.onopen = function() { };
 		this.ws.onmessage = function(e)

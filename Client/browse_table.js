@@ -18,7 +18,7 @@ function browse_users_table_refresh()
 	button_accept.disabled = true;
 
 	var url = "http://localhost:5000/BrowseUsersTable";
-	if (ID != -1) { url += "%" + ID; }
+	if (ID != -1) { url += "/" + ID; }
 	var xhl_req = new XMLHttpRequest();
 	xhl_req.open("GET", url, false);	//	gives console warning
 	xhl_req.send(null);

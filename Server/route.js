@@ -27,7 +27,20 @@ async function routes(fastify, options)
 {
 	fastify.get('/ws', { websocket: true }, async function (socket, request)
 	{
-		user.AllUsers_Add(socket);
+		user.User.All_Add(socket);
+	});
+
+	fastify.get('/BrowseUsersTable/:id?', async function (request, reply)
+	{
+		var id = -1;
+		if (request.params.id)
+		{
+			//id = request.params.id;
+		}
+		console.log("ID: " + request.params.id);
+		reply.code(200);
+		reply.header('Content-Type', 'text/html');
+		reply.send(user.User.All_Table(id));
 	});
 
 	fastify.get('/:file', async function (request, reply)
@@ -46,7 +59,6 @@ async function routes(fastify, options)
 	});
 
 	const node_path = './node_modules/';
-
 	fastify.get('/node_modules/:dir1/:dir2/:file', async function (request, reply)
 	{
 		var rel_path = node_path

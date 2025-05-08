@@ -1,7 +1,8 @@
 
 var BrowseUsersSelectedID = -1;
 var BrowseUsersSelectedStatus = "";
-function browse_users_table_refresh()
+
+function browse_users_table_ws_send()
 {
 	var table = document.getElementById("browse-users-table");
 	var rows = table.rows;
@@ -17,8 +18,61 @@ function browse_users_table_refresh()
 	button_invite.disabled = true;
 	button_accept.disabled = true;
 
+	WebSocket_Send("User-Table-List: ");
+}
+function browse_users_table_ws_recv(text)
+{
+	console.log(text);
+
+	var table = document.getElementById("browse-users-table");
+
+	var data = JSON.parse(text);
+	for (var i = 0; i < data.length; i++)
+	{
+		var row = table.insertRow(i + 1);
+		var cell_id = row.insertCell(0);
+		var cell_user = row.insertCell(1);
+		var cell_status = row.insertCell(2);
+
+		var func = new Function("browse_users_table_row_func(" + (i + 1) + ");");
+		row.onclick = func;
+
+		cell_id.textContent = data[i].ID;
+		cell_user.textContent = data[i].User;
+		cell_status.textContent = data[i].Status;
+	}
+
+	var label_your_ID = document.getElementById("browse-users-your-ID");
+	var label_count = document.getElementById("browse-users-count");
+	//label_your_ID.textContent = ID;
+	label_count.textContent = data.length;
+
+	browse_users_table_row_func(-1);
+}
+
+
+
+function browse_users_table_refresh()
+{
+	browse_users_table_ws_send();
+	return;
+
+	var table = document.getElementById("browse-users-table");
+	var rows = table.rows;
+	while (rows.length > 1)
+	{
+		table.deleteRow(1);
+	}
+
+	var button_invite = document.getElementById("browse-users-button-invite");
+	var button_accept = document.getElementById("browse-users-button-accept");
+	BrowseUsersSelectedID = -1;
+	BrowseUsersSelectedStatus = "";
+	button_invite.disabled = true;
+	button_accept.disabled = true;
+
 	var url = "http://localhost:5000/BrowseUsersTable";
-	if (ID != -1) { url += "/" + ID; }
+	//if (ID != -1) { url += "/" + ID; }
 	var xhl_req = new XMLHttpRequest();
 	xhl_req.open("GET", url, false);	//	gives console warning
 	xhl_req.send(null);

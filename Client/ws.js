@@ -1,9 +1,5 @@
 
-function test()
-{
-	console.log("test");
-}
-
+/*
 ws = null;
 ID = -1;
 Name = "";
@@ -81,15 +77,45 @@ function WebSocket_Disconnect()
 	}
 
 	ws.close();
+}*/
+
+ws = null;
+autoConnectFunc();
+function autoConnectFunc()
+{
+	ws = new WebSocket("ws");
+	ws.binaryType = "arraybuffer";
+	ws.onerror = function(e)
+	{
+		console.log("socket error: ", e);
+		//WebSocket_ShowStatus();
+	};
+	ws.onclose = function(e)
+	{
+		console.log("socket closed:" + e.code + ":" + e.reason);
+		console.log("WS Close");
+		ws = null;
+	};
+	ws.onopen = function()
+	{
+		console.log("WS Open");
+	};
+	ws.onmessage = function(e)
+	{
+		//console.log("'" + e.data + "'");
+		WebSocket_Message(e.data);
+	};
 }
-
-
 
 
 
 function WebSocket_Message(text)
 {
-	var message_to_element = [
+	const message_to_element = [
+		["WS-Temp-ID: ", "ws-id-field"],
+		["User-ID: "   , "logged-id-label"],
+		["User-Name: " , "logged-name-label"],
+
 		["Session-ID: "     , "session-ID"],
 		["Session-State: "  , "session-state"],
 		["Session-L-ID: "   , "session-L-ID"],
@@ -101,7 +127,6 @@ function WebSocket_Message(text)
 		["Session-R-Score: ", "session-R-score"],
 		["Session-R-State: ", "session-R-state"],
 	];
-
 	var found = false;
 	for (var i = 0; i < message_to_element.length; i++)
 	{
@@ -112,13 +137,47 @@ function WebSocket_Message(text)
 			var cut = text.substring(header.length);
 			var elem = document.getElementById(element);
 			elem.textContent = cut;
-			found = true;
+			return;
+			//found = true;
 		}
 	}
 	if (found)
 	{
 		return;
 	}
+
+
+
+	if (text.startsWith("LogIn: "))
+	{
+		const value = text.substring("LogIn: ".length);
+		User_LogIn_Change(value);
+		return;
+	}
+
+	if (text.startsWith("User-Table-List: "))
+	{
+		const value = text.substring("User-Table-List: ".length);
+		browse_users_table_ws_recv(value);
+		return;
+	}
+
+	const message_to_func = [
+		//["LogIn: ", User_LogIn_Succ],
+		//["LogIn: Failure", User_LogIn_Fail],
+		["LogOut", User_LogOut_Change],
+	];
+	for (var i = 0; i < message_to_func.length; i++)
+	{
+		var header = message_to_func[i][0];
+		var func = message_to_func[i][1];
+		if (text.startsWith(header))
+		{
+			func();
+			return;
+		}
+	}
+
 
 	var cmd_ID = "ID: ";
 	var cmd_SimulationData = "Simulation-Data: ";

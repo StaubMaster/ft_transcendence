@@ -3,11 +3,9 @@ import { SessionPong } from './Session/SesPong.js';
 
 export class User
 {
-	static ID = 0;
-
 	ws;
-	ID;
-	Name;
+	DB_User;
+
 	DisConnect;
 
 	InvitesSendToOthersList;
@@ -16,12 +14,10 @@ export class User
 	PressUP;
 	PressDW;
 
-	constructor(ws)
+	constructor(ws, DB_User)
 	{
 		this.ws = ws;
-
-		this.ID = User.ID;
-		User.ID++;
+		this.DB_User = DB_User;
 
 		this.InvitesSendToOthersList = [];
 		this.InvitesRecvFromOthersList = [];
@@ -29,26 +25,6 @@ export class User
 
 		this.PressUP = false;
 		this.PressDW = false;
-
-		const user = this;
-		this.ws.onerror = function(e)
-		{
-			console.log(user.ID + " socket error: ", e);
-		};
-		this.ws.onclose = function(e)
-		{
-			console.log(user.ID + " socket closed:" + e.code + ":" + e.reason);
-			user.DisConnect = true;
-			User.All_Remove(user.ID);
-		};
-		//this.ws.onopen = function() { };
-		this.ws.onmessage = function(e)
-		{
-			//console.log(user.ID + ' "' + e.data + '"');
-			user.ParseMessage(e.data);
-		};
-
-		this.ws.send(api.API_USER_ID + user.ID);
 	}
 
 	SendText(text)
@@ -60,10 +36,10 @@ export class User
 	{
 		var str = '{';
 
-		str += '"ID":' + this.ID + ',';
-		str += '"User":"' + this.Name + '",';
+		str += '"ID":' + this.DB_User.id + ',';
+		str += '"User":"' + this.DB_User.UserName + '",';
 		str += '"Status":"';
-		if (this.ID == id)
+		if (this.DB_User.id == id)
 		{
 			str += "this is you";
 		}
@@ -118,16 +94,16 @@ export class User
 		else if (msg.startsWith(api.API_USER_INVITE))
 		{
 			const value = msg.substr(api.API_USER_INVITE.length);
-			console.log("#" + api.API_USER_INVITE + "#'" + value + "'");
-			if (value == this.ID)
+			//console.log("#" + api.API_USER_INVITE + "#'" + value + "'");
+			if (value == this.DB_User.id)
 			{
 				console.log(".... Invite Self");
-				//	create Session
 				SessionPong.All_Add(this, this);
 			}
 			else
 			{
-				const other = All_GetByID(value);
+				console.log("INVITE OTHER: Out of Service");
+				/*const other = All_GetByID(value);
 				if (other != null)
 				{
 					if (other.HasInviteRecvFromID(this.ID))
@@ -144,7 +120,7 @@ export class User
 				else
 				{
 					console.log("!!!! User not found");
-				}
+				}*/
 			}
 		}
 		else if (msg.startsWith(api.API_USER_IAMHERE))
@@ -165,6 +141,13 @@ export class User
 				console.log("Unknown Session Input '" + value + "'");
 			}
 		}
+		else if (msg.startsWith(api.USER_Table_List))
+		{
+			const value = msg.substr(api.USER_Table_List.length);
+			//console.log("TABLE");
+			const table = User.All_Table(-1);
+			this.SendText(api.USER_Table_List + table);
+		}
 		else
 		{
 			console.log("Unidentified Message: '" + msg + "'");
@@ -173,13 +156,14 @@ export class User
 
 
 
-
-
 	static AllUsersArray = [];
-	static All_Add(ws)
+	static All_Add(ws, DB_User)
 	{
 		console.log("++++ User ++++");
-		this.AllUsersArray.push(new User(ws));
+		//this.AllUsersArray.push(new User(ws));
+		var user = new User(ws, DB_User);
+		this.AllUsersArray.push(user);
+		return user;
 	}
 	static All_Remove(id)
 	{

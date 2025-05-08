@@ -46,3 +46,18 @@ tr:nth-child(odd) {
 .selected {
 	background-color: #777777;
 }
+
+
+
+.tab button.active {
+	background-color: #777777;
+}
+.tab button.L {
+	float: left
+}
+.tab button.R {
+	float: right
+}
+.tabcontent {
+	display: none;
+}

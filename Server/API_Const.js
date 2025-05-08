@@ -1,10 +1,23 @@
 
+//	WS
+export const WS_Temp_ID = "WS-Temp-ID: ";
+
+export const LOGIN = "LogIn: ";
+export const LOGOUT = "LogOut";
+
+export const USER_ID = "User-ID: ";
+export const USER_Name = "User-Name: ";
+export const USER_Table_List = "User-Table-List: ";
+
+
+
 //	User
 export const API_USER_ID = "ID: ";
 export const API_USER_NAME = "Change-Name: ";
 export const API_USER_INVITE = "InviteRequestTo: ";
 export const API_USER_IAMHERE = "I-Am-Here";
 export const API_USER_SESSION = "Session-Simulation-Input: ";
+
 
 
 //	Session

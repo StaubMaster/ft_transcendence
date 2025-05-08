@@ -44,12 +44,12 @@ export class SessionPong
 		this.SendTextAll(api.API_SES_ID + '0');
 		this.SendTextAll(api.API_SES_State + 'none');
 
-		this.SendTextAll(api.API_SES_L_ID + this.UserL.ID);
-		this.SendTextAll(api.API_SES_L_Name + this.UserL.Name);
+		this.SendTextAll(api.API_SES_L_ID + this.UserL.DB_User.id);
+		this.SendTextAll(api.API_SES_L_Name + this.UserL.DB_User.UserName);
 		this.SendTextAll(api.API_SES_L_State + 'none');
 
-		this.SendTextAll(api.API_SES_R_ID + this.UserR.ID);
-		this.SendTextAll(api.API_SES_R_Name + this.UserR.Name);
+		this.SendTextAll(api.API_SES_R_ID + this.UserR.DB_User.id);
+		this.SendTextAll(api.API_SES_R_Name + this.UserR.DB_User.UserName);
 		this.SendTextAll(api.API_SES_R_State + 'none');
 
 		this.ScoreL = 0;

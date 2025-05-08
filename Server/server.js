@@ -26,21 +26,4 @@ function (err, address)
 	}
 });
 
-
-
-console.log("DATABASE");
-const SQLite = require('node:sqlite');
-const database = new SQLite.DatabaseSync(':memory:');
-
-database.exec(`
-  CREATE TABLE data(
-    key INTEGER PRIMARY KEY,
-    value TEXT
-  ) STRICT
-`);
-const insert = database.prepare('INSERT INTO data (key, value) VALUES (?, ?)');
-insert.run(1, 'hello');
-insert.run(2, 'world');
-
-const query = database.prepare('SELECT * FROM data ORDER BY key');
-console.log(query.all());
+const database = require('./DataBase.js');

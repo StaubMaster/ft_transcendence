@@ -14,8 +14,8 @@ export class WS
 
 	constructor(socket)
 	{
-		this.ID = User.ID;
-		WS.ID++;
+		this.Temp_ID = WS.Temp_ID;
+		WS.Temp_ID++;
 
 		this.socket = socket;
 		this.DisConnect = false;
@@ -24,13 +24,14 @@ export class WS
 		const self_referance = this;
 		this.socket.onerror = function(e)
 		{
-			console.log(self_referance.ID + " socket error: ", e);
+			console.log(self_referance.Temp_ID + " socket error: ", e);
 		};
 		this.socket.onclose = function(e)
 		{
-			console.log(self_referance.ID + " socket closed:" + e.code + ":" + e.reason);
+			console.log(self_referance.Temp_ID + " socket closed:" + e.code + ":" + e.reason);
 			self_referance.DisConnect = true;
-			WS.All_Remove(self_referance.ID);
+			WS.All_Remove(self_referance.Temp_ID);
+			self_referance.UserRemove();
 		};
 		//this.socket.onopen = function() { };
 		this.socket.onmessage = function(e)
@@ -58,32 +59,65 @@ export class WS
 			}
 
 			const value = text.substr(api.LOGIN.length);
-			const NamePase = value.split(", ");
-			const UserName = NamePase[0];
-			const PassWord = NamePase[1];
+			const NamePass = value.split(", ");
+			const UserName = NamePass[0];
+			const PassWord = NamePass[1];
 			//console.log("UserName '" + UserName + "'");
 			//console.log("PassWord '" + PassWord + "'");
 
 			const DB_User = database.CheckUser(UserName, PassWord);
 			if (typeof DB_User == "string")
 			{
-				this.SendText(api.LOGIN + DB_User);
+				this.SendText(api.LOG_INFO + DB_User);
 				return;
 			}
-
 			this.User = User.All_Add(this.socket, DB_User);
-			this.SendText(api.LOGIN);
+
+			this.SendText(api.LOG_INFO);
 			this.SendText(api.USER_ID + DB_User.id);
 			this.SendText(api.USER_Name + DB_User.UserName);
 		}
 		else if (text.startsWith(api.LOGOUT))
 		{
+			this.UserRemove();
+			this.SendText(api.LOGOUT);
+		}
+		else if (text.startsWith(api.REGISTER))
+		{
+			const value = text.substr(api.REGISTER.length);
+			const NamePass = value.split(", ");
+			const UserName = NamePass[0];
+			const PassWord = NamePass[1];
+			console.log("UserName '" + UserName + "'");
+			console.log("PassWord '" + PassWord + "'");
+
+			const ret = database.InsertUser(UserName, PassWord);
+			if (ret !== undefined)
+			{
+				this.SendText(api.LOG_INFO + ret);
+				return;
+			}
+
+			const DB_User = database.CheckUser(UserName, PassWord);
+			if (typeof DB_User == "string")
+			{
+				this.SendText(api.LOG_INFO + DB_User);
+				return;
+			}
+			this.User = User.All_Add(this.socket, DB_User);
+
+			this.SendText(api.LOG_INFO);
+			this.SendText(api.USER_ID + DB_User.id);
+			this.SendText(api.USER_Name + DB_User.UserName);
+		}
+		else if (text.startsWith(api.DELETE_ME))
+		{
 			if (this.User != null)
 			{
-				User.All_Remove(this.User.ID);
-				this.User = null;
+				database.RemoveUser(this.User.DB_User.UserName, this.User.DB_User.PassWord);
 			}
-			this.SendText(api.LOGOUT);
+			this.UserRemove();
+			this.SendText(api.DELETE_ME);
 		}
 		else
 		{
@@ -95,6 +129,15 @@ export class WS
 		}
 	}
 
+	UserRemove()
+	{
+		if (this.User != null)
+		{
+			User.All_Remove(this.User.DB_User.id);
+			this.User = null;
+		}
+	}
+
 
 
 
@@ -102,20 +145,27 @@ export class WS
 	static AllWSArray = [];
 	static All_Add(socket)
 	{
-		console.log("++++ WS ++++");
+		console.log("++++ WS", this.Temp_ID);
 		this.AllWSArray.push(new WS(socket));
 	}
 	static All_Remove(id)
 	{
 		for (var i = 0; i < this.AllWSArray.length; i++)
 		{
-			if (this.AllWSArray[i].ID == id)
+			if (this.AllWSArray[i].Temp_ID == id)
 			{
-				console.log("---- WS ----");
+				console.log("---- WS", this.Temp_ID);
 				this.AllWSArray.splice(i, i + 1);
 				i--;
 				return;
 			}
+		}
+	}
+	static All_Send(text)
+	{
+		for (var i = 0; i < this.AllWSArray.length; i++)
+		{
+			this.AllWSArray[i].SendText(text);
 		}
 	}
 }

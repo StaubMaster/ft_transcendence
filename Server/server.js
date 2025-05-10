@@ -1,15 +1,10 @@
 
-const sesPong = require('./Session/SesPong.js');
-setInterval(function ()
-{
-	sesPong.SessionPong.All_Update();
-}, 1);
-
-
-
 const fastify = require('fastify')(
 {
-	logger: true
+	logger: true,
+	/*https: {
+		key: fs.readFileSync('./key.pem'),
+	}*/
 });
 fastify.register(require('@fastify/websocket'));
 fastify.register(require('./route.js'));
@@ -25,5 +20,16 @@ function (err, address)
 		process.exit(1)
 	}
 });
+
+
+
+const autoTicker = require('./AutoTicker.js');
+/*const sesPong = require('./Session/SesPong.js');
+setInterval(function ()
+{
+	sesPong.SessionPong.All_Update();
+}, 1);*/
+
+
 
 const database = require('./DataBase.js');

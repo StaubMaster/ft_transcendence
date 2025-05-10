@@ -1,29 +1,8 @@
 
-/*
-console.log("DATABASE");
-const SQLite = require('node:sqlite');
-const database = new SQLite.DatabaseSync(':memory:');
-
-database.exec(`
-  CREATE TABLE data(
-	key INTEGER PRIMARY KEY,
-	value TEXT
-  ) STRICT
-`);
-const insert = database.prepare('INSERT INTO data (key, value) VALUES (?, ?)');
-insert.run(1, 'hello');
-insert.run(2, 'world');
-
-const query = database.prepare('SELECT * FROM data ORDER BY key');
-console.log(query.all());
-*/
 
 
-
-//console.log("DATABASE");
-//const SQLite = require('node:sqlite');
 import * as SQLite from 'node:sqlite';
-//const database = new SQLite.DatabaseSync(':memory:');
+import { sha256 } from './SHA256.js';
 const database = new SQLite.DatabaseSync('DataBase');
 
 database.exec(`
@@ -36,11 +15,10 @@ database.exec(`
 
 
 
-console.log("check:", CheckUser("fe", "323"));
-console.log("check:", CheckUser("asd", "323"));
-console.log("check:", CheckUser("asd", "123"));
 export function CheckUser(userName, passWord)
 {
+	passWord = sha256(passWord);
+
 	const query = database.prepare("SELECT * FROM user WHERE UserName='" + userName + "'");
 	const users = query.all();
 	if (users.length == 0)
@@ -60,9 +38,10 @@ export function CheckUser(userName, passWord)
 
 
 
-console.log("inser:", InsertUser('asd', '123'));
 export function InsertUser(userName, passWord)
 {
+	passWord = sha256(passWord);
+
 	const query = database.prepare("SELECT * FROM user WHERE UserName='" + userName + "'");
 	if (query.all().length != 0)
 	{
@@ -71,10 +50,20 @@ export function InsertUser(userName, passWord)
 
 	const insert = database.prepare('INSERT INTO user (UserName, PassWord) VALUES (?, ?)');
 	insert.run(userName, passWord);
+	console.log("++++ DataBase User '" + userName + "' '" + passWord + "'");
+}
+
+
+
+export function RemoveUser(userName, passWord)
+{
+	const remove = database.prepare("DELETE FROM user WHERE UserName='" + userName + "' AND PassWord='" + passWord + "'");
+	remove.run();
+	console.log("---- DataBase User '" + userName + "' '" + passWord + "'");
 }
 
 
 
 const query = database.prepare("SELECT * FROM user ORDER BY id");
-//const query = database.prepare("SELECT id, UserName FROM user ORDER BY id");
 console.log(query.all());
+

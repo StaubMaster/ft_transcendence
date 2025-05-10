@@ -6,123 +6,99 @@
 		<link rel="stylesheet" href="style.css">
 
 		<script src="/ws.js"></script>
-		<script src="/login.js"></script>
+		<script src="/logIO.js"></script>
 		<script src="/tab_bar.js"></script>
-		<script src="/browse_table.js"></script>
+		<script src="/user_table.js"></script>
+		<script src="/invite.js"></script>
 
 		<!--<script type="module" src="/baby.js"></script>-->
 	</head>
 	<body>
-		<div class="tab">
-			<button class="tablinks L" onclick="openTab(event, 'Info')" id="defaultTab">Info</button>
-			<button class="tablinks L" onclick="openTab(event, 'UserList')">Users List</button>
-
-			<button class="tablinks R" onclick="openTab(event, 'Login')">Login</button>
-			<button class="tablinks R" onclick="openTab(event, 'Invite')">Invite List</button>
-			<button class="tablinks R" onclick="openTab(event, 'UserData')">User Data</button>
+		<div id="ws-info" style="display: none;">
+			<h1 id="ws-info-head"></h1>
+			<button type="button" onclick="WebSocket_Connect()">ReConnect</button>
 		</div>
 
+		<div id="not-session">
+			<div class="tab">
+				<button class="tablinks L" onclick="openTab(event, 'Info')" id="defaultTab">Info</button>
+				<button class="tablinks L" onclick="openTab(event, 'UserList')">Users List</button>
 
+				<button class="tablinks R" onclick="openTab(event, 'Login')">Login</button>
+				<button class="tablinks R" onclick="openTab(event, 'UserData')">User Data</button>
+			</div>
 
-		<div id="Info" class="tabcontent">
-			<h3>Info</h3>
-			<p>put Info here</p>
-		</div>
+			<div id="Info" class="tabcontent">
+				<h3>Info</h3>
+				<p>put Info here</p>
+			</div>
 
-		<div id="UserList" class="tabcontent">
-			<h3>Users List</h3>
-			<div id="browse-users">
-				<label>ID: </label><label id="browse-users-your-ID"></label><br>
-				<label>Users: </label><label id="browse-users-count"></label><br>
-				<table id="browse-users-table">
-					<tr onclick="browse_users_table_row_func(-1)">
-						<th>ID</th>
-						<th>User</th>
-						<th>Status</th>
-					</tr>
-				</table>
-				<button type="button" onclick="browse_users_table_refresh()">Refresh</button>
-				<button type="button" id="browse-users-button-invite" onclick="browse_users_invite()" disabled="disabled">Invite</button>
-				<button type="button" id="browse-users-button-accept" onclick="browse_users_accept()" disabled="disabled">Accept</button>
+			<div id="UserList" class="tabcontent">
+				<div>
+					<label>All Users</label><br>
+					<table id="browse-users-table">
+						<tr onclick="browse_users_table_select(-1)">
+							<th>ID</th>
+							<th>Name</th>
+							<th>Status</th>
+						</tr>
+					</table>
+					<button type="button" disabled id="browse-users-button-invite" onclick="browse_users_invite()">Invite</button>
+					<br>
+				</div>
+				<div>
+					<label>Invited User: </label><br>
+					<div>
+						<label>ID: </label><label id="invite-user-id"></label><br>
+						<label>Name: </label><label id="invite-user-name"></label><br>
+						<label>Status: </label><label id="invite-user-status"></label><br>
+					</div>
+					<label>Invite Status: </label><label id="invite-status"></label><br>
+					<button type="button" disabled id="browse-users-button-cancel" onclick="users_invite_set(-1)">Cancel Invite</button><br>
+				</div>
+				<div>
+					<label>Invites received: </label><br>
+					<table id="browse-invite-table">
+						<tr onclick="invite_users_table_select(-1)">
+							<th>ID</th>
+							<th>Name</th>
+							<th>Status</th>
+						</tr>
+					</table>
+					<!--Button wont start disabled ?-->
+					<button type="button" disabled id="browse-users-button-accept" onclick="browse_invite_accept()">Accept</button><br>
+				</div>
+			</div>
+
+			<div id="Login" class="tabcontent">
+				<h3>Login</h3>
+				<label>WS ID:</label><label id="ws-id-field"></label><br>
+				<label>Info:</label><label id="login-info-field"></label><br>
+
+				<div id="login-field">
+					<input type="text" id="login-username-field" placeholder="UserName"><br>
+					<input type="text" id="login-password-field" placeholder="PassWord"><br>
+				</div>
+
+				<div id="logged-field" style="display: none;">
+					<label>Name:</label><label id="logged-name-label"></label><br>
+					<label>ID:</label><label id="logged-id-label"></label><br>
+				</div>
+
+				<button type="button" id="logIO" onclick="User_LogIO()">Log In</button>
+				<button type="button" id="regDel" onclick="User_Register_Delete()">Register</button>
 				<br>
 			</div>
-		</div>
 
-		<div id="Login" class="tabcontent">
-			<h3>Login</h3>
-			<label>WS ID:</label><label id="ws-id-field"></label><br>
-			<label>Info:</label><label id="login-info-field"></label><br>
-
-			<div id="login-field">
-				<input type="text" id="login-username-field" placeholder="UserName"><br>
-				<input type="text" id="login-password-field" placeholder="PassWord"><br>
+			<div id="UserData" class="tabcontent">
+				<h3>User Account Data</h3>
+				<p>put User list here</p>
 			</div>
 
-			<div id="logged-field" style="display: none;">
-				<label>Name:</label><label id="logged-name-label"></label><br>
-				<label>ID:</label><label id="logged-id-label"></label><br>
-			</div>
-
-			<button type="button" id="logIO" onclick="User_LogIO()">Log In</button><br>
-			
-			<!--
-			<input type="text" id="connection-name-field" placeholder="UserName"><br>
-			<button type="button" onclick="WebSocket_Connect()">Connect</button>
-			<button type="button" onclick="WebSocket_Disconnect()">Disconnect</button>
-			<br>
-			<label>WebSocket:</label>
-			<label id="socketStatus"></label>
-			<br>
-			<label>ID:</label>
-			<label id="socketID"></label>
-			<br>
-			-->
+			<script>document.getElementById("defaultTab").click();</script>
 		</div>
 
-		<div id="Invite" class="tabcontent">
-			<h3>Invite</h3>
-			<p>put User list here</p>
-		</div>
-
-		<div id="UserData" class="tabcontent">
-			<h3>User Account Data</h3>
-			<p>put User list here</p>
-		</div>
-
-		<script>document.getElementById("defaultTab").click();</script>
-
-
-
-		<!--<div>
-			<input type="text" id="connection-name-field" placeholder="UserName"><br>
-			<button type="button" onclick="WebSocket_Connect()">Connect</button>
-			<button type="button" onclick="WebSocket_Disconnect()">Disconnect</button>
-			<br>
-			<label>WebSocket:</label>
-			<label id="socketStatus"></label>
-			<br>
-			<label>ID:</label>
-			<label id="socketID"></label>
-			<br>
-		</div>
-
-		<div id="browse-users">
-			<label>ID: </label><label id="browse-users-your-ID"></label><br>
-			<label>Users: </label><label id="browse-users-count"></label><br>
-			<table id="browse-users-table">
-				<tr onclick="browse_users_table_row_func(-1)">
-					<th>ID</th>
-					<th>User</th>
-					<th>Status</th>
-				</tr>
-			</table>
-			<button type="button" onclick="browse_users_table_refresh()">Refresh</button>
-			<button type="button" id="browse-users-button-invite" onclick="browse_users_invite()" disabled="disabled">Invite</button>
-			<button type="button" id="browse-users-button-accept" onclick="browse_users_accept()" disabled="disabled">Accept</button>
-			<br>
-		</div>-->
-
-		<div id="session">
+		<div id="session" style="display: none;">
 			<label>Session ID: </label>
 			<label id="session-ID"></label>
 			<br>

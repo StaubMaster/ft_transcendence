@@ -1,5 +1,6 @@
 import * as api from './API_Const.js';
 import { SessionPong } from './Session/SesPong.js';
+import { TimeTicker } from './TimeTicker.js';
 
 export class User
 {
@@ -8,23 +9,27 @@ export class User
 
 	DisConnect;
 
-	InvitesSendToOthersList;
-	InvitesRecvFromOthersList;
+	InvitedUser;
+	InvitesList;
 
 	PressUP;
 	PressDW;
+
+	Status;
 
 	constructor(ws, DB_User)
 	{
 		this.ws = ws;
 		this.DB_User = DB_User;
 
-		this.InvitesSendToOthersList = [];
-		this.InvitesRecvFromOthersList = [];
+		this.InvitedUser = null;
+		this.InvitesList = [];
 		this.DisConnect = false;
 
 		this.PressUP = false;
 		this.PressDW = false;
+
+		this.Status = 0;
 	}
 
 	SendText(text)
@@ -32,57 +37,61 @@ export class User
 		this.ws.send(text);
 	}
 
-	GetTable(id)
+	GetTable()
 	{
-		var str = '{';
+		this.Status++;
 
+		var str = '{';
 		str += '"ID":' + this.DB_User.id + ',';
 		str += '"User":"' + this.DB_User.UserName + '",';
 		str += '"Status":"';
-		if (this.DB_User.id == id)
-		{
-			str += "this is you";
-		}
-		else
-		{
-			var invS = this.HasInviteSendToID(id);
-			var invR = this.HasInviteRecvFromID(id);
-			if (!invS && !invR)
-				str += "none";
-			else if (!invS && !invR)
-				str += "invited you";
-			else if (!invS && !invR)
-				str += "you invited";
-			else
-				str += "mutual invite";
-		}
+		str += this.Status;
 		str += '"';
-
 		return str + '}';
 	}
 
-	HasInviteSendToID(id)
+
+
+	InvitesList_Add(user)
 	{
-		for (var i = 0; i < this.InvitesSendToOthersList.length; i++)
+		console.log("++++ Invite", this.DB_User.id, user.DB_User.id);
+		this.InvitesList.push(user);
+	}
+	InvitesList_Remove(user)
+	{
+		for (var i = 0; i < this.InvitesList.length; i++)
 		{
-			if (this.InvitesSendToOthersList[i].ID == id)
+			if (this.InvitesList[i].DB_User.id == user.DB_User.id)
 			{
-				return true
+				console.log("---- Invite", this.DB_User.id, user.DB_User.id);
+				this.InvitesList.splice(i, i + 1);
+				return;
 			}
 		}
-		return false;
 	}
-	HasInviteRecvFromID(id)
+	InvitesList_Find(id)
 	{
-		for (var i = 0; i < this.InvitesRecvFromOthersList.length; i++)
+		for (var i = 0; i < this.InvitesList.length; i++)
 		{
-			if (this.InvitesRecvFromOthersList[i].ID == id)
+			if (this.InvitesList[i].DB_User.id == id)
 			{
-				return true
+				return this.InvitesList[i];
 			}
 		}
-		return false;
+		return null;
 	}
+	InvitesList_Table()
+	{
+		var table = '[';
+		for (var i = 0; i < this.InvitesList.length; i++)
+		{
+			if (i != 0) { table += ','; }
+			table += this.InvitesList[i].GetTable(-1);
+		}
+		return table + ']';
+	}
+
+
 
 	ParseMessage(msg)
 	{
@@ -91,7 +100,29 @@ export class User
 			const value = msg.substr(api.API_USER_NAME.length);
 			this.Name = value;
 		}
-		else if (msg.startsWith(api.API_USER_INVITE))
+		else if (msg.startsWith(api.INVITE_Request_ID))
+		{
+			const value = msg.substr(api.INVITE_Request_ID.length);
+			if (this.InvitedUser != null)
+			{
+				this.InvitedUser.InvitesList_Remove(this);
+			}
+			this.InvitedUser = User.All_GetByID(value);
+			if (this.InvitedUser != null)
+			{
+				this.InvitedUser.InvitesList_Add(this);
+			}
+		}
+		else if (msg.startsWith(api.INVITE_Accept_ID))
+		{
+			const value = msg.substr(api.INVITE_Accept_ID.length);
+			var user = this.InvitesList_Find(value);
+			if (user != null)
+			{
+				SessionPong.All_Add(this, user);
+			}
+		}
+		/*else if (msg.startsWith(api.API_USER_INVITE))
 		{
 			const value = msg.substr(api.API_USER_INVITE.length);
 			//console.log("#" + api.API_USER_INVITE + "#'" + value + "'");
@@ -103,7 +134,7 @@ export class User
 			else
 			{
 				console.log("INVITE OTHER: Out of Service");
-				/*const other = All_GetByID(value);
+				const other = All_GetByID(value);
 				if (other != null)
 				{
 					if (other.HasInviteRecvFromID(this.ID))
@@ -120,9 +151,9 @@ export class User
 				else
 				{
 					console.log("!!!! User not found");
-				}*/
+				}
 			}
-		}
+		}*/
 		else if (msg.startsWith(api.API_USER_IAMHERE))
 		{
 			const value = msg.substr(api.API_USER_IAMHERE.length);
@@ -137,16 +168,8 @@ export class User
 			else if (value == "!DW") { this.PressDW = false; }
 			else
 			{
-				//console.log("#" + api.API_USER_SESSION + "#'" + value + "'");
 				console.log("Unknown Session Input '" + value + "'");
 			}
-		}
-		else if (msg.startsWith(api.USER_Table_List))
-		{
-			const value = msg.substr(api.USER_Table_List.length);
-			//console.log("TABLE");
-			const table = User.All_Table(-1);
-			this.SendText(api.USER_Table_List + table);
 		}
 		else
 		{
@@ -159,8 +182,7 @@ export class User
 	static AllUsersArray = [];
 	static All_Add(ws, DB_User)
 	{
-		console.log("++++ User ++++");
-		//this.AllUsersArray.push(new User(ws));
+		console.log("++++ User", DB_User.id);
 		var user = new User(ws, DB_User);
 		this.AllUsersArray.push(user);
 		return user;
@@ -169,9 +191,9 @@ export class User
 	{
 		for (var i = 0; i < this.AllUsersArray.length; i++)
 		{
-			if (this.AllUsersArray[i].ID == id)
+			if (this.AllUsersArray[i].DB_User.id == id)
 			{
-				console.log("---- User ----");
+				console.log("---- User", id);
 				this.AllUsersArray.splice(i, i + 1);
 				i--;
 				return;
@@ -182,21 +204,29 @@ export class User
 	{
 		for (var i = 0; i < this.AllUsersArray.length; i++)
 		{
-			if (this.AllUsersArray[i].ID == id)
+			if (this.AllUsersArray[i].DB_User.id == id)
 			{
 				return this.AllUsersArray[i];
 			}
 		}
 		return null;
 	}
-	static All_Table(id)
+	static All_Table()
 	{
 		var table = '[';
 		for (var i = 0; i < this.AllUsersArray.length; i++)
 		{
 			if (i != 0) { table += ','; }
-			table += this.AllUsersArray[i].GetTable(id);
+			table += this.AllUsersArray[i].GetTable();
 		}
 		return table + ']';
+	}
+	static All_Invite_Tables()
+	{
+		for (var i = 0; i < this.AllUsersArray.length; i++)
+		{
+			const table = this.AllUsersArray[i].InvitesList_Table();
+			this.AllUsersArray[i].SendText(api.INVITE_Table + table);
+		}
 	}
 }

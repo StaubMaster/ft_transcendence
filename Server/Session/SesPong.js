@@ -41,6 +41,8 @@ export class SessionPong
 		this.UserL = userL;
 		this.UserR = userR;
 
+		this.SendTextAll(api.SESSION_Start);
+
 		this.SendTextAll(api.API_SES_ID + '0');
 		this.SendTextAll(api.API_SES_State + 'none');
 
@@ -57,6 +59,12 @@ export class SessionPong
 		this.SendScoreAll();
 
 		this.Sim = new simPong.SimPong(this);
+	}
+
+	GameOver()
+	{
+		this.isGameOver = true;
+		this.SendTextAll(api.SESSION_End);
 	}
 
 	SendTextAll(text)
@@ -90,7 +98,7 @@ export class SessionPong
 
 		if (this.UserL.DisConnect || this.UserR.DisConnect)
 		{
-			this.isGameOver = true;
+			this.GameOver();
 			return;
 		}
 
@@ -98,7 +106,6 @@ export class SessionPong
 
 		if (this.ScoreL >= 3 || this.ScoreR >= 3)
 		{
-			this.isGameOver = true;
 			this.SendTextAll(api.API_SES_State + "Game Over");
 			var l = api.API_SES_L_State;
 			var r = api.API_SES_R_State;
@@ -119,6 +126,7 @@ export class SessionPong
 			}
 			this.SendTextAll(l);
 			this.SendTextAll(r);
+			this.GameOver();
 		}
 	}
 

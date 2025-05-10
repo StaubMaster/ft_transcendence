@@ -1,0 +1,12 @@
+
+Inviting multiple people at once is kind of stupid
+
+User List
+when Inviting a User
+show a side div
+	show Invited User ID, Name, current Status
+show Invite Status
+	declined
+	accepted
+
+

@@ -1,110 +1,65 @@
 
-/*
+
+
 ws = null;
-ID = -1;
-Name = "";
-gameID = -1;
-
-function WebSocket_ShowStatus()
+WebSocket_Connect();
+function WebSocket_Connect()
 {
-	var elem = document.getElementById("socketStatus");
+	if (ws != null) { return; }
 
-	if (ws == null)
+	ws = new WebSocket("ws");
+	ws.binaryType = "arraybuffer";
+	ws.onerror = function(e)
 	{
-		elem.textContent = "null";
+		console.log("socket error: ", e);
+	};
+	ws.onclose = function(e)
+	{
+		console.log("socket closed:" + e.code + ":" + e.reason);
+		ws = null;
+		WebSocket_Info("Server Connection Error");
+	};
+	ws.onopen = function()
+	{
+		WebSocket_Info();
+	};
+	ws.onmessage = function(e)
+	{
+		WebSocket_Message(e.data);
+	};
+}
+
+
+
+function WebSocket_Info(text)
+{
+	var ws_info = document.getElementById("ws-info");
+	var ws_info_head = document.getElementById("ws-info-head");
+	if (text === undefined)
+	{
+		ws_info.style.display = "none";
 	}
 	else
 	{
-		if (ws.readyState == 0) { elem.textContent = "0 (CONNECTING)";}
-		else if (ws.readyState == 1) { elem.textContent = "1 (OPEN)";}
-		else if (ws.readyState == 2) { elem.textContent = "2 (CLOSING)";}
-		else if (ws.readyState == 3) { elem.textContent = "3 (CLOSED)";}
-		else { elem.textContent = ws.readyState + " (UNKNOWN)";}
+		ws_info.style.display = "block";
+		ws_info_head.textContent = text;
 	}
 }
-//WebSocket_ShowStatus();
 
-function WebSocket_ShowID()
+
+
+function Session_Start()
 {
-	var elem = document.getElementById("socketID");
-	elem.textContent = ID;
+	document.getElementById("session").style.display = "block";
+	document.getElementById("not-session").style.display = "none";
+	browse_users_table_select(-1);
+	users_invite_set(-1);
+	invite_users_table_select(-1);
 }
-//WebSocket_ShowID();
-
-function WebSocket_Connect()
+function Session_End()
 {
-	if (ws != null)
-	{
-		console.log("WebSocket_Connect(): already connected");
-		return;
-	}
-
-	var nameField = document.getElementById("connection-name-field");
-	Name = nameField.value;
-
-	ws = new WebSocket("ws");
-	ws.binaryType = "arraybuffer";
-	ws.onerror = function(e)
-	{
-		console.log("socket error: ", e);
-		WebSocket_ShowStatus();
-	};
-	ws.onclose = function(e)
-	{
-		console.log("socket closed:" + e.code + ":" + e.reason);
-		ws = null;
-		ID = -1;
-		WebSocket_ShowStatus();
-		WebSocket_ShowID();
-	};
-	ws.onopen = function()
-	{
-		WebSocket_ShowStatus();
-		ws.send("Change-Name: " + Name);
-	};
-	ws.onmessage = function(e)
-	{
-		WebSocket_Message(e.data);
-	};
-}
-
-function WebSocket_Disconnect()
-{
-	if (ws == null)
-	{
-		console.log("WebSocket_Disconnect(): not connected");
-		return;
-	}
-
-	ws.close();
-}*/
-
-ws = null;
-autoConnectFunc();
-function autoConnectFunc()
-{
-	ws = new WebSocket("ws");
-	ws.binaryType = "arraybuffer";
-	ws.onerror = function(e)
-	{
-		console.log("socket error: ", e);
-		//WebSocket_ShowStatus();
-	};
-	ws.onclose = function(e)
-	{
-		console.log("socket closed:" + e.code + ":" + e.reason);
-		console.log("WS Close");
-		ws = null;
-	};
-	ws.onopen = function()
-	{
-		console.log("WS Open");
-	};
-	ws.onmessage = function(e)
-	{
-		//console.log("'" + e.data + "'");
-		WebSocket_Message(e.data);
-	};
+	document.getElementById("session").style.display = "none";
+	document.getElementById("not-session").style.display = "block";
 }
 
 
@@ -148,24 +103,28 @@ function WebSocket_Message(text)
 
 
 
-	if (text.startsWith("LogIn: "))
+	const message_to_func_value = [
+		["Log-Info: ",        User_LogIn_Change],
+		["User-Table-List: ", browse_users_table_ws_recv],
+		["Invite-Table: ",    invite_users_table_ws_recv],
+	];
+	for (var i = 0; i < message_to_func_value.length; i++)
 	{
-		const value = text.substring("LogIn: ".length);
-		User_LogIn_Change(value);
-		return;
-	}
-
-	if (text.startsWith("User-Table-List: "))
-	{
-		const value = text.substring("User-Table-List: ".length);
-		browse_users_table_ws_recv(value);
-		return;
+		var header = message_to_func_value[i][0];
+		var func = message_to_func_value[i][1];
+		if (text.startsWith(header))
+		{
+			const value = text.substring(header.length);
+			func(value);
+			return;
+		}
 	}
 
 	const message_to_func = [
-		//["LogIn: ", User_LogIn_Succ],
-		//["LogIn: Failure", User_LogIn_Fail],
 		["LogOut", User_LogOut_Change],
+		["DeleteMe", User_LogOut_Change],
+		["Session-Start", Session_Start],
+		["Session-End", Session_End],
 	];
 	for (var i = 0; i < message_to_func.length; i++)
 	{

@@ -36,8 +36,6 @@ export function CheckUser(userName, passWord)
 	return users[0];
 }
 
-
-
 export function InsertUser(userName, passWord)
 {
 	passWord = sha256(passWord);
@@ -53,8 +51,6 @@ export function InsertUser(userName, passWord)
 	console.log("++++ DataBase User '" + userName + "' '" + passWord + "'");
 }
 
-
-
 export function RemoveUser(userName, passWord)
 {
 	const remove = database.prepare("DELETE FROM user WHERE UserName='" + userName + "' AND PassWord='" + passWord + "'");
@@ -62,6 +58,16 @@ export function RemoveUser(userName, passWord)
 	console.log("---- DataBase User '" + userName + "' '" + passWord + "'");
 }
 
+export function FindUser(id)
+{
+	const query = database.prepare("SELECT * FROM user WHERE id=" + id);
+	const users = query.all();
+	if (users.length == 1)
+	{
+		return users[0];
+	}
+	return;
+}
 
 
 const query = database.prepare("SELECT * FROM user ORDER BY id");

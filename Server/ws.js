@@ -119,6 +119,11 @@ export class WS
 			this.UserRemove();
 			this.SendText(api.DELETE_ME);
 		}
+		else if (text.startsWith(api.USER_DATA_SEARCH_ID))
+		{
+			const value = text.substr(api.USER_DATA_SEARCH_ID.length);
+			this.SendText(api.USER_DATA + WS.SearchUserData(value));
+		}
 		else
 		{
 			//console.log("'" + text + "'");
@@ -135,6 +140,38 @@ export class WS
 		{
 			User.All_Remove(this.User.DB_User.id);
 			this.User = null;
+		}
+	}
+
+
+
+
+
+	static SearchUserData(id)
+	{
+		const DB_User = database.FindUser(id);
+		if (DB_User === undefined)
+		{
+			return "";
+		}
+		else
+		{
+			const All_User = User.All_GetByID(id);
+			var str = '{';
+			str += '"ID":' + DB_User.id + ',';
+			str += '"Name":"' + DB_User.UserName + '",';
+			str += '"Status":"';
+			if (All_User == null)
+			{
+				str += "offline";
+			}
+			else
+			{
+				str += All_User.Status;
+			}
+			str += '"';
+			str += '}';
+			return str;
 		}
 	}
 

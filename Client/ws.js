@@ -107,6 +107,7 @@ function WebSocket_Message(text)
 		["Log-Info: ",        User_LogIn_Change],
 		["User-Table-List: ", browse_users_table_ws_recv],
 		["Invite-Table: ",    invite_users_table_ws_recv],
+		["User-Data: ",       user_data_show],
 	];
 	for (var i = 0; i < message_to_func_value.length; i++)
 	{

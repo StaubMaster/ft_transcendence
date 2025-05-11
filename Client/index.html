@@ -10,6 +10,7 @@
 		<script src="/tab_bar.js"></script>
 		<script src="/user_table.js"></script>
 		<script src="/invite.js"></script>
+		<script src="/user_data.js"></script>
 
 		<!--<script type="module" src="/baby.js"></script>-->
 	</head>
@@ -65,14 +66,12 @@
 							<th>Status</th>
 						</tr>
 					</table>
-					<!--Button wont start disabled ?-->
 					<button type="button" disabled id="browse-users-button-accept" onclick="browse_invite_accept()">Accept</button><br>
 				</div>
 			</div>
 
 			<div id="Login" class="tabcontent">
 				<h3>Login</h3>
-				<label>WS ID:</label><label id="ws-id-field"></label><br>
 				<label>Info:</label><label id="login-info-field"></label><br>
 
 				<div id="login-field">
@@ -91,8 +90,41 @@
 			</div>
 
 			<div id="UserData" class="tabcontent">
-				<h3>User Account Data</h3>
-				<p>put User list here</p>
+				<input type="number" id="user-data-search-id" placeholder="User ID">
+				<button onclick="user_data_search()">Search User</button>
+				<br>
+				<label id="user-data-search-info"></label>
+				<br>
+				<div>
+					<label>ID:</label><label id="user-data-id"></label><br>
+					<label>Name:</label><label id="user-data-name"></label><br>
+					<label>Status:</label><label id="user-data-status"></label><br>
+					<label>Sessions:</label></label><br>
+					<table id="user-data-sessions">
+						<tr>
+							<th>ID</th>
+							<th>Result</th>
+							<th>Tour ID</th>
+							<th>L ID</th>
+							<th>L Score</th>
+							<th>L Result</th>
+							<th>R ID</th>
+							<th>R Score</th>
+							<th>R Result</th>
+						</tr>
+						<tr>
+							<td>1</td>
+							<td>Game Over</td>
+							<td>N/A</td>
+							<td>1</td>
+							<td>3</td>
+							<td>winner</td>
+							<td>2</td>
+							<td>2</td>
+							<td>loser</td>
+						</tr>
+					</table>
+				</div>
 			</div>
 
 			<script>document.getElementById("defaultTab").click();</script>

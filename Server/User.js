@@ -1,6 +1,8 @@
+
 import * as api from './API_Const.js';
 import { SessionPong } from './Session/SesPong.js';
 import { TimeTicker } from './TimeTicker.js';
+import * as database from './DataBase.js';
 
 export class User
 {
@@ -37,10 +39,9 @@ export class User
 		this.ws.send(text);
 	}
 
-	GetTable()
+	ToJSON()
 	{
 		this.Status++;
-
 		var str = '{';
 		str += '"ID":' + this.DB_User.id + ',';
 		str += '"User":"' + this.DB_User.UserName + '",';
@@ -49,8 +50,17 @@ export class User
 		str += '"';
 		return str + '}';
 	}
-
-
+	ToTableJSON()
+	{
+		this.Status++;
+		var str = '{';
+		str += '"ID":' + this.DB_User.id + ',';
+		str += '"User":"' + this.DB_User.UserName + '",';
+		str += '"Status":"';
+		str += this.Status;
+		str += '"';
+		return str + '}';
+	}
 
 	InvitesList_Add(user)
 	{
@@ -179,6 +189,8 @@ export class User
 
 
 
+
+
 	static AllUsersArray = [];
 	static All_Add(ws, DB_User)
 	{
@@ -217,7 +229,7 @@ export class User
 		for (var i = 0; i < this.AllUsersArray.length; i++)
 		{
 			if (i != 0) { table += ','; }
-			table += this.AllUsersArray[i].GetTable();
+			table += this.AllUsersArray[i].ToTableJSON();
 		}
 		return table + ']';
 	}

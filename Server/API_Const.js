@@ -19,6 +19,11 @@ export const INVITE_Table = "Invite-Table: ";
 
 
 
+export const USER_DATA_SEARCH_ID = "User-Data-Search-ID: ";
+export const USER_DATA = "User-Data: ";
+
+
+
 export const SESSION_Start = "Session-Start";
 export const SESSION_End = "Session-End";
 

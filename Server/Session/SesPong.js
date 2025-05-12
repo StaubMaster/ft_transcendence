@@ -196,7 +196,7 @@ export class SessionPong
 			if (this.AllSessionsPong[i].isGameOver)
 			{
 				console.log("---- Session Pong ----");
-				this.AllSessionsPong.splice(i, i + 1);
+				this.AllSessionsPong.splice(i, 1);
 				i--;
 			}
 		}

@@ -1,7 +1,10 @@
+import * as api from './Help/API_Const.js';
+import * as logIO from './logIO.js';
+import * as invite from './invite.js';
 
 
 
-ws = null;
+var ws = null;
 WebSocket_Connect();
 function WebSocket_Connect()
 {
@@ -22,6 +25,8 @@ function WebSocket_Connect()
 	ws.onopen = function()
 	{
 		WebSocket_Info();
+		logIO.AccountChangeLogOut();
+		invite.borwser_users_invite_clear();
 	};
 	ws.onmessage = function(e)
 	{
@@ -69,19 +74,19 @@ function Session_End()
 function WebSocket_Message(text)
 {
 	const message_to_element = [
-		["User-ID: "   , "logged-id-label"],
-		["User-Name: " , "logged-name-label"],
+		[api.USER_ID,   "logged-id-label"],
+		[api.USER_Name, "logged-name-label"],
 
-		["Session-ID: "     , "session-ID"],
-		["Session-State: "  , "session-state"],
-		["Session-L-ID: "   , "session-L-ID"],
-		["Session-L-Name: " , "session-L-name"],
-		["Session-L-Score: ", "session-L-score"],
-		["Session-L-State: ", "session-L-state"],
-		["Session-R-ID: "   , "session-R-ID"],
-		["Session-R-Name: " , "session-R-name"],
-		["Session-R-Score: ", "session-R-score"],
-		["Session-R-State: ", "session-R-state"],
+		[api.API_SES_ID,      "session-ID"],
+		[api.API_SES_State,   "session-state"],
+		[api.API_SES_L_ID,    "session-L-ID"],
+		[api.API_SES_L_Name,  "session-L-name"],
+		[api.API_SES_L_Score, "session-L-score"],
+		[api.API_SES_L_State, "session-L-state"],
+		[api.API_SES_R_ID,    "session-R-ID"],
+		[api.API_SES_R_Name,  "session-R-name"],
+		[api.API_SES_R_Score, "session-R-score"],
+		[api.API_SES_R_State, "session-R-state"],
 	];
 	for (var i = 0; i < message_to_element.length; i++)
 	{
@@ -97,10 +102,10 @@ function WebSocket_Message(text)
 	}
 
 	const message_to_func_value = [
-		["Log-Info: ",        User_LogIn_Change],
-		["User-Table-List: ", browse_users_table_ws_recv],
-		["Invite-Table: ",    invite_users_table_ws_recv],
-		["User-Data: ",       user_data_show],
+		[api.LOG_INFO,        logIO.AccountChangeInfo],
+		[api.USER_Table_List, invite.browse_users_table_ws_recv],
+		[api.INVITE_Table,    invite.invite_users_table_ws_recv],
+		[api.USER_DATA,       user_data_show],
 	];
 	for (var i = 0; i < message_to_func_value.length; i++)
 	{
@@ -115,10 +120,10 @@ function WebSocket_Message(text)
 	}
 
 	const message_to_func = [
-		["LogOut", User_LogOut_Change],
-		["DeleteMe", User_LogOut_Change],
-		["Session-Start", Session_Start],
-		["Session-End", Session_End],
+		[api.LOGIN,         logIO.AccountChangeLogIn],
+		[api.LOGOUT,        logIO.AccountChangeLogOut],
+		[api.SESSION_Start, Session_Start],
+		[api.SESSION_End,   Session_End],
 	];
 	for (var i = 0; i < message_to_func.length; i++)
 	{
@@ -132,9 +137,9 @@ function WebSocket_Message(text)
 	}
 
 
+
 	var cmd_ID = "ID: ";
 	var cmd_SimulationData = "Simulation-Data: ";
-
 	if (text.startsWith(cmd_ID))
 	{
 		var cut = text.substring(cmd_ID.length);
@@ -152,7 +157,7 @@ function WebSocket_Message(text)
 	}
 }
 
-function WebSocket_Send(text)
+export function WebSocket_Send(text)
 {
 	if (ws == null)
 	{
@@ -165,3 +170,4 @@ function WebSocket_Send(text)
 		ws.send(text);
 	}
 }
+window.WebSocket_Send = WebSocket_Send;

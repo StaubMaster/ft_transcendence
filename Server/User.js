@@ -173,7 +173,7 @@ export class User
 			this.SendText(api.LOG_INFO + DB_User);
 			return;
 		}
-		this.SendText(api.LOG_INFO);
+		this.SendText(api.LOGIN);
 		this.SendText(api.USER_ID + DB_User.id);
 		this.SendText(api.USER_Name + DB_User.UserName);
 
@@ -181,6 +181,7 @@ export class User
 		this.InvitedUser = null;
 		this.InvitesList = [];
 		this.IsLoggedIn = true;
+		console.log("User", this.Temp_ID, "logged in");
 	}
 	AccountLogOut()
 	{
@@ -195,6 +196,7 @@ export class User
 		this.InvitedUser = null;
 		this.InvitesList = null;
 		this.IsLoggedIn = false;
+		console.log("User", this.Temp_ID, "logged out");
 	}
 	AccountRegister(UserName, PassWord)
 	{
@@ -286,8 +288,9 @@ export class User
 	static AllUsersArray = [];
 	static All_Add(socket)
 	{
-		console.log("++++ User", this.Temp_ID);
+		console.log("++++ User", this.Temp_ID, this.AllUsersArray.length);
 		this.AllUsersArray.push(new User(this.Temp_ID, socket));
+		this.Temp_ID++;
 	}
 	static All_Remove(temp_id)
 	{
@@ -295,9 +298,9 @@ export class User
 		{
 			if (this.AllUsersArray[i].Temp_ID == temp_id)
 			{
-				console.log("---- User", temp_id);
+				console.log("---- User", temp_id, i);
 				this.AllUsersArray[i].IsConnected = false;
-				this.AllUsersArray.splice(i, i + 1);
+				this.AllUsersArray.splice(i, 1);
 				return;
 			}
 		}

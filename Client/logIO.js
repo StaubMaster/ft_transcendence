@@ -1,125 +1,153 @@
+import * as api from './Help/API_Const.js';
+import * as check from './Help/loginCheck.js';
 
-function lazyCheckAlphaNumeric(str)
+
+
+function GetNamePass()
 {
-	var i, c;
+	var InfoLabel = document.getElementById("login-info-field");
 
-	for (i = 0; i < str.length; i++)
+	var UserNameField = document.getElementById("login-username-field");
+	var PassWordField = document.getElementById("login-password-field");
+	var UserName = UserNameField.value;
+	var PassWord = PassWordField.value;
+
+	if (!check.lazyCheckAlphaNumeric(UserName))
 	{
-		c = str[i];
-		if (!(c >= 'a' && c <= 'z') &&
-			!(c >= 'A' && c <= 'Z') &&
-			!(c >= '0' && c <= '9'))
-		{
-			return false;
-		}
+		InfoLabel.textContent = "UserName is not AlphaNumeric";
+		return;
 	}
-	return true;
+	if (!check.lazyCheckAlphaNumeric(PassWord))
+	{
+		InfoLabel.textContent = "PassWord is not AlphaNumeric";
+		return;
+	}
+
+	return [UserName, PassWord];
 }
 
-isNotLogged = true;
-function User_LogIO()
+
+
+export function AccountLogIn()
 {
-	if (isNotLogged)
-	{
-		var InfoLabel = document.getElementById("login-info-field");
-		InfoLabel.textContent = "";
-
-		var UserNameField = document.getElementById("login-username-field");
-		var PassWordField = document.getElementById("login-password-field");
-		var UserName = UserNameField.value;
-		var PassWord = PassWordField.value;
-		//UserNameField.value = "";
-		//PassWordField.value = "";
-
-		if (!lazyCheckAlphaNumeric(UserName))
-		{
-			InfoLabel.textContent = "UserName is not AlphaNumeric";
-			return;
-		}
-		if (!lazyCheckAlphaNumeric(PassWord))
-		{
-			InfoLabel.textContent = "PassWord is not AlphaNumeric";
-			return;
-		}
-		
-		WebSocket_Send("LogIn: " + UserName + ", " + PassWord);
-		InfoLabel.textContent = "logging in ...";
-	}
-	else
-	{
-		WebSocket_Send("LogOut");
-	}
-}
-deleteRepeatPress = 0;
-function User_Register_Delete()
-{
-	if (isNotLogged)
-	{
-		var InfoLabel = document.getElementById("login-info-field");
-		InfoLabel.textContent = "";
-
-		var UserNameField = document.getElementById("login-username-field");
-		var PassWordField = document.getElementById("login-password-field");
-		var UserName = UserNameField.value;
-		var PassWord = PassWordField.value;
-
-		if (!lazyCheckAlphaNumeric(UserName))
-		{
-			InfoLabel.textContent = "UserName is not AlphaNumeric";
-			return;
-		}
-		if (!lazyCheckAlphaNumeric(PassWord))
-		{
-			InfoLabel.textContent = "PassWord is not AlphaNumeric";
-			return;
-		}
-
-		WebSocket_Send("Register: " + UserName + ", " + PassWord);
-		InfoLabel.textContent = "registering in ...";
-	}
-	else
-	{
-		if (deleteRepeatPress == 0)
-		{
-			WebSocket_Send("DeleteMe");
-		}
-		else
-		{
-			document.getElementById("regDel").textContent = "press " + deleteRepeatPress + " more time(s) to delete";
-			deleteRepeatPress--;
-		}
-	}
-}
-
-function User_LogIn_Change(response)
-{
-	if (response === undefined || response.length == 0)
-	{
-		isNotLogged = false;
-		document.getElementById("login-field").style.display = "none";
-		document.getElementById("logged-field").style.display = "block";
-		document.getElementById("logIO").textContent = "Log Out";
-		document.getElementById("regDel").textContent = "Delete Me";
-		deleteRepeatPress = 5;
-
-		var InfoLabel = document.getElementById("login-info-field");
-		InfoLabel.textContent = "Logged In";
-	}
-	else
-	{
-		var InfoLabel = document.getElementById("login-info-field");
-		InfoLabel.textContent = response;
-	}
-}
-
-function User_LogOut_Change()
-{
-	isNotLogged = true;
-	document.getElementById("login-field").style.display = "block";
-	document.getElementById("logged-field").style.display = "none";
-	document.getElementById("logIO").textContent = "Log In";
-	document.getElementById("regDel").textContent = "Register";
-
 	var InfoLabel = document.getElementById("login-info-field");
 	InfoLabel.textContent = "";
+
+	const ret = GetNamePass();
+	if (ret === undefined) { return; }
+	const [UserName, PassWord] = ret;
+
+	IsWaiting = true;
+	InfoLabel.textContent = "logging in ...";
+	WebSocket_Send(api.LOGIN + UserName + ", " + PassWord);
+}
+export function AccountLogOut()
+{
+	var InfoLabel = document.getElementById("login-info-field");
+	InfoLabel.textContent = "";
+
+	IsWaiting = true;
+	InfoLabel.textContent = "logging out ...";
+	WebSocket_Send(api.LOGOUT);
+}
+export function AccountRegister()
+{
+	var InfoLabel = document.getElementById("login-info-field");
+	InfoLabel.textContent = "";
+
+	const ret = GetNamePass();
+	if (ret === undefined) { return; }
+	const [UserName, PassWord] = ret;
+
+	IsWaiting = true;
+	InfoLabel.textContent = "registering ...";
+	WebSocket_Send(api.REGISTER + UserName + ", " + PassWord);
+}
+var deleteRepeatPress = 0;
+export function AccountDeleteMe()
+{
+	var InfoLabel = document.getElementById("login-info-field");
+	if (deleteRepeatPress == 0)
+	{
+		IsWaiting = true;
+		InfoLabel.textContent = "deleting ...";
+		WebSocket_Send("DeleteMe");
+	}
+	else
+	{
+		InfoLabel.textContent = "press " + deleteRepeatPress + " more time(s) to delete";
+		deleteRepeatPress--;
+	}
+}
+
+
+
+var IsLoggedIn = false;
+var IsWaiting = false;
+export function AccountLogInLogOut()
+{
+	if (IsWaiting) { return; }
+
+	if (!IsLoggedIn)
+	{
+		AccountLogIn();
+	}
+	else
+	{
+		AccountLogOut();
+	}
+}
+export function AccountRegisterDeleteMe()
+{
+	if (IsWaiting) { return; }
+
+	if (!IsLoggedIn)
+	{
+		AccountRegister();
+	}
+	else
+	{
+		AccountDeleteMe();
+	}
+}
+window.AccountLogInLogOut = AccountLogInLogOut;
+window.AccountRegisterDeleteMe = AccountRegisterDeleteMe;
+
+
+
+export function AccountChangeInfo(text)
+{
+	IsWaiting = false;
+	var InfoLabel = document.getElementById("login-info-field");
+	InfoLabel.textContent = text;
+}
+export function AccountChangeLogIn()
+{
+	IsWaiting = false;
+	IsLoggedIn = true;
+
+	document.getElementById("login-field").style.display = "none";
+	document.getElementById("logged-field").style.display = "block";
+
+	document.getElementById("account-logIO").textContent = "Log Out"
+	document.getElementById("account-RegDel").textContent = "Delete Me";
+
+	deleteRepeatPress = 5;
+
+	var InfoLabel = document.getElementById("login-info-field");
+	InfoLabel.textContent = "Logged In";
+}
+export function AccountChangeLogOut()
+{
+	IsWaiting = false;
+	IsLoggedIn = false;
+
+	document.getElementById("login-field").style.display = "block";
+	document.getElementById("logged-field").style.display = "none";
+
+	document.getElementById("account-logIO").textContent = "Log In"
+	document.getElementById("account-RegDel").textContent = "Register";
+
+	var InfoLabel = document.getElementById("login-info-field");
+	InfoLabel.textContent = "Logged Out";
 }

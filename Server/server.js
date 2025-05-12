@@ -1,7 +1,7 @@
 
 const fastify = require('fastify')(
 {
-	logger: true,
+	//logger: true,
 	/*https: {
 		key: fs.readFileSync('./key.pem'),
 	}*/

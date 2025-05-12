@@ -5,11 +5,10 @@
 		<title>HATE</title>
 		<link rel="stylesheet" href="style.css">
 
-		<script src="/ws.js"></script>
-		<script src="/logIO.js"></script>
+		<script type="module" src="/ws.js"></script>
+		<script type="module" src="/logIO.js"></script>
+		<script type="module" src="/invite.js"></script>
 		<script src="/tab_bar.js"></script>
-		<script src="/user_table.js"></script>
-		<script src="/invite.js"></script>
 		<script src="/user_data.js"></script>
 
 		<!--<script type="module" src="/baby.js"></script>-->
@@ -44,7 +43,7 @@
 							<th>Status</th>
 						</tr>
 					</table>
-					<button type="button" disabled id="browse-users-button-invite" onclick="browse_users_invite()">Invite</button>
+					<button type="button" disabled id="browse-users-button-invite" onclick="browse_users_invite_selected()">Invite</button>
 					<br>
 				</div>
 				<div>
@@ -55,7 +54,7 @@
 						<label>Status: </label><label id="invite-user-status"></label><br>
 					</div>
 					<label>Invite Status: </label><label id="invite-status"></label><br>
-					<button type="button" disabled id="browse-users-button-cancel" onclick="users_invite_set(-1)">Cancel Invite</button><br>
+					<button type="button" disabled id="browse-users-button-cancel" onclick="borwser_users_invite_clear()">Cancel Invite</button><br>
 				</div>
 				<div>
 					<label>Invites received: </label><br>
@@ -72,7 +71,7 @@
 
 			<div id="Login" class="tabcontent">
 				<h3>Login</h3>
-				<label>Info:</label><label id="login-info-field"></label><br>
+				<label>Info:</label><label id="login-info-field">Logged Out</label><br>
 
 				<div id="login-field">
 					<input type="text" id="login-username-field" placeholder="UserName"><br>
@@ -84,8 +83,8 @@
 					<label>ID:</label><label id="logged-id-label"></label><br>
 				</div>
 
-				<button type="button" id="logIO" onclick="User_LogIO()">Log In</button>
-				<button type="button" id="regDel" onclick="User_Register_Delete()">Register</button>
+				<button type="button" id="account-logIO" onclick="AccountLogInLogOut()">Log In</button>
+				<button type="button" id="account-RegDel" onclick="AccountRegisterDeleteMe()">Register</button>
 				<br>
 			</div>
 
@@ -162,9 +161,6 @@
 					<td id="session-R-state"></td>
 				</tr>
 			</table>
-
-			<button type="button" id="session-presance-check-button" onclick="WebSocket_Send('I-Am-Here')">I Am Here</button>
-			<br>
 
 			<canvas id="session-canvas"></canvas>
 		</div>

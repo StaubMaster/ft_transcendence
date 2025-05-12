@@ -59,6 +59,21 @@ async function routes(fastify, options)
 		}
 	});
 
+	fastify.get('/Help/:file', async function (request, reply)
+	{
+		var rel_path = './Help/';
+		if (request.params.file)
+		{
+			get_file(reply, rel_path + request.params.file);
+		}
+		else
+		{
+			var index_file = 'index';
+			index_file += ".html";
+			get_file(reply, rel_path + index_file);
+		}
+	});
+
 	const node_path = './node_modules/';
 	fastify.get('/node_modules/:dir1/:dir2/:file', async function (request, reply)
 	{

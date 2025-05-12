@@ -1,5 +1,6 @@
 
-function openTab(evt, tabName) {
+function openTab(evt, tabName)
+{
 	var i;
 
 	var tabcontent = document.getElementsByClassName("tabcontent");

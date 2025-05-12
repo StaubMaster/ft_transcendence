@@ -2,6 +2,11 @@ import * as SQLite from 'node:sqlite';
 import { sha256 } from '../Help/SHA256.js';
 
 const database = new SQLite.DatabaseSync('DataBase');
+
+
+
+
+
 database.exec(`
 	CREATE TABLE IF NOT EXISTS user(
 		id INTEGER PRIMARY KEY,
@@ -9,8 +14,6 @@ database.exec(`
 		PassWord TEXT
 	) STRICT
 `);
-
-
 
 export function CheckUser(userName, passWord)
 {
@@ -66,7 +69,43 @@ export function FindUser(id)
 	return;
 }
 
+const query_user = database.prepare("SELECT * FROM user ORDER BY id");
+console.log(query_user.all());
 
-const query = database.prepare("SELECT * FROM user ORDER BY id");
-console.log(query.all());
 
+
+
+
+//database.exec('DROP TABLE session');
+database.exec(`
+	CREATE TABLE IF NOT EXISTS session(
+		ID INTEGER PRIMARY KEY,
+		Result Text,
+		Tour_ID INTEGER,
+
+		L_ID INTEGER,
+		L_Score INTEGER,
+		L_Result Text,
+
+		R_ID INTEGER,
+		R_Score INTEGER,
+		R_Result Text
+
+		) STRICT
+`);
+
+export function InsertSession(result, tour_id, l_id, l_score, l_result, r_id, r_score, r_result)
+{
+	const insert = database.prepare('INSERT INTO session (Result, Tour_ID, L_ID, L_Score, L_Result, R_ID, R_Score, R_Result) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+	insert.run(result, tour_id, l_id, l_score, l_result, r_id, r_score, r_result);
+	console.log("++++ DataBase Session");
+}
+
+export function FindSearchUserID(user_id)
+{
+	const query = database.prepare("SELECT * FROM session WHERE L_ID=" + user_id + " OR R_ID=" + user_id);
+	return query.all();
+}
+
+const query_session = database.prepare("SELECT * FROM session ORDER BY ID");
+console.log(query_session.all());

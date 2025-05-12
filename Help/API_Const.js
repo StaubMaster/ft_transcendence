@@ -21,6 +21,8 @@ export const INVITE_Table = "Invite-Table: ";
 
 export const USER_DATA_SEARCH_ID = "User-Data-Search-ID: ";
 export const USER_DATA = "User-Data: ";
+export const SEARCH_SESSIONS_LIST_USER_ID = "Search-Session-List-User-ID: ";
+export const SEARCH_SESSIONS_LIST_DATA = "Search-Session-List-Data: ";
 
 
 

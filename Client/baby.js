@@ -1,4 +1,7 @@
+import * as api from './Help/API_Const.js';
 import * as BABYLON from './node_modules/@babylonjs/core/';
+
+
 
 const canvas = document.getElementById('session-canvas');
 
@@ -55,7 +58,6 @@ function BoxToPos(box)
 
 export function SimulationDataChangeFunc(str)
 {
-	//console.log("'" + str + "'");
 	var full_data = JSON.parse(str);
 
 	if (full_data.name == "Ball")
@@ -121,7 +123,7 @@ scene.onKeyboardObservable.add(function(key_info)
 			if (!MoveUpKeyPressed)
 			{
 				MoveUpKeyPressed = true;
-				WebSocket_Send("Session-Simulation-Input: UP");
+				WebSocket_Send(api.API_USER_SESSION + "UP");
 			}
 		}
 		if (key_info.event.key == "s")
@@ -129,7 +131,7 @@ scene.onKeyboardObservable.add(function(key_info)
 			if (!MoveDwKeyPressed)
 			{
 				MoveDwKeyPressed = true;
-				WebSocket_Send("Session-Simulation-Input: DW");
+				WebSocket_Send(api.API_USER_SESSION + "DW");
 			}
 		}
 	}
@@ -140,7 +142,7 @@ scene.onKeyboardObservable.add(function(key_info)
 			if (MoveUpKeyPressed)
 			{
 				MoveUpKeyPressed = false;
-				WebSocket_Send("Session-Simulation-Input: !UP");
+				WebSocket_Send(api.API_USER_SESSION + "!UP");
 			}
 		}
 		if (key_info.event.key == "s")
@@ -148,7 +150,7 @@ scene.onKeyboardObservable.add(function(key_info)
 			if (MoveDwKeyPressed)
 			{
 				MoveDwKeyPressed = false;
-				WebSocket_Send("Session-Simulation-Input: !DW");
+				WebSocket_Send(api.API_USER_SESSION + "!DW");
 			}
 		}
 	}

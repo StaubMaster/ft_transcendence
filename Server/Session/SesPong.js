@@ -1,6 +1,9 @@
 import * as api from '../../Help/API_Const.js';
+import * as database from '../DataBase.js';
 import { TimeCountDown } from '../../Help/TimeCountDown.js';
 import { SimPong } from '../Simulation/SimPong.js';
+
+
 
 export class SessionPong
 {
@@ -12,8 +15,9 @@ export class SessionPong
 	ScoreL;
 	ScoreR;
 
-	StatusL;
-	StatusR;
+	Result;
+	ResultL;
+	ResultR;
 
 	Sim;
 
@@ -29,8 +33,9 @@ export class SessionPong
 		this.UserL.IsActive = false;
 		this.UserR.IsActive = false;
 
-		this.StateL = "...";
-		this.StateR = "...";
+		this.Result = "...";
+		this.ResultL = "...";
+		this.ResultR = "...";
 
 		this.PresanceCheckCountDown = new TimeCountDown(1, 10);
 
@@ -40,11 +45,11 @@ export class SessionPong
 
 		this.SendTextAll(api.API_SES_L_ID + this.UserL.DB_User.id);
 		this.SendTextAll(api.API_SES_L_Name + this.UserL.DB_User.UserName);
-		this.SendTextAll(api.API_SES_L_State + this.StateL);
+		this.SendTextAll(api.API_SES_L_State + this.ResultL);
 
 		this.SendTextAll(api.API_SES_R_ID + this.UserR.DB_User.id);
 		this.SendTextAll(api.API_SES_R_Name + this.UserR.DB_User.UserName);
-		this.SendTextAll(api.API_SES_R_State + this.StateR);
+		this.SendTextAll(api.API_SES_R_State + this.ResultR);
 
 		this.ScoreL = 0;
 		this.ScoreR = 0;
@@ -52,6 +57,8 @@ export class SessionPong
 
 		this.Sim = new SimPong(this);
 	}
+
+
 
 	SendTextAll(text)
 	{
@@ -75,16 +82,20 @@ export class SessionPong
 		this.SendTextAll('Simulation-Data: { "name": "' + name + '", "data": ' + data + ' }');
 	}
 
-	StateLChange(state)
+
+
+	ResultLChange(state)
 	{
-		this.StateL = state;
-		this.SendTextAll(api.API_SES_L_State + this.StateL);
+		this.ResultL = state;
+		this.SendTextAll(api.API_SES_L_State + this.ResultL);
 	}
-	StateRChange(state)
+	ResultRChange(state)
 	{
-		this.StateR = state;
-		this.SendTextAll(api.API_SES_R_State + this.StateR);
+		this.ResultR = state;
+		this.SendTextAll(api.API_SES_R_State + this.ResultR);
 	}
+
+
 
 	GameOver()
 	{
@@ -92,9 +103,16 @@ export class SessionPong
 		this.SendTextAll(api.SESSION_End);
 
 		console.log("Session End");
-		console.log("Score: " + this.ScoreL + " : " + this.ScoreR);
-		console.log("State: " + this.StateL + " : " + this.StateR);
+		console.log("Result: " + this.Result);
+		console.log("L:", this.UserL.DB_User.id, this.ScoreL, this.ResultL);
+		console.log("R:", this.UserR.DB_User.id, this.ScoreR, this.ResultR);
+		database.InsertSession(this.Result, 0,
+			this.UserL.DB_User.id, this.ScoreL, this.ResultL,
+			this.UserR.DB_User.id, this.ScoreR, this.ResultR
+		);
 	}
+
+
 
 	CheckPresance()
 	{
@@ -103,8 +121,9 @@ export class SessionPong
 		if (this.PresanceCheckCountDown.isDone)
 		{
 			this.PresanceCheckCountDown = null;
-			if (this.UserL.IsActive) { this.StateL = "was here"; } else { this.StateL = "wan't here"; }
-			if (this.UserR.IsActive) { this.StateR = "was here"; } else { this.StateR = "wan't here"; }
+			this.Result = "Presance check Failed";
+			if (this.UserL.IsActive) { this.ResultL = "was here"; } else { this.ResultL = "wasn't here"; }
+			if (this.UserR.IsActive) { this.ResultR = "was here"; } else { this.ResultR = "wasn't here"; }
 			this.GameOver();
 			return;
 		}
@@ -114,13 +133,13 @@ export class SessionPong
 			this.SendTextAll(api.API_SES_State + 'waiting for user input ' + this.PresanceCheckCountDown.TickRemaining);
 		}
 
-		if (this.StateL == "..." && this.UserL.IsActive)
+		if (this.ResultL == "..." && this.UserL.IsActive)
 		{
-			this.StateLChange("here");
+			this.ResultLChange("here");
 		}
-		if (this.StateR == "..." && this.UserR.IsActive)
+		if (this.ResultR == "..." && this.UserR.IsActive)
 		{
-			this.StateRChange("here");
+			this.ResultRChange("here");
 		}
 
 		if (this.UserL.IsActive && this.UserR.IsActive)
@@ -134,20 +153,21 @@ export class SessionPong
 	{
 		if (this.ScoreL >= 3 || this.ScoreR >= 3)
 		{
+			this.Result = "Winning Score";
 			if (this.ScoreL > this.ScoreR)
 			{
-				this.StateL = "winner";
-				this.StateR = "loser";
+				this.ResultL = "winner";
+				this.ResultR = "loser";
 			}
 			else if (this.ScoreL < this.ScoreR)
 			{
-				this.StateL = "loser";
-				this.StateR = "winner";
+				this.ResultL = "loser";
+				this.ResultR = "winner";
 			}
 			else
 			{
-				this.StateL = "tie";
-				this.StateR = "tie";
+				this.ResultL = "tie";
+				this.ResultR = "tie";
 			}
 			this.GameOver();
 		}
@@ -157,13 +177,16 @@ export class SessionPong
 	{
 		if (!this.UserL.IsConnected || !this.UserR.IsConnected)
 		{
-			if (!this.UserL.IsConnected) { this.StateL = "disconnect"; } else { this.StateL = "default"; }
-			if (!this.UserR.IsConnected) { this.StateR = "disconnect"; } else { this.StateR = "default"; }
+			this.Result = "Disconnection";
+			if (!this.UserL.IsConnected) { this.ResultL = "disconnect"; } else { this.ResultL = "default"; }
+			if (!this.UserR.IsConnected) { this.ResultR = "disconnect"; } else { this.ResultR = "default"; }
 			this.GameOver();
 			return true;
 		}
 		return false;
 	}
+
+
 
 	Update()
 	{
@@ -201,5 +224,30 @@ export class SessionPong
 			}
 		}
 	}
-	
+	static All_SearchByUserID(user_id)
+	{
+		const found = database.FindSearchUserID(user_id);
+		/*var str = '[';
+		var notFirst = false;
+		for (var i = 0; i < found.length; i++)
+		{
+			const ses = found[i];
+			if (notFirst) { str += ','; }
+			else { notFirst = true; }
+			str += '{';
+			str += '"ID":'        + ses.ID + ',';
+			str += '"Result":"'   + ses.Result + '",';
+			str += '"Tour_ID":'   + ses.Tour_ID + ',';
+			str += '"L_ID":'      + ses.L_ID + ',';
+			str += '"L_Score":'   + ses.L_Score + ',';
+			str += '"L_Result":"' + ses.L_Result + '",';
+			str += '"R_ID":'      + ses.R_ID + ',';
+			str += '"R_Score":'   + ses.R_Score + ',';
+			str += '"R_Result":"' + ses.R_Result + '"';
+			str += '}';
+		}
+		str += ']';
+		return str;*/
+		return JSON.stringify(found);
+	}
 }

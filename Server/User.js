@@ -1,7 +1,8 @@
-
 import * as api from '../Help/API_Const.js';
 import * as database from './DataBase.js';
 import { SessionPong } from './Session/SesPong.js';
+
+
 
 export class User
 {
@@ -59,6 +60,8 @@ export class User
 		};
 	}
 
+
+
 	SendText(text)
 	{
 		if (this.IsConnected)
@@ -68,7 +71,17 @@ export class User
 	}
 	RecvText(text)
 	{
-		if (text.startsWith(api.LOGIN))
+		if (text.startsWith(api.USER_DATA_SEARCH_ID))
+		{
+			const value = text.substr(api.USER_DATA_SEARCH_ID.length);
+			this.SendText(api.USER_DATA + User.All_SearchUserData(value));
+		}
+		else if (text.startsWith(api.SEARCH_SESSIONS_LIST_USER_ID))
+		{
+			const value = text.substr(api.SEARCH_SESSIONS_LIST_USER_ID.length);
+			this.SendText(api.SEARCH_SESSIONS_LIST_DATA + SessionPong.All_SearchByUserID(value));
+		}
+		else if (text.startsWith(api.LOGIN))
 		{
 			const value = text.substr(api.LOGIN.length);
 			const NamePass = value.split(", ");
@@ -88,74 +101,45 @@ export class User
 		{
 			this.AccountDeleteMe();
 		}
+		else if (text.startsWith(api.INVITE_Request_ID))
+		{
+			const value = text.substr(api.INVITE_Request_ID.length);
+			if (this.InvitedUser != null)
+			{
+				this.InvitedUser.InvitesList_Remove(this);
+			}
+			this.InvitedUser = User.All_GetByID(value);
+			if (this.InvitedUser != null)
+			{
+				this.InvitedUser.InvitesList_Add(this);
+			}
+		}
+		else if (text.startsWith(api.INVITE_Accept_ID))
+		{
+			const value = text.substr(api.INVITE_Accept_ID.length);
+			var user = this.InvitesList_Find(value);
+			if (user != null)
+			{
+				SessionPong.All_Add(this, user);
+			}
+		}
+		else if (text.startsWith(api.API_USER_SESSION))
+		{
+			this.IsActive = true;
+			const value = text.substr(api.API_USER_SESSION.length);
+			if      (value == "UP") { this.PressUP = true; }
+			else if (value == "DW") { this.PressDW = true; }
+			else if (value == "!UP") { this.PressUP = false; }
+			else if (value == "!DW") { this.PressDW = false; }
+			else
+			{
+				console.log("Unknown Session Input '" + value + "'");
+			}
+		}
 		else
 		{
-			this.ParseMessage(text);
+			console.log("Unidentified Message: '" + text + "'");
 		}
-	}
-
-	ToJSON()
-	{
-		this.Status++;
-		var str = '{';
-		str += '"ID":' + this.DB_User.id + ',';
-		str += '"User":"' + this.DB_User.UserName + '",';
-		str += '"Status":"';
-		str += this.Status;
-		str += '"';
-		return str + '}';
-	}
-	ToTableJSON()
-	{
-		this.Status++;
-		var str = '{';
-		str += '"ID":' + this.DB_User.id + ',';
-		str += '"User":"' + this.DB_User.UserName + '",';
-		str += '"Status":"';
-		str += this.Status;
-		str += '"';
-		return str + '}';
-	}
-
-
-
-	InvitesList_Add(user)
-	{
-		console.log("++++ Invite", this.DB_User.id, user.DB_User.id);
-		this.InvitesList.push(user);
-	}
-	InvitesList_Remove(user)
-	{
-		for (var i = 0; i < this.InvitesList.length; i++)
-		{
-			if (this.InvitesList[i].DB_User.id == user.DB_User.id)
-			{
-				console.log("---- Invite", this.DB_User.id, user.DB_User.id);
-				this.InvitesList.splice(i, i + 1);
-				return;
-			}
-		}
-	}
-	InvitesList_Find(id)
-	{
-		for (var i = 0; i < this.InvitesList.length; i++)
-		{
-			if (this.InvitesList[i].DB_User.id == id)
-			{
-				return this.InvitesList[i];
-			}
-		}
-		return null;
-	}
-	InvitesList_Table()
-	{
-		var table = '[';
-		for (var i = 0; i < this.InvitesList.length; i++)
-		{
-			if (i != 0) { table += ','; }
-			table += this.InvitesList[i].ToTableJSON(-1);
-		}
-		return table + ']';
 	}
 
 
@@ -226,58 +210,68 @@ export class User
 
 
 
-	ParseMessage(msg)
+	InvitesList_Add(user)
 	{
-		if (msg.startsWith(api.USER_DATA_SEARCH_ID))
+		console.log("++++ Invite", this.DB_User.id, user.DB_User.id);
+		this.InvitesList.push(user);
+	}
+	InvitesList_Remove(user)
+	{
+		for (var i = 0; i < this.InvitesList.length; i++)
 		{
-			const value = msg.substr(api.USER_DATA_SEARCH_ID.length);
-			this.SendText(api.USER_DATA + User.All_SearchUserData(value));
-		}
-		else if (msg.startsWith(api.API_USER_NAME))
-		{
-			console.log("API_USER_NAME");
-			const value = msg.substr(api.API_USER_NAME.length);
-			this.Name = value;
-		}
-		else if (msg.startsWith(api.INVITE_Request_ID))
-		{
-			const value = msg.substr(api.INVITE_Request_ID.length);
-			if (this.InvitedUser != null)
+			if (this.InvitesList[i].DB_User.id == user.DB_User.id)
 			{
-				this.InvitedUser.InvitesList_Remove(this);
-			}
-			this.InvitedUser = User.All_GetByID(value);
-			if (this.InvitedUser != null)
-			{
-				this.InvitedUser.InvitesList_Add(this);
+				console.log("---- Invite", this.DB_User.id, user.DB_User.id);
+				this.InvitesList.splice(i, i + 1);
+				return;
 			}
 		}
-		else if (msg.startsWith(api.INVITE_Accept_ID))
+	}
+	InvitesList_Find(id)
+	{
+		for (var i = 0; i < this.InvitesList.length; i++)
 		{
-			const value = msg.substr(api.INVITE_Accept_ID.length);
-			var user = this.InvitesList_Find(value);
-			if (user != null)
+			if (this.InvitesList[i].DB_User.id == id)
 			{
-				SessionPong.All_Add(this, user);
+				return this.InvitesList[i];
 			}
 		}
-		else if (msg.startsWith(api.API_USER_SESSION))
+		return null;
+	}
+	InvitesList_Table()
+	{
+		var table = '[';
+		for (var i = 0; i < this.InvitesList.length; i++)
 		{
-			this.IsActive = true;
-			const value = msg.substr(api.API_USER_SESSION.length);
-			if      (value == "UP") { this.PressUP = true; }
-			else if (value == "DW") { this.PressDW = true; }
-			else if (value == "!UP") { this.PressUP = false; }
-			else if (value == "!DW") { this.PressDW = false; }
-			else
-			{
-				console.log("Unknown Session Input '" + value + "'");
-			}
+			if (i != 0) { table += ','; }
+			table += this.InvitesList[i].ToTableJSON(-1);
 		}
-		else
-		{
-			console.log("Unidentified Message: '" + msg + "'");
-		}
+		return table + ']';
+	}
+
+
+
+	ToJSON()
+	{
+		this.Status++;
+		var str = '{';
+		str += '"ID":' + this.DB_User.id + ',';
+		str += '"User":"' + this.DB_User.UserName + '",';
+		str += '"Status":"';
+		str += this.Status;
+		str += '"';
+		return str + '}';
+	}
+	ToTableJSON()
+	{
+		this.Status++;
+		var str = '{';
+		str += '"ID":' + this.DB_User.id + ',';
+		str += '"User":"' + this.DB_User.UserName + '",';
+		str += '"Status":"';
+		str += this.Status;
+		str += '"';
+		return str + '}';
 	}
 
 
@@ -288,7 +282,7 @@ export class User
 	static AllUsersArray = [];
 	static All_Add(socket)
 	{
-		console.log("++++ User", this.Temp_ID, this.AllUsersArray.length);
+		console.log("++++ User", this.Temp_ID);
 		this.AllUsersArray.push(new User(this.Temp_ID, socket));
 		this.Temp_ID++;
 	}
@@ -298,7 +292,7 @@ export class User
 		{
 			if (this.AllUsersArray[i].Temp_ID == temp_id)
 			{
-				console.log("---- User", temp_id, i);
+				console.log("---- User", temp_id);
 				this.AllUsersArray[i].IsConnected = false;
 				this.AllUsersArray.splice(i, 1);
 				return;

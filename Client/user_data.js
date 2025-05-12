@@ -1,9 +1,15 @@
+import * as api from './Help/API_Const.js';
+import * as SessionTable from './generic_session_table.js';
+
+
 
 function user_data_search()
 {
 	const search_id = document.getElementById("user-data-search-id").value;
-	WebSocket_Send("User-Data-Search-ID: " + search_id);
+	WebSocket_Send(api.USER_DATA_SEARCH_ID + search_id);
+	WebSocket_Send(api.SEARCH_SESSIONS_LIST_USER_ID + search_id);
 }
+window.user_data_search = user_data_search;
 
 function user_data_show(text)
 {
@@ -23,3 +29,12 @@ function user_data_show(text)
 		document.getElementById("user-data-search-info").textContent = "User found";
 	}
 }
+window.user_data_show = user_data_show;
+
+function user_data_session_show(text)
+{
+	var table = document.getElementById("user-data-sessions");
+	SessionTable.clear(table);
+	SessionTable.show(table, text);
+}
+window.user_data_session_show = user_data_session_show;

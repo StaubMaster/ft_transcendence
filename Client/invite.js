@@ -1,4 +1,5 @@
-import * as UserTable from './generic_user_table.js'
+import * as api from './Help/API_Const.js';
+import * as UserTable from './generic_user_table.js';
 
 
 
@@ -53,7 +54,7 @@ function users_invite_set(idx)
 
 	if (id != UsersInvitedID)
 	{
-		WebSocket_Send("Invite-Request-ID: " + UsersInvitedID);
+		WebSocket_Send(api.INVITE_Request_ID + UsersInvitedID);
 	}
 }
 function browse_users_invite_selected()
@@ -88,7 +89,7 @@ function browse_invite_accept()
 {
 	if (InviteUsersSelectedIndex != -1)
 	{
-		WebSocket_Send("Invite-Accept-ID: " + InviteUsersSelectedID);
+		WebSocket_Send(api.INVITE_Accept_ID + InviteUsersSelectedID);
 	}
 }
 window.invite_users_table_select = invite_users_table_select;

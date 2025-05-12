@@ -1,6 +1,7 @@
 import * as api from './Help/API_Const.js';
 import * as logIO from './logIO.js';
 import * as invite from './invite.js';
+import * as userData from './user_data.js';
 
 
 
@@ -106,6 +107,7 @@ function WebSocket_Message(text)
 		[api.USER_Table_List, invite.browse_users_table_ws_recv],
 		[api.INVITE_Table,    invite.invite_users_table_ws_recv],
 		[api.USER_DATA,       user_data_show],
+		[api.SEARCH_SESSIONS_LIST_DATA, user_data_session_show],
 	];
 	for (var i = 0; i < message_to_func_value.length; i++)
 	{

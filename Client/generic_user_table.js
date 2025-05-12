@@ -14,16 +14,12 @@ export function show(table, table_JSON, onClickFuncName)
 	for (var i = 0; i < data.length; i++)
 	{
 		var row = table.insertRow(i + 1);
-		var cell_id = row.insertCell(0);
-		var cell_user = row.insertCell(1);
-		var cell_status = row.insertCell(2);
+		row.insertCell(0).textContent = data[i].ID;
+		row.insertCell(1).textContent = data[i].User;
+		row.insertCell(2).textContent = data[i].Status;
 
 		var func = new Function(onClickFuncName + "(" + (i + 1) + ");");
 		row.onclick = func;
-
-		cell_id.textContent = data[i].ID;
-		cell_user.textContent = data[i].User;
-		cell_status.textContent = data[i].Status;
 	}
 }
 

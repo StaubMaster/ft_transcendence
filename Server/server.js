@@ -24,12 +24,4 @@ function (err, address)
 
 
 const autoTicker = require('./AutoTicker.js');
-/*const sesPong = require('./Session/SesPong.js');
-setInterval(function ()
-{
-	sesPong.SessionPong.All_Update();
-}, 1);*/
-
-
-
 const database = require('./DataBase.js');

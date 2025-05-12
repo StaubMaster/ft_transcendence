@@ -1,10 +1,7 @@
-
-
-
 import * as SQLite from 'node:sqlite';
-import { sha256 } from './SHA256.js';
-const database = new SQLite.DatabaseSync('DataBase');
+import { sha256 } from '../Help/SHA256.js';
 
+const database = new SQLite.DatabaseSync('DataBase');
 database.exec(`
 	CREATE TABLE IF NOT EXISTS user(
 		id INTEGER PRIMARY KEY,

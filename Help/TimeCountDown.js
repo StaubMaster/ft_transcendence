@@ -21,7 +21,7 @@ export class TimeCountDown
 		this.isDone = false;
 	}
 
-	check()
+	update()
 	{
 		this.lastUpdateWasTick= this.TimeTicker.check();
 		if (this.lastUpdateWasTick)

@@ -50,6 +50,7 @@ function WebSocket_Info(text)
 
 function Session_Start()
 {
+	console.log("Session Start");
 	document.getElementById("session").style.display = "block";
 	document.getElementById("not-session").style.display = "none";
 	browse_users_table_select(-1);
@@ -58,6 +59,7 @@ function Session_Start()
 }
 function Session_End()
 {
+	console.log("Session End");
 	document.getElementById("session").style.display = "none";
 	document.getElementById("not-session").style.display = "block";
 }
@@ -67,7 +69,6 @@ function Session_End()
 function WebSocket_Message(text)
 {
 	const message_to_element = [
-		["WS-Temp-ID: ", "ws-id-field"],
 		["User-ID: "   , "logged-id-label"],
 		["User-Name: " , "logged-name-label"],
 
@@ -82,7 +83,6 @@ function WebSocket_Message(text)
 		["Session-R-Score: ", "session-R-score"],
 		["Session-R-State: ", "session-R-state"],
 	];
-	var found = false;
 	for (var i = 0; i < message_to_element.length; i++)
 	{
 		var header = message_to_element[i][0];
@@ -93,15 +93,8 @@ function WebSocket_Message(text)
 			var elem = document.getElementById(element);
 			elem.textContent = cut;
 			return;
-			//found = true;
 		}
 	}
-	if (found)
-	{
-		return;
-	}
-
-
 
 	const message_to_func_value = [
 		["Log-Info: ",        User_LogIn_Change],

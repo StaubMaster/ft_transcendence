@@ -1,16 +1,19 @@
 
-import * as api from './API_Const.js';
-import { SessionPong } from './Session/SesPong.js';
-import { TimeTicker } from './TimeTicker.js';
+import * as api from '../Help/API_Const.js';
 import * as database from './DataBase.js';
+import { SessionPong } from './Session/SesPong.js';
 
 export class User
 {
-	ws;
+	Temp_ID;
+
+	IsConnected;
+	IsLoggedIn;
+	IsActive;
+
+	socket;
+
 	DB_User;
-
-	DisConnect;
-
 	InvitedUser;
 	InvitesList;
 
@@ -19,24 +22,76 @@ export class User
 
 	Status;
 
-	constructor(ws, DB_User)
+	constructor(temp_id, socket)
 	{
-		this.ws = ws;
-		this.DB_User = DB_User;
+		this.Temp_ID = temp_id;
 
+		this.IsConnected = true;
+		this.IsLoggedIn = false;
+		this.IsActive = false;
+
+		this.socket = socket;
+
+		this.DB_User = null;
 		this.InvitedUser = null;
-		this.InvitesList = [];
-		this.DisConnect = false;
+		this.InvitesList = null;
 
 		this.PressUP = false;
 		this.PressDW = false;
 
 		this.Status = 0;
+
+		const self_referance = this;
+		this.socket.onerror = function(e)
+		{
+			console.log(self_referance.Temp_ID + " socket error: ", e);
+		};
+		this.socket.onclose = function(e)
+		{
+			console.log(self_referance.Temp_ID + " socket closed:" + e.code + ":" + e.reason);
+			self_referance.IsConnected = false;
+			User.All_Remove(self_referance.Temp_ID);
+		};
+		//this.socket.onopen = function() { };
+		this.socket.onmessage = function(e)
+		{
+			self_referance.RecvText(e.data);
+		};
 	}
 
 	SendText(text)
 	{
-		this.ws.send(text);
+		if (this.IsConnected)
+		{
+			this.socket.send(text);
+		}
+	}
+	RecvText(text)
+	{
+		if (text.startsWith(api.LOGIN))
+		{
+			const value = text.substr(api.LOGIN.length);
+			const NamePass = value.split(", ");
+			this.AccountLogIn(NamePass[0], NamePass[1]);
+		}
+		else if (text.startsWith(api.LOGOUT))
+		{
+			this.AccountLogOut();
+		}
+		else if (text.startsWith(api.REGISTER))
+		{
+			const value = text.substr(api.REGISTER.length);
+			const NamePass = value.split(", ");
+			this.AccountRegister(NamePass[0], NamePass[1]);
+		}
+		else if (text.startsWith(api.DELETE_ME))
+		{
+			this.AccountDeleteMe();
+		}
+		else
+		{
+			this.ParseMessage(text);
+		}
 	}
 
 	ToJSON()
@@ -61,6 +116,8 @@ export class User
 		str += '"';
 		return str + '}';
 	}
+
+
 
 	InvitesList_Add(user)
 	{
@@ -96,17 +153,87 @@ export class User
 		for (var i = 0; i < this.InvitesList.length; i++)
 		{
 			if (i != 0) { table += ','; }
-			table += this.InvitesList[i].GetTable(-1);
+			table += this.InvitesList[i].ToTableJSON(-1);
 		}
 		return table + ']';
 	}
 
 
 
+	AccountLogIn(UserName, PassWord)
+	{
+		if (this.IsLoggedIn)
+		{
+			this.SendText(api.LOG_INFO + "Already Logged In");
+			return;
+		}
+		const DB_User = database.CheckUser(UserName, PassWord);
+		if (typeof DB_User == "string")
+		{
+			this.SendText(api.LOG_INFO + DB_User);
+			return;
+		}
+		this.SendText(api.LOG_INFO);
+		this.SendText(api.USER_ID + DB_User.id);
+		this.SendText(api.USER_Name + DB_User.UserName);
+
+		this.DB_User = DB_User;
+		this.InvitedUser = null;
+		this.InvitesList = [];
+		this.IsLoggedIn = true;
+	}
+	AccountLogOut()
+	{
+		if (!this.IsLoggedIn)
+		{
+			this.SendText(api.LOG_INFO + "Not Logged In");
+			return;
+		}
+		this.SendText(api.LOGOUT);
+
+		this.DB_User = null;
+		this.InvitedUser = null;
+		this.InvitesList = null;
+		this.IsLoggedIn = false;
+	}
+	AccountRegister(UserName, PassWord)
+	{
+		if (this.IsLoggedIn)
+		{
+			this.SendText(api.LOG_INFO + "Already Logged In");
+			return;
+		}
+		const ret = database.InsertUser(UserName, PassWord);
+		if (ret !== undefined)
+		{
+			this.SendText(api.LOG_INFO + ret);
+			return;
+		}
+		this.AccountLogIn(UserName, PassWord);
+	}
+	AccountDeleteMe()
+	{
+		if (!this.IsLoggedIn)
+		{
+			this.SendText(api.LOG_INFO + "Not Logged In");
+			return;
+		}
+		database.RemoveUser(this.DB_User.UserName, this.DB_User.PassWord);
+		this.AccountLogOut();
+	}
+
+
+
 	ParseMessage(msg)
 	{
-		if (msg.startsWith(api.API_USER_NAME))
+		if (msg.startsWith(api.USER_DATA_SEARCH_ID))
 		{
+			const value = msg.substr(api.USER_DATA_SEARCH_ID.length);
+			this.SendText(api.USER_DATA + User.All_SearchUserData(value));
+		}
+		else if (msg.startsWith(api.API_USER_NAME))
+		{
+			console.log("API_USER_NAME");
 			const value = msg.substr(api.API_USER_NAME.length);
 			this.Name = value;
 		}
@@ -132,45 +259,9 @@ export class User
 				SessionPong.All_Add(this, user);
 			}
 		}
-		/*else if (msg.startsWith(api.API_USER_INVITE))
-		{
-			const value = msg.substr(api.API_USER_INVITE.length);
-			//console.log("#" + api.API_USER_INVITE + "#'" + value + "'");
-			if (value == this.DB_User.id)
-			{
-				console.log(".... Invite Self");
-				SessionPong.All_Add(this, this);
-			}
-			else
-			{
-				console.log("INVITE OTHER: Out of Service");
-				const other = All_GetByID(value);
-				if (other != null)
-				{
-					if (other.HasInviteRecvFromID(this.ID))
-					{
-						console.log(".... Invite Accept");
-						//	create Session
-					}
-					else
-					{
-						console.log(".... Invite Other");
-						other.InvitesRecvFromOthersList.push(this);
-					}
-				}
-				else
-				{
-					console.log("!!!! User not found");
-				}
-			}
-		}*/
-		else if (msg.startsWith(api.API_USER_IAMHERE))
-		{
-			const value = msg.substr(api.API_USER_IAMHERE.length);
-			console.log("#" + api.API_USER_IAMHERE + "#'" + value + "'");
-		}
 		else if (msg.startsWith(api.API_USER_SESSION))
 		{
+			this.IsActive = true;
 			const value = msg.substr(api.API_USER_SESSION.length);
 			if      (value == "UP") { this.PressUP = true; }
 			else if (value == "DW") { this.PressDW = true; }
@@ -191,23 +282,22 @@ export class User
 
 
 
+	static Temp_ID = 0;
 	static AllUsersArray = [];
-	static All_Add(ws, DB_User)
+	static All_Add(socket)
 	{
-		console.log("++++ User", DB_User.id);
-		var user = new User(ws, DB_User);
-		this.AllUsersArray.push(user);
-		return user;
+		console.log("++++ User", this.Temp_ID);
+		this.AllUsersArray.push(new User(this.Temp_ID, socket));
 	}
-	static All_Remove(id)
+	static All_Remove(temp_id)
 	{
 		for (var i = 0; i < this.AllUsersArray.length; i++)
 		{
-			if (this.AllUsersArray[i].DB_User.id == id)
+			if (this.AllUsersArray[i].Temp_ID == temp_id)
 			{
-				console.log("---- User", id);
+				console.log("---- User", temp_id);
+				this.AllUsersArray[i].IsConnected = false;
 				this.AllUsersArray.splice(i, i + 1);
-				i--;
 				return;
 			}
 		}
@@ -216,9 +306,10 @@ export class User
 	{
 		for (var i = 0; i < this.AllUsersArray.length; i++)
 		{
-			if (this.AllUsersArray[i].DB_User.id == id)
+			const user = this.AllUsersArray[i];
+			if (user.IsConnected && user.IsLoggedIn && user.DB_User.id == id)
 			{
-				return this.AllUsersArray[i];
+				return user;
 			}
 		}
 		return null;
@@ -226,10 +317,16 @@ export class User
 	static All_Table()
 	{
 		var table = '[';
+		var notFirst = false;
 		for (var i = 0; i < this.AllUsersArray.length; i++)
 		{
-			if (i != 0) { table += ','; }
-			table += this.AllUsersArray[i].ToTableJSON();
+			const user = this.AllUsersArray[i];
+			if (user.IsConnected && user.IsLoggedIn)
+			{
+				if (notFirst) { table += ','; }
+				else { notFirst = true; }
+				table += user.ToTableJSON();
+			}
 		}
 		return table + ']';
 	}
@@ -237,8 +334,50 @@ export class User
 	{
 		for (var i = 0; i < this.AllUsersArray.length; i++)
 		{
-			const table = this.AllUsersArray[i].InvitesList_Table();
-			this.AllUsersArray[i].SendText(api.INVITE_Table + table);
+			const user = this.AllUsersArray[i];
+			if (user.IsConnected && user.IsLoggedIn)
+			{
+				const table = user.InvitesList_Table();
+				user.SendText(api.INVITE_Table + table);
+			}
+		}
+	}
+	static All_Send(text)
+	{
+		for (var i = 0; i < this.AllUsersArray.length; i++)
+		{
+			const user = this.AllUsersArray[i];
+			if (user.IsConnected)
+			{
+				user.SendText(text);
+			}
+		}
+	}
+	static All_SearchUserData(id)
+	{
+		const DB_User = database.FindUser(id);
+		if (DB_User === undefined)
+		{
+			return "";
+		}
+		else
+		{
+			const All_User = User.All_GetByID(id);
+			var str = '{';
+			str += '"ID":' + DB_User.id + ',';
+			str += '"Name":"' + DB_User.UserName + '",';
+			str += '"Status":"';
+			if (All_User == null)
+			{
+				str += "offline";
+			}
+			else
+			{
+				str += All_User.Status;
+			}
+			str += '"';
+			str += '}';
+			return str;
 		}
 	}
 }

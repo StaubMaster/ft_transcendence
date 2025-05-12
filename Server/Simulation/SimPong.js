@@ -1,15 +1,9 @@
-//import * as point2D from './Point2D.js';
-//import * as box2D from './Box2D.js';
-//import * as velbox2D from './VelBox2D.js';
-//import * as paddle2D from './Paddle2D.js';
-//import * as ticker from '../TimeTicker.js';
-//import * as countDown from '../TimeCountDown.js';
 import { Point2D } from './Point2D.js';
 import { Box2D } from './Box2D.js';
 import { VelBox2D } from './VelBox2D.js';
 import { Paddle2D } from './Paddle2D.js';
-import { TimeTicker, timeNs } from '../TimeTicker.js';
-import { TimeCountDown } from '../TimeCountDown.js';
+import { TimeTicker, timeNs } from '../../Help/TimeTicker.js';
+import { TimeCountDown } from '../../Help/TimeCountDown.js';
 
 const WallTickness = 0.05;
 const PaddleSpeedAccel = 0.001;
@@ -171,7 +165,7 @@ export class SimPong
 			}
 			this.Ball.Box.SetCenter(pos);
 
-			this.ServingTimer.check();
+			this.ServingTimer.update();
 			if (this.ServingTimer.lastUpdateWasTick)
 			{
 				//echo "Serving: " . this.ServingTimer.GetRemaining() . "\n";

@@ -1,6 +1,5 @@
 
 const user = require('./User.js');
-const ws = require('./ws.js');
 const fs = require('fs');
 
 function get_file(reply, file_path)
@@ -28,8 +27,8 @@ async function routes(fastify, options)
 {
 	fastify.get('/ws', { websocket: true }, async function (socket, request)
 	{
-		//user.User.All_Add(socket);
-		ws.WS.All_Add(socket);
+		user.User.All_Add(socket);
+		//ws.WS.All_Add(socket);
 	});
 
 	fastify.get('/BrowseUsersTable/:id?', async function (request, reply)

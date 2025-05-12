@@ -59,6 +59,8 @@ SearchUserData()
 	Live Update:
 		leave away for now
 
+	do this by using HTTP GET ?
+
 
 
 
@@ -69,4 +71,9 @@ session data
 	if you want to look up the other user just search in the ID
 	maybe for tournaments
 
+
+
+
+
+make all the current stuff more organized
 

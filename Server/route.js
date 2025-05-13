@@ -25,7 +25,7 @@ function get_file(reply, file_path)
 
 async function routes(fastify, options)
 {
-	fastify.get('/ws', { websocket: true }, async function (socket, request)
+	fastify.get('/wss', { websocket: true }, async function (socket, request)
 	{
 		user.User.All_Add(socket);
 		//ws.WS.All_Add(socket);

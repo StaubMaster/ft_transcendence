@@ -11,7 +11,7 @@ function WebSocket_Connect()
 {
 	if (ws != null) { return; }
 
-	ws = new WebSocket("ws");
+	ws = new WebSocket("wss");
 	ws.binaryType = "arraybuffer";
 	ws.onerror = function(e)
 	{

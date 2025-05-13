@@ -1,16 +1,16 @@
 
+const fs = require('fs');
 const fastify = require('fastify')(
 {
-	//logger: true,
-	/*https: {
-		key: fs.readFileSync('./key.pem'),
-	}*/
+	logger: true,
+	https: {
+		key: fs.readFileSync('./Cert/server.key'),
+		cert: fs.readFileSync('./Cert/server.crt')
+	}
 });
 fastify.register(require('@fastify/websocket'));
 fastify.register(require('./route.js'));
 
-//	use ipconfig to get local IP
-//	e.g.:	192.168.0.208
 fastify.listen({ port:5000, host:'0.0.0.0' },
 function (err, address)
 {

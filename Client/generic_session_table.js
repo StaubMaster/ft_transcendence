@@ -26,6 +26,6 @@ export function show(table, table_JSON)
 
 		row.insertCell(7).textContent = data[i].R_ID;
 		row.insertCell(8).textContent = data[i].R_Score;
-		row.insertCell(9).textContent = data[i].R_EndsTate;
+		row.insertCell(9).textContent = data[i].L_EndState;
 	}
 }

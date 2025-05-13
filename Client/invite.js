@@ -54,7 +54,7 @@ export function users_invite_set(idx)
 
 	if (id != UsersInvitedID)
 	{
-		WebSocket_Send(api.INVITE_Request_ID + UsersInvitedID);
+		WebSocket_Send(api.USER_INVITE_Request_ID + UsersInvitedID);
 	}
 }
 function browse_users_invite_selected()
@@ -89,7 +89,7 @@ function browse_invite_accept()
 {
 	if (InviteUsersSelectedIndex != -1)
 	{
-		WebSocket_Send(api.INVITE_Accept_ID + InviteUsersSelectedID);
+		WebSocket_Send(api.USER_INVITE_Accept_ID + InviteUsersSelectedID);
 	}
 }
 window.invite_users_table_select = invite_users_table_select;

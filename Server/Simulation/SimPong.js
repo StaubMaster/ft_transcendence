@@ -1,3 +1,4 @@
+import * as api from '../../Help/API_Const.js';
 import { Point2D } from './Point2D.js';
 import { Box2D } from './Box2D.js';
 import { VelBox2D } from './VelBox2D.js';
@@ -61,14 +62,14 @@ export class SimPong
 
 		this.isServing = false;
 
-		this.SendFunc("Wall0", this.Wall0.ToJSON());
-		this.SendFunc("Wall1", this.Wall1.ToJSON());
-		this.SendFunc("Wall2", this.Wall2.ToJSON());
-		this.SendFunc("Wall3", this.Wall3.ToJSON());
+		this.SendFunc(api.SIMULATION_WALL0, this.Wall0.ToJSON());
+		this.SendFunc(api.SIMULATION_WALL1, this.Wall1.ToJSON());
+		this.SendFunc(api.SIMULATION_WALL2, this.Wall2.ToJSON());
+		this.SendFunc(api.SIMULATION_WALL3, this.Wall3.ToJSON());
 
-		this.SendFunc("Ball", this.Ball.ToJSON());
-		this.SendFunc("PaddleL", this.PaddleL.ToJSON());
-		this.SendFunc("PaddleR", this.PaddleR.ToJSON());
+		this.SendFunc(api.SIMULATION_BALL, this.Ball.ToJSON());
+		this.SendFunc(api.SIMULATION_PADDLE_L, this.PaddleL.ToJSON());
+		this.SendFunc(api.SIMULATION_PADDLE_R, this.PaddleR.ToJSON());
 	}
 
 	SendFunc(name, data)
@@ -196,9 +197,9 @@ export class SimPong
 		this.PaddleL.LimitBox(this.LimitBox);
 		this.PaddleR.LimitBox(this.LimitBox);
 
-		this.SendFunc("Ball", this.Ball.ToJSON());
-		this.SendFunc("PaddleL", this.PaddleL.ToJSON());
-		this.SendFunc("PaddleR", this.PaddleR.ToJSON());
+		this.SendFunc(api.SIMULATION_BALL, this.Ball.ToJSON());
+		this.SendFunc(api.SIMULATION_PADDLE_L, this.PaddleL.ToJSON());
+		this.SendFunc(api.SIMULATION_PADDLE_R, this.PaddleR.ToJSON());
 
 		this.TimeTickCount++;
 	}

@@ -60,43 +60,43 @@ export function SimulationDataChangeFunc(str)
 {
 	var full_data = JSON.parse(str);
 
-	if (full_data.name == "Ball")
+	if (full_data.name == api.SIMULATION_BALL)
 	{
 		var data = full_data.data;
 		ball.scaling = BoxToScale(data.box);
 		ball.position = BoxToPos(data.box);
 	}
-	else if (full_data.name == "Wall0")
+	else if (full_data.name == api.SIMULATION_WALL0)
 	{
 		var data = full_data.data;
 		wall0.scaling = BoxToScale(data);
 		wall0.position = BoxToPos(data);
 	}
-	else if (full_data.name == "Wall1")
+	else if (full_data.name == api.SIMULATION_WALL1)
 	{
 		var data = full_data.data;
 		wall1.scaling = BoxToScale(data);
 		wall1.position = BoxToPos(data);
 	}
-	else if (full_data.name == "Wall2")
+	else if (full_data.name == api.SIMULATION_WALL2)
 	{
 		var data = full_data.data;
 		wall2.scaling = BoxToScale(data);
 		wall2.position = BoxToPos(data);
 	}
-	else if (full_data.name == "Wall3")
+	else if (full_data.name == api.SIMULATION_WALL3)
 	{
 		var data = full_data.data;
 		wall3.scaling = BoxToScale(data);
 		wall3.position = BoxToPos(data);
 	}
-	else if (full_data.name == "PaddleL")
+	else if (full_data.name == api.SIMULATION_PADDLE_L)
 	{
 		var data = full_data.data;
 		paddleL.scaling = BoxToScale(data.box);
 		paddleL.position = BoxToPos(data.box);
 	}
-	else if (full_data.name == "PaddleR")
+	else if (full_data.name == api.SIMULATION_PADDLE_R)
 	{
 		var data = full_data.data;
 		paddleR.scaling = BoxToScale(data.box);
@@ -123,7 +123,7 @@ scene.onKeyboardObservable.add(function(key_info)
 			if (!MoveUpKeyPressed)
 			{
 				MoveUpKeyPressed = true;
-				WebSocket_Send(api.API_USER_SESSION + "UP");
+				WebSocket_Send(api.API_USER_SESSION + api.USER_INPUT_UP_PRESS);
 			}
 		}
 		if (key_info.event.key == "s")
@@ -131,7 +131,7 @@ scene.onKeyboardObservable.add(function(key_info)
 			if (!MoveDwKeyPressed)
 			{
 				MoveDwKeyPressed = true;
-				WebSocket_Send(api.API_USER_SESSION + "DW");
+				WebSocket_Send(api.API_USER_SESSION + api.USER_INPUT_DW_PRESS);
 			}
 		}
 	}
@@ -142,7 +142,7 @@ scene.onKeyboardObservable.add(function(key_info)
 			if (MoveUpKeyPressed)
 			{
 				MoveUpKeyPressed = false;
-				WebSocket_Send(api.API_USER_SESSION + "!UP");
+				WebSocket_Send(api.API_USER_SESSION + api.USER_INPUT_UP_RELEASE);
 			}
 		}
 		if (key_info.event.key == "s")
@@ -150,7 +150,7 @@ scene.onKeyboardObservable.add(function(key_info)
 			if (MoveDwKeyPressed)
 			{
 				MoveDwKeyPressed = false;
-				WebSocket_Send(api.API_USER_SESSION + "!DW");
+				WebSocket_Send(api.API_USER_SESSION + api.USER_INPUT_DW_RELEASE);
 			}
 		}
 	}

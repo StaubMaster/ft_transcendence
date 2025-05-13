@@ -21,7 +21,8 @@ export class User
 	PressUP;
 	PressDW;
 
-	Status;
+	IsInSession;
+	IsInTournament;
 
 	constructor(temp_id, socket)
 	{
@@ -40,7 +41,8 @@ export class User
 		this.PressUP = false;
 		this.PressDW = false;
 
-		this.Status = 0;
+		this.IsInSession = false;
+		this.IsInTournament = false;
 
 		const self_referance = this;
 		this.socket.onerror = function(e)
@@ -71,39 +73,35 @@ export class User
 	}
 	RecvText(text)
 	{
-		if (text.startsWith(api.USER_DATA_SEARCH_ID))
+		if (text.startsWith(api.USER_SEARCH_ID))
 		{
-			const value = text.substr(api.USER_DATA_SEARCH_ID.length);
-			this.SendText(api.USER_DATA + User.All_SearchUserData(value));
+			const value = text.substr(api.USER_SEARCH_ID.length);
+			this.SendText(api.USER_SEARCH_USER_DATA + User.All_SearchUserData(value));
+			this.SendText(api.USER_SEARCH_SESSION_DATA + SessionPong.All_SearchByUserID(value));
 		}
-		else if (text.startsWith(api.SEARCH_SESSIONS_LIST_USER_ID))
+		else if (text.startsWith(api.USER_ACCOUNT_LOGIN))
 		{
-			const value = text.substr(api.SEARCH_SESSIONS_LIST_USER_ID.length);
-			this.SendText(api.SEARCH_SESSIONS_LIST_DATA + SessionPong.All_SearchByUserID(value));
-		}
-		else if (text.startsWith(api.LOGIN))
-		{
-			const value = text.substr(api.LOGIN.length);
+			const value = text.substr(api.USER_ACCOUNT_LOGIN.length);
 			const NamePass = value.split(", ");
 			this.AccountLogIn(NamePass[0], NamePass[1]);
 		}
-		else if (text.startsWith(api.LOGOUT))
+		else if (text.startsWith(api.USER_ACCOUNT_LOGOUT))
 		{
 			this.AccountLogOut();
 		}
-		else if (text.startsWith(api.REGISTER))
+		else if (text.startsWith(api.USER_ACCOUNT_REGISTER))
 		{
-			const value = text.substr(api.REGISTER.length);
+			const value = text.substr(api.USER_ACCOUNT_REGISTER.length);
 			const NamePass = value.split(", ");
 			this.AccountRegister(NamePass[0], NamePass[1]);
 		}
-		else if (text.startsWith(api.DELETE_ME))
+		else if (text.startsWith(api.USER_ACCOUNT_DELETE_ME))
 		{
 			this.AccountDeleteMe();
 		}
-		else if (text.startsWith(api.INVITE_Request_ID))
+		else if (text.startsWith(api.USER_INVITE_Request_ID))
 		{
-			const value = text.substr(api.INVITE_Request_ID.length);
+			const value = text.substr(api.USER_INVITE_Request_ID.length);
 			if (this.InvitedUser != null)
 			{
 				this.InvitedUser.InvitesList_Remove(this);
@@ -114,9 +112,9 @@ export class User
 				this.InvitedUser.InvitesList_Add(this);
 			}
 		}
-		else if (text.startsWith(api.INVITE_Accept_ID))
+		else if (text.startsWith(api.USER_INVITE_Accept_ID))
 		{
-			const value = text.substr(api.INVITE_Accept_ID.length);
+			const value = text.substr(api.USER_INVITE_Accept_ID.length);
 			var user = this.InvitesList_Find(value);
 			if (user != null)
 			{
@@ -127,10 +125,10 @@ export class User
 		{
 			this.IsActive = true;
 			const value = text.substr(api.API_USER_SESSION.length);
-			if      (value == "UP") { this.PressUP = true; }
-			else if (value == "DW") { this.PressDW = true; }
-			else if (value == "!UP") { this.PressUP = false; }
-			else if (value == "!DW") { this.PressDW = false; }
+			if      (value == api.USER_INPUT_UP_PRESS) { this.PressUP = true; }
+			else if (value == api.USER_INPUT_DW_PRESS) { this.PressDW = true; }
+			else if (value == api.USER_INPUT_UP_RELEASE) { this.PressUP = false; }
+			else if (value == api.USER_INPUT_DW_RELEASE) { this.PressDW = false; }
 			else
 			{
 				console.log("Unknown Session Input '" + value + "'");
@@ -148,6 +146,12 @@ export class User
 	{
 		return (this.IsConnected && this.IsLoggedIn);
 	}
+	GetStatus()
+	{
+		if (this.IsInTournament) { return api.USER_STATE_TOURNAMENT; }
+		if (this.IsInSession) { return api.USER_STATE_SESION; }
+		return api.USER_STATE_ONLINE;
+	}
 
 
 
@@ -155,18 +159,18 @@ export class User
 	{
 		if (this.IsLoggedIn)
 		{
-			this.SendText(api.LOG_INFO + "Already Logged In");
+			this.SendText(api.USER_ACCOUNT_LOG_INFO + api.USER_ACCOUNT_ALREADY_LOGGED_IN);
 			return;
 		}
 		const DB_User = database.CheckUser(UserName, PassWord);
 		if (typeof DB_User == "string")
 		{
-			this.SendText(api.LOG_INFO + DB_User);
+			this.SendText(api.USER_ACCOUNT_LOG_INFO + DB_User);
 			return;
 		}
-		this.SendText(api.LOGIN);
-		this.SendText(api.USER_ID + DB_User.id);
-		this.SendText(api.USER_Name + DB_User.UserName);
+		this.SendText(api.USER_ACCOUNT_LOGIN);
+		this.SendText(api.USER_ACCOUNT_ID + DB_User.id);
+		this.SendText(api.USER_ACCOUNT_Name + DB_User.UserName);
 
 		this.DB_User = DB_User;
 		this.InvitedUser = null;
@@ -178,10 +182,10 @@ export class User
 	{
 		if (!this.IsLoggedIn)
 		{
-			this.SendText(api.LOG_INFO + "Not Logged In");
+			this.SendText(api.USER_ACCOUNT_LOG_INFO + api.USER_ACCOUNT_NOT_LOGGED_IN);
 			return;
 		}
-		this.SendText(api.LOGOUT);
+		this.SendText(api.USER_ACCOUNT_LOGOUT);
 
 		this.DB_User = null;
 		this.InvitedUser = null;
@@ -193,13 +197,13 @@ export class User
 	{
 		if (this.IsLoggedIn)
 		{
-			this.SendText(api.LOG_INFO + "Already Logged In");
+			this.SendText(api.USER_ACCOUNT_LOG_INFO + api.USER_ACCOUNT_ALREADY_LOGGED_IN);
 			return;
 		}
 		const ret = database.InsertUser(UserName, PassWord);
 		if (ret !== undefined)
 		{
-			this.SendText(api.LOG_INFO + ret);
+			this.SendText(api.USER_ACCOUNT_LOG_INFO + ret);
 			return;
 		}
 		this.AccountLogIn(UserName, PassWord);
@@ -208,7 +212,7 @@ export class User
 	{
 		if (!this.IsLoggedIn)
 		{
-			this.SendText(api.LOG_INFO + "Not Logged In");
+			this.SendText(api.USER_ACCOUNT_LOG_INFO + api.USER_ACCOUNT_NOT_LOGGED_IN);
 			return;
 		}
 		database.RemoveUser(this.DB_User.UserName, this.DB_User.PassWord);
@@ -258,25 +262,13 @@ export class User
 
 
 
-	ToJSON()
-	{
-		this.Status++;
-		var str = '{';
-		str += '"ID":' + this.DB_User.id + ',';
-		str += '"User":"' + this.DB_User.UserName + '",';
-		str += '"Status":"';
-		str += this.Status;
-		str += '"';
-		return str + '}';
-	}
 	ToTableJSON()
 	{
-		this.Status++;
 		var str = '{';
 		str += '"ID":' + this.DB_User.id + ',';
 		str += '"User":"' + this.DB_User.UserName + '",';
 		str += '"Status":"';
-		str += this.Status;
+		str += this.GetStatus();
 		str += '"';
 		return str + '}';
 	}
@@ -332,7 +324,8 @@ export class User
 				table += user.ToTableJSON();
 			}
 		}
-		return table + ']';
+		table += ']';
+		User.All_Send(api.ALL_USERS_Table + table);
 	}
 	static All_Invite_Tables()
 	{
@@ -342,7 +335,7 @@ export class User
 			if (user.IsConnected && user.IsLoggedIn)
 			{
 				const table = user.InvitesList_Table();
-				user.SendText(api.INVITE_Table + table);
+				user.SendText(api.USER_INVITE_Table + table);
 			}
 		}
 	}
@@ -377,7 +370,7 @@ export class User
 			}
 			else
 			{
-				str += All_User.Status;
+				str += All_User.GetStatus();
 			}
 			str += '"';
 			str += '}';

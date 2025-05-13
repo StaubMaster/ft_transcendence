@@ -23,7 +23,7 @@ export class TimeCountDown
 
 	update()
 	{
-		this.lastUpdateWasTick= this.TimeTicker.check();
+		this.lastUpdateWasTick = this.TimeTicker.check();
 		if (this.lastUpdateWasTick)
 		{
 			this.TickRemaining--;

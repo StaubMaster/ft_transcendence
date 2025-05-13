@@ -6,8 +6,9 @@ import * as SessionTable from './generic_session_table.js';
 function user_data_search()
 {
 	const search_id = document.getElementById("user-data-search-id").value;
-	WebSocket_Send(api.USER_DATA_SEARCH_ID + search_id);
-	WebSocket_Send(api.SEARCH_SESSIONS_LIST_USER_ID + search_id);
+	WebSocket_Send(api.USER_SEARCH_ID + search_id);
+	//WebSocket_Send(api.USER_DATA_SEARCH_ID + search_id);
+	//WebSocket_Send(api.SEARCH_SESSIONS_LIST_USER_ID + search_id);
 }
 window.user_data_search = user_data_search;
 

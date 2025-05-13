@@ -37,13 +37,16 @@ export class SessionPong
 		this.UserL.IsActive = false;
 		this.UserR.IsActive = false;
 
+		this.UserL.IsInSession = true;
+		this.UserR.IsInSession = true;
+
 		this.ScoreL = 0;
 		this.ScoreR = 0;
 
-		this.EndReason = "...";
-		this.EndStateL = "...";
-		this.EndStateR = "...";
-		this.Winner = "N";
+		this.EndReason = api.SESSION_DEFAULT_END_REASON;
+		this.EndStateL = api.SESSION_DEFAULT_END_STATE;
+		this.EndStateR = api.SESSION_DEFAULT_END_STATE;
+		this.Winner = api.SESSION_WINNER_NONE;
 
 		this.CountDownCheckActive = new TimeCountDown(1, 10);
 		this.CountDownShowResult = null;
@@ -56,16 +59,16 @@ export class SessionPong
 
 		this.SendTextAll(api.SESSION_Start);
 
-		this.SendTextAll(api.API_SES_State + 'Waiting for user input ' + this.CountDownCheckActive.TickRemaining);
+		this.SendTextAll(api.SESSION_State + api.SESSION_INFO_ACTIVITY_TIMER + this.CountDownCheckActive.TickRemaining);
 
-		this.SendTextAll(api.API_SES_L_ID + this.UserL.DB_User.id);
-		this.SendTextAll(api.API_SES_R_ID + this.UserR.DB_User.id);
+		this.SendTextAll(api.SESSION_L_ID + this.UserL.DB_User.id);
+		this.SendTextAll(api.SESSION_R_ID + this.UserR.DB_User.id);
 
-		this.SendTextAll(api.API_SES_L_Name + this.UserL.DB_User.UserName);
-		this.SendTextAll(api.API_SES_R_Name + this.UserR.DB_User.UserName);
+		this.SendTextAll(api.SESSION_L_Name + this.UserL.DB_User.UserName);
+		this.SendTextAll(api.SESSION_R_Name + this.UserR.DB_User.UserName);
 
-		this.SendTextAll(api.API_SES_L_State + this.EndStateL);
-		this.SendTextAll(api.API_SES_R_State + this.EndStateR);
+		this.SendTextAll(api.SESSION_L_State + this.EndStateL);
+		this.SendTextAll(api.SESSION_R_State + this.EndStateR);
 
 		this.SendScoreAll();
 	}
@@ -91,8 +94,8 @@ export class SessionPong
 	}
 	SendScoreAll()
 	{
-		this.SendTextAll(api.API_SES_L_Score + this.ScoreL);
-		this.SendTextAll(api.API_SES_R_Score + this.ScoreR);
+		this.SendTextAll(api.SESSION_L_Score + this.ScoreL);
+		this.SendTextAll(api.SESSION_R_Score + this.ScoreR);
 	}
 	SendSimData(name, data)
 	{
@@ -115,9 +118,9 @@ export class SessionPong
 		);
 		this.CountDownShowResult = new TimeCountDown(1, 5);
 
-		this.SendTextAll(api.API_SES_L_State + this.EndStateL);
-		this.SendTextAll(api.API_SES_R_State + this.EndStateR);
-		this.SendTextAll(api.API_SES_State + 'This Session will Self-Destruct in ' + this.CountDownShowResult.TickRemaining);
+		this.SendTextAll(api.SESSION_L_State + this.EndStateL);
+		this.SendTextAll(api.SESSION_R_State + this.EndStateR);
+		this.SendTextAll(api.SESSION_State + api.SESSION_INFO_RESULT_TIMER + this.CountDownShowResult.TickRemaining);
 	}
 
 
@@ -131,34 +134,35 @@ export class SessionPong
 		if (this.CountDownCheckActive.isDone)
 		{
 			this.CountDownCheckActive = null;
-			this.EndReason = "InActivity";
-			if (this.UserL.IsActive) { this.EndStateL = "was here"; } else { this.EndStateL = "wasn't here"; }
-			if (this.UserR.IsActive) { this.EndStateR = "was here"; } else { this.EndStateR = "wasn't here"; }
-			if (this.UserL.IsActive && !this.UserR.IsActive) { this.Winner = "L"; }
-			if (!this.UserL.IsActive && this.UserR.IsActive) { this.Winner = "R"; }
+			this.EndReason = api.SESSION_INACTIVITY_END_REASON;
+			if (this.UserL.IsActive) { this.EndStateL = api.SESSION_INACTIVITY_END_STATE_GOOD; } else { this.EndStateL = api.SESSION_INACTIVITY_END_STATE_BAD; }
+			if (this.UserR.IsActive) { this.EndStateR = api.SESSION_INACTIVITY_END_STATE_GOOD; } else { this.EndStateR = api.SESSION_INACTIVITY_END_STATE_BAD; }
+			if (this.UserL.IsActive && !this.UserR.IsActive) { this.Winner = api.SESSION_WINNER_L; }
+			if (!this.UserL.IsActive && this.UserR.IsActive) { this.Winner = api.SESSION_WINNER_R; }
 			this.GameOver();
 			return;
 		}
 
 		if (this.CountDownCheckActive.lastUpdateWasTick)
 		{
-			this.SendTextAll(api.API_SES_State + 'Waiting for user input ' + this.CountDownCheckActive.TickRemaining);
+			this.SendTextAll(api.SESSION_State + api.SESSION_INFO_ACTIVITY_TIMER + this.CountDownCheckActive.TickRemaining);
 		}
 
-		if (this.EndStateL == "..." && this.UserL.IsActive)
+		if (this.EndStateL == api.SESSION_DEFAULT_END_STATE && this.UserL.IsActive)
 		{
-			this.EndStateL = "here";
-			this.SendTextAll(api.API_SES_L_State + this.EndStateL);
+			this.EndStateL = api.SESSION_ACTIVE_END_STATE;
+			this.SendTextAll(api.SESSION_L_State + this.EndStateL);
 		}
-		if (this.EndStateR == "..." && this.UserR.IsActive)
+		if (this.EndStateR == api.SESSION_DEFAULT_END_STATE && this.UserR.IsActive)
 		{
-			this.EndStateR = "here";
-			this.SendTextAll(api.API_SES_R_State + this.EndStateR);
+			this.EndStateR = api.SESSION_ACTIVE_END_STATE;
+			this.SendTextAll(api.SESSION_R_State + this.EndStateR);
 		}
 
 		if (this.UserL.IsActive && this.UserR.IsActive)
 		{
 			this.CountDownCheckActive = null;
+			this.SendTextAll(api.SESSION_State + api.SESSION_ACTIVE_END_REASON);
 			return;
 		}
 	}
@@ -167,23 +171,23 @@ export class SessionPong
 	{
 		if (this.ScoreL >= 3 || this.ScoreR >= 3)
 		{
-			this.EndReason = "Winning Score";
+			this.EndReason = api.SESSION_SCORE_END_REASON;
 			if (this.ScoreL > this.ScoreR)
 			{
-				this.EndStateL = "winner";
-				this.EndStateR = "loser";
-				this.Winner = "L";
+				this.EndStateL = api.SESSION_SCORE_END_STATE_GOOD;
+				this.EndStateR = api.SESSION_SCORE_END_STATE_BAD;
+				this.Winner = api.SESSION_WINNER_L;
 			}
 			else if (this.ScoreL < this.ScoreR)
 			{
-				this.EndStateL = "loser";
-				this.EndStateR = "winner";
-				this.Winner = "R";
+				this.EndStateL = api.SESSION_SCORE_END_STATE_BAD;
+				this.EndStateR = api.SESSION_SCORE_END_STATE_GOOD;
+				this.Winner = api.SESSION_WINNER_R;
 			}
 			else
 			{
-				this.EndStateL = "tie";
-				this.EndStateR = "tie";
+				this.EndStateL = api.SESSION_SCORE_END_STATE_NEUTRAL;
+				this.EndStateR = api.SESSION_SCORE_END_STATE_NEUTRAL;
 			}
 			this.GameOver();
 		}
@@ -193,11 +197,11 @@ export class SessionPong
 	{
 		if (!this.UserL.CheckIsHere() || !this.UserR.CheckIsHere())
 		{
-			this.EndReason = "DiCconnection";
-			if (!this.UserL.CheckIsHere()) { this.EndStateL = "disconnect"; } else { this.EndStateL = "default"; }
-			if (!this.UserR.CheckIsHere()) { this.EndStateR = "disconnect"; } else { this.EndStateR = "default"; }
-			if (this.UserL.CheckIsHere() && !this.UserR.CheckIsHere()) { this.Winner = "L"; }
-			if (!this.UserL.CheckIsHere() && this.UserR.CheckIsHere()) { this.Winner = "R"; }
+			this.EndReason = api.SESSION_DISCONNECT_END_REASON;
+			if (!this.UserL.CheckIsHere()) { this.EndStateL = api.SESSION_DISCONNECT_END_STATE_BAD; } else { this.EndStateL = api.SESSION_DISCONNECT_END_STATE_GOOD; }
+			if (!this.UserR.CheckIsHere()) { this.EndStateR = api.SESSION_DISCONNECT_END_STATE_BAD; } else { this.EndStateR = api.SESSION_DISCONNECT_END_STATE_GOOD; }
+			if (this.UserL.CheckIsHere() && !this.UserR.CheckIsHere()) { this.Winner = api.SESSION_WINNER_L; }
+			if (!this.UserL.CheckIsHere() && this.UserR.CheckIsHere()) { this.Winner = api.SESSION_WINNER_R; }
 			this.GameOver();
 			return true;
 		}
@@ -210,6 +214,8 @@ export class SessionPong
 
 		if (this.CountDownShowResult.isDone)
 		{
+			this.UserL.IsInSession = false;
+			this.UserR.IsInSession = false;
 			this.SendTextAll(api.SESSION_End);
 			this.IsDone = true;
 			return;
@@ -217,7 +223,7 @@ export class SessionPong
 
 		if (this.CountDownShowResult.lastUpdateWasTick)
 		{
-			this.SendTextAll(api.API_SES_State + 'This Session will Self-Destruct in ' + this.CountDownShowResult.TickRemaining);
+			this.SendTextAll(api.SESSION_State + api.SESSION_INFO_RESULT_TIMER + this.CountDownShowResult.TickRemaining);
 		}
 	}
 

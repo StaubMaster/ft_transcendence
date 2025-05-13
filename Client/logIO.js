@@ -39,7 +39,7 @@ export function AccountLogIn()
 
 	IsWaiting = true;
 	InfoLabel.textContent = "logging in ...";
-	WebSocket_Send(api.LOGIN + UserName + ", " + PassWord);
+	WebSocket_Send(api.USER_ACCOUNT_LOGIN + UserName + ", " + PassWord);
 }
 export function AccountLogOut()
 {
@@ -48,7 +48,7 @@ export function AccountLogOut()
 
 	IsWaiting = true;
 	InfoLabel.textContent = "logging out ...";
-	WebSocket_Send(api.LOGOUT);
+	WebSocket_Send(api.USER_ACCOUNT_LOGOUT);
 }
 export function AccountRegister()
 {
@@ -61,7 +61,7 @@ export function AccountRegister()
 
 	IsWaiting = true;
 	InfoLabel.textContent = "registering ...";
-	WebSocket_Send(api.REGISTER + UserName + ", " + PassWord);
+	WebSocket_Send(api.USER_ACCOUNT_REGISTER + UserName + ", " + PassWord);
 }
 var deleteRepeatPress = 0;
 export function AccountDeleteMe()
@@ -71,7 +71,7 @@ export function AccountDeleteMe()
 	{
 		IsWaiting = true;
 		InfoLabel.textContent = "deleting ...";
-		WebSocket_Send("DeleteMe");
+		WebSocket_Send(api.USER_ACCOUNT_DELETE_ME);
 	}
 	else
 	{

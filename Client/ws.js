@@ -71,24 +71,32 @@ function Session_End()
 	document.getElementById("not-session").style.display = "block";
 }
 
+function User_Table(text)
+{
+	invite.browse_users_table_ws_recv(text);
+}
+
 
 
 function WebSocket_Message(text)
 {
 	const message_to_element = [
-		[api.USER_ID,   "logged-id-label"],
-		[api.USER_Name, "logged-name-label"],
+		[api.USER_ACCOUNT_ID,   "logged-id-label"],
+		[api.USER_ACCOUNT_Name, "logged-name-label"],
 
-		[api.API_SES_ID,      "session-ID"],
-		[api.API_SES_State,   "session-state"],
-		[api.API_SES_L_ID,    "session-L-ID"],
-		[api.API_SES_L_Name,  "session-L-name"],
-		[api.API_SES_L_Score, "session-L-score"],
-		[api.API_SES_L_State, "session-L-state"],
-		[api.API_SES_R_ID,    "session-R-ID"],
-		[api.API_SES_R_Name,  "session-R-name"],
-		[api.API_SES_R_Score, "session-R-score"],
-		[api.API_SES_R_State, "session-R-state"],
+
+
+		[api.SESSION_State,   "session-state"],
+
+		[api.SESSION_L_ID,    "session-L-ID"],
+		[api.SESSION_L_Name,  "session-L-name"],
+		[api.SESSION_L_Score, "session-L-score"],
+		[api.SESSION_L_State, "session-L-state"],
+
+		[api.SESSION_R_ID,    "session-R-ID"],
+		[api.SESSION_R_Name,  "session-R-name"],
+		[api.SESSION_R_Score, "session-R-score"],
+		[api.SESSION_R_State, "session-R-state"],
 	];
 	for (var i = 0; i < message_to_element.length; i++)
 	{
@@ -104,11 +112,11 @@ function WebSocket_Message(text)
 	}
 
 	const message_to_func_value = [
-		[api.LOG_INFO,        logIO.AccountChangeInfo],
-		[api.USER_Table_List, invite.browse_users_table_ws_recv],
-		[api.INVITE_Table,    invite.invite_users_table_ws_recv],
-		[api.USER_DATA,       user_data_show],
-		[api.SEARCH_SESSIONS_LIST_DATA, user_data_session_show],
+		[api.ALL_USERS_Table,          User_Table],
+		[api.USER_ACCOUNT_LOG_INFO,    logIO.AccountChangeInfo],
+		[api.USER_INVITE_Table,        invite.invite_users_table_ws_recv],
+		[api.USER_SEARCH_USER_DATA,    user_data_show],
+		[api.USER_SEARCH_SESSION_DATA, user_data_session_show],
 	];
 	for (var i = 0; i < message_to_func_value.length; i++)
 	{
@@ -123,8 +131,8 @@ function WebSocket_Message(text)
 	}
 
 	const message_to_func = [
-		[api.LOGIN,         logIO.AccountChangeLogIn],
-		[api.LOGOUT,        logIO.AccountChangeLogOut],
+		[api.USER_ACCOUNT_LOGIN,         logIO.AccountChangeLogIn],
+		[api.USER_ACCOUNT_LOGOUT,        logIO.AccountChangeLogOut],
 		[api.SESSION_Start, Session_Start],
 		[api.SESSION_End,   Session_End],
 	];

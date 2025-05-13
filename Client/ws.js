@@ -34,6 +34,7 @@ function WebSocket_Connect()
 		WebSocket_Message(e.data);
 	};
 }
+window.WebSocket_Connect = WebSocket_Connect;
 
 
 
@@ -60,7 +61,7 @@ function Session_Start()
 	document.getElementById("session").style.display = "block";
 	document.getElementById("not-session").style.display = "none";
 	browse_users_table_select(-1);
-	users_invite_set(-1);
+	invite.users_invite_set(-1);
 	invite_users_table_select(-1);
 }
 function Session_End()

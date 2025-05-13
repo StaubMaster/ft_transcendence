@@ -144,6 +144,13 @@ export class User
 
 
 
+	CheckIsHere()
+	{
+		return (this.IsConnected && this.IsLoggedIn);
+	}
+
+
+
 	AccountLogIn(UserName, PassWord)
 	{
 		if (this.IsLoggedIn)

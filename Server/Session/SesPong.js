@@ -7,7 +7,7 @@ import { SimPong } from '../Simulation/SimPong.js';
 
 export class SessionPong
 {
-	isGameOver;
+	IsDone;
 
 	UserL;
 	UserR;
@@ -15,17 +15,21 @@ export class SessionPong
 	ScoreL;
 	ScoreR;
 
-	Result;
-	ResultL;
-	ResultR;
+	EndReason;
+	EndStateL;
+	EndStateR;
+	Winner;
+
+	CountDownCheckActive;
+	CountDownShowResult;
 
 	Sim;
 
-	PresanceCheckCountDown;
+	Tournament;
 
-	constructor(userL, userR)
+	constructor(userL, userR, tour)
 	{
-		this.isGameOver = false;
+		this.IsDone = false;
 
 		this.UserL = userL;
 		this.UserR = userR;
@@ -33,35 +37,48 @@ export class SessionPong
 		this.UserL.IsActive = false;
 		this.UserR.IsActive = false;
 
-		this.Result = "...";
-		this.ResultL = "...";
-		this.ResultR = "...";
+		this.ScoreL = 0;
+		this.ScoreR = 0;
 
-		this.PresanceCheckCountDown = new TimeCountDown(1, 10);
+		this.EndReason = "...";
+		this.EndStateL = "...";
+		this.EndStateR = "...";
+		this.Winner = "N";
+
+		this.CountDownCheckActive = new TimeCountDown(1, 10);
+		this.CountDownShowResult = null;
+
+		this.Sim = new SimPong(this);
+
+		this.Tournament = tour;
+
+
 
 		this.SendTextAll(api.SESSION_Start);
 
-		this.SendTextAll(api.API_SES_State + 'waiting for user input ' + this.PresanceCheckCountDown.TickRemaining);
+		this.SendTextAll(api.API_SES_State + 'Waiting for user input ' + this.CountDownCheckActive.TickRemaining);
 
 		this.SendTextAll(api.API_SES_L_ID + this.UserL.DB_User.id);
-		this.SendTextAll(api.API_SES_L_Name + this.UserL.DB_User.UserName);
-		this.SendTextAll(api.API_SES_L_State + this.ResultL);
-
 		this.SendTextAll(api.API_SES_R_ID + this.UserR.DB_User.id);
+
+		this.SendTextAll(api.API_SES_L_Name + this.UserL.DB_User.UserName);
 		this.SendTextAll(api.API_SES_R_Name + this.UserR.DB_User.UserName);
-		this.SendTextAll(api.API_SES_R_State + this.ResultR);
 
-		this.ScoreL = 0;
-		this.ScoreR = 0;
+		this.SendTextAll(api.API_SES_L_State + this.EndStateL);
+		this.SendTextAll(api.API_SES_R_State + this.EndStateR);
+
 		this.SendScoreAll();
-
-		this.Sim = new SimPong(this);
 	}
 
 
 
 	SendTextAll(text)
 	{
+		if (this.Tournament !== undefined && this.Tournament != null)
+		{
+			//	SendTextAll in Tournament
+		}
+
 		if (this.UserL.Temp_ID == this.UserR.Temp_ID)
 		{
 			this.UserL.SendText(text);
@@ -84,67 +101,64 @@ export class SessionPong
 
 
 
-	ResultLChange(state)
-	{
-		this.ResultL = state;
-		this.SendTextAll(api.API_SES_L_State + this.ResultL);
-	}
-	ResultRChange(state)
-	{
-		this.ResultR = state;
-		this.SendTextAll(api.API_SES_R_State + this.ResultR);
-	}
-
-
-
 	GameOver()
 	{
-		this.isGameOver = true;
-		this.SendTextAll(api.SESSION_End);
-
 		console.log("Session End");
-		console.log("Result: " + this.Result);
-		console.log("L:", this.UserL.DB_User.id, this.ScoreL, this.ResultL);
-		console.log("R:", this.UserR.DB_User.id, this.ScoreR, this.ResultR);
-		database.InsertSession(this.Result, 0,
-			this.UserL.DB_User.id, this.ScoreL, this.ResultL,
-			this.UserR.DB_User.id, this.ScoreR, this.ResultR
+		console.log("Reason: " + this.EndReason);
+		console.log("Winner: " + this.Winner);
+		console.log("L:", this.UserL.DB_User.id, this.ScoreL, this.EndStateL);
+		console.log("R:", this.UserR.DB_User.id, this.ScoreR, this.EndStateR);
+
+		database.InsertSession(this.EndReason, this.Winner, -1,
+			this.UserL.DB_User.id, this.ScoreL, this.EndStateL,
+			this.UserR.DB_User.id, this.ScoreR, this.EndStateR
 		);
+		this.CountDownShowResult = new TimeCountDown(1, 5);
+
+		this.SendTextAll(api.API_SES_L_State + this.EndStateL);
+		this.SendTextAll(api.API_SES_R_State + this.EndStateR);
+		this.SendTextAll(api.API_SES_State + 'This Session will Self-Destruct in ' + this.CountDownShowResult.TickRemaining);
 	}
 
 
 
-	CheckPresance()
-	{
-		this.PresanceCheckCountDown.update();
 
-		if (this.PresanceCheckCountDown.isDone)
+
+	CheckActive()
+	{
+		this.CountDownCheckActive.update();
+
+		if (this.CountDownCheckActive.isDone)
 		{
-			this.PresanceCheckCountDown = null;
-			this.Result = "Presance check Failed";
-			if (this.UserL.IsActive) { this.ResultL = "was here"; } else { this.ResultL = "wasn't here"; }
-			if (this.UserR.IsActive) { this.ResultR = "was here"; } else { this.ResultR = "wasn't here"; }
+			this.CountDownCheckActive = null;
+			this.EndReason = "InActivity";
+			if (this.UserL.IsActive) { this.EndStateL = "was here"; } else { this.EndStateL = "wasn't here"; }
+			if (this.UserR.IsActive) { this.EndStateR = "was here"; } else { this.EndStateR = "wasn't here"; }
+			if (this.UserL.IsActive && !this.UserR.IsActive) { this.Winner = "L"; }
+			if (!this.UserL.IsActive && this.UserR.IsActive) { this.Winner = "R"; }
 			this.GameOver();
 			return;
 		}
 
-		if (this.PresanceCheckCountDown.lastUpdateWasTick)
+		if (this.CountDownCheckActive.lastUpdateWasTick)
 		{
-			this.SendTextAll(api.API_SES_State + 'waiting for user input ' + this.PresanceCheckCountDown.TickRemaining);
+			this.SendTextAll(api.API_SES_State + 'Waiting for user input ' + this.CountDownCheckActive.TickRemaining);
 		}
 
-		if (this.ResultL == "..." && this.UserL.IsActive)
+		if (this.EndStateL == "..." && this.UserL.IsActive)
 		{
-			this.ResultLChange("here");
+			this.EndStateL = "here";
+			this.SendTextAll(api.API_SES_L_State + this.EndStateL);
 		}
-		if (this.ResultR == "..." && this.UserR.IsActive)
+		if (this.EndStateR == "..." && this.UserR.IsActive)
 		{
-			this.ResultRChange("here");
+			this.EndStateR = "here";
+			this.SendTextAll(api.API_SES_R_State + this.EndStateR);
 		}
 
 		if (this.UserL.IsActive && this.UserR.IsActive)
 		{
-			this.PresanceCheckCountDown = null;
+			this.CountDownCheckActive = null;
 			return;
 		}
 	}
@@ -153,21 +167,23 @@ export class SessionPong
 	{
 		if (this.ScoreL >= 3 || this.ScoreR >= 3)
 		{
-			this.Result = "Winning Score";
+			this.EndReason = "Winning Score";
 			if (this.ScoreL > this.ScoreR)
 			{
-				this.ResultL = "winner";
-				this.ResultR = "loser";
+				this.EndStateL = "winner";
+				this.EndStateR = "loser";
+				this.Winner = "L";
 			}
 			else if (this.ScoreL < this.ScoreR)
 			{
-				this.ResultL = "loser";
-				this.ResultR = "winner";
+				this.EndStateL = "loser";
+				this.EndStateR = "winner";
+				this.Winner = "R";
 			}
 			else
 			{
-				this.ResultL = "tie";
-				this.ResultR = "tie";
+				this.EndStateL = "tie";
+				this.EndStateR = "tie";
 			}
 			this.GameOver();
 		}
@@ -175,26 +191,50 @@ export class SessionPong
 
 	CheckConnection()
 	{
-		if (!this.UserL.IsConnected || !this.UserR.IsConnected)
+		if (!this.UserL.CheckIsHere() || !this.UserR.CheckIsHere())
 		{
-			this.Result = "Disconnection";
-			if (!this.UserL.IsConnected) { this.ResultL = "disconnect"; } else { this.ResultL = "default"; }
-			if (!this.UserR.IsConnected) { this.ResultR = "disconnect"; } else { this.ResultR = "default"; }
+			this.EndReason = "DiCconnection";
+			if (!this.UserL.CheckIsHere()) { this.EndStateL = "disconnect"; } else { this.EndStateL = "default"; }
+			if (!this.UserR.CheckIsHere()) { this.EndStateR = "disconnect"; } else { this.EndStateR = "default"; }
+			if (this.UserL.CheckIsHere() && !this.UserR.CheckIsHere()) { this.Winner = "L"; }
+			if (!this.UserL.CheckIsHere() && this.UserR.CheckIsHere()) { this.Winner = "R"; }
 			this.GameOver();
 			return true;
 		}
 		return false;
 	}
 
+	ShowResult()
+	{
+		this.CountDownShowResult.update();
+
+		if (this.CountDownShowResult.isDone)
+		{
+			this.SendTextAll(api.SESSION_End);
+			this.IsDone = true;
+			return;
+		}
+
+		if (this.CountDownShowResult.lastUpdateWasTick)
+		{
+			this.SendTextAll(api.API_SES_State + 'This Session will Self-Destruct in ' + this.CountDownShowResult.TickRemaining);
+		}
+	}
+
 
 
 	Update()
 	{
-		if (this.isGameOver) { return; }
-		if (this.CheckConnection()) { return; }
-		if (this.PresanceCheckCountDown != null)
+		if (this.IsDone) { return; }
+		if (this.CountDownShowResult != null)
 		{
-			this.CheckPresance();
+			this.ShowResult();
+			return;
+		}
+		if (this.CheckConnection()) { return; }
+		if (this.CountDownCheckActive != null)
+		{
+			this.CheckActive();
 			return;
 		}
 		this.Sim.Update();
@@ -216,7 +256,7 @@ export class SessionPong
 		for (var i = 0; i < this.AllSessionsPong.length; i++)
 		{
 			this.AllSessionsPong[i].Update();
-			if (this.AllSessionsPong[i].isGameOver)
+			if (this.AllSessionsPong[i].IsGameOver)
 			{
 				console.log("---- Session Pong ----");
 				this.AllSessionsPong.splice(i, 1);

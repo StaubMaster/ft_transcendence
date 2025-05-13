@@ -28,7 +28,7 @@ window.browse_users_table_select = browse_users_table_select;
 var UsersInvitedID = -1;
 var UsersInvitedName = "";
 var UsersInvitedStatus = "";
-function users_invite_set(idx)
+export function users_invite_set(idx)
 {
 	const id = UsersInvitedID;
 

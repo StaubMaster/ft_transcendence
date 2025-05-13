@@ -1,0 +1,76 @@
+
+FrontEnd
+{
+	Not in Tournament
+	{
+		List	Tournament Invites
+		Button	Accept Tournament Invite
+
+		Button	Create Tournament
+	}
+
+	when "Create Tournament" is clicked
+		request the server to create a tournament
+
+	In Tournament
+	{
+		Label		Info
+
+		Button		Remove Tournament					(Creator only)
+		Button		Start Tournament					(Creator only)
+		CheckBox	Can non-Creator Invite other Users	(Creator only)
+
+		UserList	All Users
+		Button		Invite User
+
+		UserList	Users Invited
+		Button		UnInvite User
+
+		UserList	User in Tournament
+		Button		Kick User from Tournament	(Creator cannot kick self)
+	}
+}
+
+BackEnd
+{
+	Class
+	{
+		Bool	IsSetup
+
+		//	Setup
+		List	AllUserr
+		Bool	CanNonCreatorInvite
+
+		//	GamePlay
+		List	RemainingUsers
+
+
+
+		Send_All(text)
+
+		InviteUser(user)
+		UnInviteUser(user)
+		KickUser(user)
+
+		StartTournament()
+
+
+		Update()
+	}
+
+	GamePlay:
+		this is the simplest way to matchmake
+			take the bottom 2 from RemainingUsers and put them in a Session
+			Session should know it's in a Tournament and redirect to Send_All()
+			Session should better return who won
+			Winner gets added to top of RemainingUsers
+		no parallel games, when 2 are playing, the others can see but not interact
+
+		when RemainingUsers is 1
+			thats the Winner
+		when RemainingUsers is 0
+			this should only really happen if both are Inactive ?
+			Edgecase
+
+		remove players that disconnect / log out
+}

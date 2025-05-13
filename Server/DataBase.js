@@ -80,24 +80,25 @@ console.log(query_user.all());
 database.exec(`
 	CREATE TABLE IF NOT EXISTS session(
 		ID INTEGER PRIMARY KEY,
-		Result Text,
+		EndReason Text,
+		Winner Text,
 		Tour_ID INTEGER,
 
 		L_ID INTEGER,
 		L_Score INTEGER,
-		L_Result Text,
+		L_EndState Text,
 
 		R_ID INTEGER,
 		R_Score INTEGER,
-		R_Result Text
+		R_EndState Text
 
 		) STRICT
 `);
 
-export function InsertSession(result, tour_id, l_id, l_score, l_result, r_id, r_score, r_result)
+export function InsertSession(endReason, winner, tour_id, l_id, l_score, l_endState, r_id, r_score, r_endState)
 {
-	const insert = database.prepare('INSERT INTO session (Result, Tour_ID, L_ID, L_Score, L_Result, R_ID, R_Score, R_Result) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
-	insert.run(result, tour_id, l_id, l_score, l_result, r_id, r_score, r_result);
+	const insert = database.prepare('INSERT INTO session (EndReason, Winner, Tour_ID, L_ID, L_Score, L_EndState, R_ID, R_Score, R_EndState) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+	insert.run(endReason, winner, tour_id, l_id, l_score, l_endState, r_id, r_score, r_endState);
 	console.log("++++ DataBase Session");
 }
 

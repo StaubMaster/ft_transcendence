@@ -1,0 +1,6 @@
+
+right now the website is kind of ugly and unintuitive
+also it dosent use typescript or Tailwind CSS to redesign it anyway
+
+
+

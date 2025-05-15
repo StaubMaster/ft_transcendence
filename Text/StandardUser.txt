@@ -1,0 +1,24 @@
+
+not everything in the subject is done
+
+ ◦ Users can securely subscribe to the website.
+ ◦ Registered users can securely log in.
+    these two should be good
+ ◦ Users can select a unique display name to participate in tournaments.
+    save an alias, if none is specified, use normal name
+ ◦ Users can update their information.
+    change alias ?
+ ◦ Users can upload an avatar, with a default option if none is provided.
+    profile picture ? sending over WebSocket might be stupid
+    how to protect POST request ?
+ ◦ Users can add others as friends and view their online status.
+    firends table in databse, id of person, id of friend, accepted ?
+    have another invite like system ?
+ ◦ User profiles display stats, such as wins and losses.
+    save these in the user or recalculate everytime ?
+    recalculate after each session ?
+ ◦ Each user has a Match History including 1v1 games, dates, and relevant
+ details, accessible to logged-in users.
+    currently only lists sessions
+    accessible to everyone
+    also not very user friendly

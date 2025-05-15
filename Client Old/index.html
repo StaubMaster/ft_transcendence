@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>HATE</title>
+		<link rel="stylesheet" href="style.css">
+
+		<script type="module" src="/ws.js"></script>
+		<script type="module" src="/logIO.js"></script>
+		<script type="module" src="/invite.js"></script>
+		<script type="module" src="/user_data.js"></script>
+		<script src="/tab_bar.js"></script>
+
+		<!--<script type="module" src="/baby.js"></script>-->
+	</head>
+	<body>
+		<div id="ws-info" style="display: none;">
+			<h1 id="ws-info-head"></h1>
+			<button type="button" onclick="WebSocket_Connect()">ReConnect</button>
+		</div>
+
+		<div id="not-session">
+			<div class="tab">
+				<button class="tablinks L" onclick="openTab(event, 'Info')" id="defaultTab">Info</button>
+				<button class="tablinks L" onclick="openTab(event, 'UserList')">Users List</button>
+
+				<button class="tablinks R" onclick="openTab(event, 'Login')">Login</button>
+				<button class="tablinks R" onclick="openTab(event, 'UserData')">User Data</button>
+			</div>
+
+			<div id="Info" class="tabcontent">
+				<h3>Info</h3>
+				<p>The site might take a while to load because of all the Babylon.js stuff.</p>
+			</div>
+
+			<div id="UserList" class="tabcontent">
+				<div>
+					<label>All Users</label><br>
+					<table id="browse-users-table">
+						<tr onclick="browse_users_table_select(-1)">
+							<th>ID</th>
+							<th>Name</th>
+							<th>Status</th>
+						</tr>
+					</table>
+					<button type="button" disabled id="browse-users-button-invite" onclick="browse_users_invite_selected()">Invite</button>
+					<br>
+				</div>
+				<div>
+					<label>Invited User: </label><br>
+					<div>
+						<label>ID: </label><label id="invite-user-id"></label><br>
+						<label>Name: </label><label id="invite-user-name"></label><br>
+						<label>Status: </label><label id="invite-user-status"></label><br>
+					</div>
+					<label>Invite Status: </label><label id="invite-status"></label><br>
+					<button type="button" disabled id="browse-users-button-cancel" onclick="borwser_users_invite_clear()">Cancel Invite</button><br>
+				</div>
+				<div>
+					<label>Invites received: </label><br>
+					<table id="browse-invite-table">
+						<tr onclick="invite_users_table_select(-1)">
+							<th>ID</th>
+							<th>Name</th>
+							<th>Status</th>
+						</tr>
+					</table>
+					<button type="button" disabled id="browse-users-button-accept" onclick="browse_invite_accept()">Accept</button><br>
+				</div>
+			</div>
+
+			<div id="Login" class="tabcontent">
+				<h3>Login</h3>
+				<label>Info:</label><label id="login-info-field">Logged Out</label><br>
+
+				<div id="login-field">
+					<input type="text" id="login-username-field" placeholder="UserName"><br>
+					<input type="text" id="login-password-field" placeholder="PassWord"><br>
+				</div>
+
+				<div id="logged-field" style="display: none;">
+					<label>Name:</label><label id="logged-name-label"></label><br>
+					<label>ID:</label><label id="logged-id-label"></label><br>
+				</div>
+
+				<button type="button" id="account-logIO" onclick="AccountLogInLogOut()">Log In</button>
+				<button type="button" id="account-RegDel" onclick="AccountRegisterDeleteMe()">Register</button>
+				<br>
+			</div>
+
+			<div id="UserData" class="tabcontent">
+				<input type="number" id="user-data-search-id" placeholder="User ID">
+				<button onclick="user_data_search()">Search User</button>
+				<br>
+				<label id="user-data-search-info"></label>
+				<br>
+				<div>
+					<label>ID:</label><label id="user-data-id"></label><br>
+					<label>Name:</label><label id="user-data-name"></label><br>
+					<label>Status:</label><label id="user-data-status"></label><br>
+					<label>Sessions:</label></label><br>
+					<table id="user-data-sessions" style="height: 150px;">
+						<tr>
+							<th>ID</th>
+							<th>EndReason</th>
+							<th>Winner</th>
+							<th>Tour ID</th>
+							<th>L ID</th>
+							<th>L Score</th>
+							<th>L EndState</th>
+							<th>R ID</th>
+							<th>R Score</th>
+							<th>R EndState</th>
+						</tr>
+					</table>
+				</div>
+			</div>
+
+			<script>document.getElementById("defaultTab").click();</script>
+		</div>
+
+		<div id="session" style="display: none;">
+			<label id="session-state">none</label>
+			<br>
+
+			<table>
+				<tr>
+					<th>Side</th>
+					<th>ID</th>
+					<th>Name</th>
+					<th>Score</th>
+					<th>State</th>
+				</tr>
+				<tr>
+					<td>L</td>
+					<td id="session-L-ID"></td>
+					<td id="session-L-name"></td>
+					<td id="session-L-score"></td>
+					<td id="session-L-state"></td>
+				</tr>
+				<tr>
+					<td>R</td>
+					<td id="session-R-ID"></td>
+					<td id="session-R-name"></td>
+					<td id="session-R-score"></td>
+					<td id="session-R-state"></td>
+				</tr>
+			</table>
+
+			<canvas id="session-canvas"></canvas>
+		</div>
+	</body>
+</html>

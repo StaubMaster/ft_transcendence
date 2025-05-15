@@ -1,153 +1,113 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<title>HATE</title>
-		<link rel="stylesheet" href="style.css">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>New Hate</title>
 
-		<script type="module" src="/ws.js"></script>
-		<script type="module" src="/logIO.js"></script>
-		<script type="module" src="/invite.js"></script>
-		<script type="module" src="/user_data.js"></script>
-		<script src="/tab_bar.js"></script>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
-		<!--<script type="module" src="/baby.js"></script>-->
-	</head>
-	<body>
-		<div id="ws-info" style="display: none;">
-			<h1 id="ws-info-head"></h1>
-			<button type="button" onclick="WebSocket_Connect()">ReConnect</button>
+	<link href="./style.css" rel="stylesheet">
+
+	<!--<script type="module" src="/navigator.js"></script>-->
+	<!--<script type="module" src="/logIO.js"></script>-->
+	<script type="module" src="/main.js"></script>
+
+</head>
+<body class="bg-neutral-700">
+	<header class="bg-neutral-900">
+		<div class="container py-6 flex item-center justify-between text-neutral-300">
+			<div><strong>Hate</strong></div>
+
+			<!--Nav when Logged in-->
+			<nav id="main-nav" class="hidden">
+				<ul class="flex item-center gap-4">
+					<li class="cursor-pointer hover:underline" name="main-nav-elem" onclick="MainNavigator_Select(event, 'main-section-tournament')">
+						TOURNAMENT
+					</li>
+					<li class="cursor-pointer hover:underline" name="main-nav-elem" onclick="MainNavigator_Select(event, 'main-section-1v1')">
+						1v1
+					</li>
+					<li class="cursor-pointer hover:underline" name="main-nav-elem" onclick="MainNavigator_Select(event, 'main-section-data')">
+						DATA
+					</li>
+					<li class="cursor-pointer hover:underline" name="main-nav-elem" onclick="MainNavigator_Select(event, 'main-section-friends')">
+						FRIENDS
+					</li>
+					<li class="cursor-pointer hover:underline" name="main-nav-elem" onclick="MainNavigator_Select(event, 'main-section-profile')">
+						PROFILE
+					</li>
+				</ul>
+			</nav>
 		</div>
+	</header>
 
-		<div id="not-session">
-			<div class="tab">
-				<button class="tablinks L" onclick="openTab(event, 'Info')" id="defaultTab">Info</button>
-				<button class="tablinks L" onclick="openTab(event, 'UserList')">Users List</button>
-
-				<button class="tablinks R" onclick="openTab(event, 'Login')">Login</button>
-				<button class="tablinks R" onclick="openTab(event, 'UserData')">User Data</button>
+	<main class="">
+		<section name="main-section" id="main-section-default" class="relative text-white flex items-center justify-center text-center">
+			<div class="container relative z-10">
+				<h1 class="text-4xl md:text-5xl xl:text-7xl font-black">HATE</h1>
+				<h2 class="text-2xl md:text-3xl xl:text-4xl">I have no time, and I must Pong</h2>
+				<button class="button-main" id="button-main" onclick="LogIO_Show()">LOGIN</button>
 			</div>
+		</section>
 
-			<div id="Info" class="tabcontent">
-				<h3>Info</h3>
-				<p>The site might take a while to load because of all the Babylon.js stuff.</p>
-			</div>
+		<section name="main-section" id="main-section-login" style="display: none;" class="main-section w-72 h-48">
+			<label class="text-red-600" id="login-info-field">Info goes here</label><br>
+			<input type="text" id="login-username-field" placeholder="UserName" class="bg-neutral-400 text-black p-2 m-2"><br>
+			<input type="text" id="login-password-field" placeholder="PassWord" class="bg-neutral-400 text-black p-2 m-2"><br>
+			<button class="button m-2" id="button-login">Log In</button>
+			<button class="button m-2" id="button-register">Register</button>
+		</section>
 
-			<div id="UserList" class="tabcontent">
-				<div>
-					<label>All Users</label><br>
-					<table id="browse-users-table">
-						<tr onclick="browse_users_table_select(-1)">
-							<th>ID</th>
-							<th>Name</th>
-							<th>Status</th>
-						</tr>
-					</table>
-					<button type="button" disabled id="browse-users-button-invite" onclick="browse_users_invite_selected()">Invite</button>
-					<br>
-				</div>
-				<div>
-					<label>Invited User: </label><br>
-					<div>
-						<label>ID: </label><label id="invite-user-id"></label><br>
-						<label>Name: </label><label id="invite-user-name"></label><br>
-						<label>Status: </label><label id="invite-user-status"></label><br>
+		<section name="main-section" id="main-section-tournament" style="display: none;" class="main-section">
+			<h1>TOURNAMENT</h1>
+		</section>
+
+		<section name="main-section" id="main-section-1v1" style="display: none;" class="main-section">
+			<h1>1v1</h1>
+		</section>
+
+		<section name="main-section" id="main-section-data" style="display: none;" class="main-section">
+			<h1>DATA</h1>
+		</section>
+
+		<section name="main-section" id="main-section-friends" style="display: none;" class="main-section">
+			<h1>FRIENDS</h1>
+		</section>
+
+		<section name="main-section" id="main-section-profile" style="display: none;" class="main-section w-3xl h-96">
+			<div class="flex flex-col h-full">
+				<h1>PROFILE</h1>
+				<div class="flex flex-1 flex-row">
+					<div class=w-1/2 h-full flex-col">
+						<h2 class="h-2/12">Personal</h2>
+						<div class="h-9/12">
+							<ul class="text-left p-4">
+								<li>ID: <label>0</label></li>
+								<li>NAME: <label>placeholder</label></li>
+							</ul>
+						</div>
+						<div class="h-1/12 flex justify-start">
+							<button class="button">CHANGE</button>
+						</div>
 					</div>
-					<label>Invite Status: </label><label id="invite-status"></label><br>
-					<button type="button" disabled id="browse-users-button-cancel" onclick="borwser_users_invite_clear()">Cancel Invite</button><br>
-				</div>
-				<div>
-					<label>Invites received: </label><br>
-					<table id="browse-invite-table">
-						<tr onclick="invite_users_table_select(-1)">
-							<th>ID</th>
-							<th>Name</th>
-							<th>Status</th>
-						</tr>
-					</table>
-					<button type="button" disabled id="browse-users-button-accept" onclick="browse_invite_accept()">Accept</button><br>
+					<div class="bg-blue-700 w-1/2 h-full">
+						<h2>Statistics</h2>
+						<div>
+							<table>
+								<th>Session ID</th>
+								<th>Winner</th>
+								<th>Score L</th>
+								<th>Score R</th>
+							</table>
+						</div>
+					</div>
 				</div>
 			</div>
+		</section>
+	</main>
 
-			<div id="Login" class="tabcontent">
-				<h3>Login</h3>
-				<label>Info:</label><label id="login-info-field">Logged Out</label><br>
-
-				<div id="login-field">
-					<input type="text" id="login-username-field" placeholder="UserName"><br>
-					<input type="text" id="login-password-field" placeholder="PassWord"><br>
-				</div>
-
-				<div id="logged-field" style="display: none;">
-					<label>Name:</label><label id="logged-name-label"></label><br>
-					<label>ID:</label><label id="logged-id-label"></label><br>
-				</div>
-
-				<button type="button" id="account-logIO" onclick="AccountLogInLogOut()">Log In</button>
-				<button type="button" id="account-RegDel" onclick="AccountRegisterDeleteMe()">Register</button>
-				<br>
-			</div>
-
-			<div id="UserData" class="tabcontent">
-				<input type="number" id="user-data-search-id" placeholder="User ID">
-				<button onclick="user_data_search()">Search User</button>
-				<br>
-				<label id="user-data-search-info"></label>
-				<br>
-				<div>
-					<label>ID:</label><label id="user-data-id"></label><br>
-					<label>Name:</label><label id="user-data-name"></label><br>
-					<label>Status:</label><label id="user-data-status"></label><br>
-					<label>Sessions:</label></label><br>
-					<table id="user-data-sessions">
-						<tr>
-							<th>ID</th>
-							<th>EndReason</th>
-							<th>Winner</th>
-							<th>Tour ID</th>
-							<th>L ID</th>
-							<th>L Score</th>
-							<th>L EndState</th>
-							<th>R ID</th>
-							<th>R Score</th>
-							<th>R EndState</th>
-						</tr>
-					</table>
-				</div>
-			</div>
-
-			<script>document.getElementById("defaultTab").click();</script>
-		</div>
-
-		<div id="session" style="display: none;">
-			<label id="session-state">none</label>
-			<br>
-
-			<table>
-				<tr>
-					<th>Side</th>
-					<th>ID</th>
-					<th>Name</th>
-					<th>Score</th>
-					<th>State</th>
-				</tr>
-				<tr>
-					<td>L</td>
-					<td id="session-L-ID"></td>
-					<td id="session-L-name"></td>
-					<td id="session-L-score"></td>
-					<td id="session-L-state"></td>
-				</tr>
-				<tr>
-					<td>R</td>
-					<td id="session-R-ID"></td>
-					<td id="session-R-name"></td>
-					<td id="session-R-score"></td>
-					<td id="session-R-state"></td>
-				</tr>
-			</table>
-
-			<canvas id="session-canvas"></canvas>
-		</div>
-	</body>
+</body>
 </html>

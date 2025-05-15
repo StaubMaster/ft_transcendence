@@ -1,0 +1,6 @@
+
+should have planned better
+this is a major module and would probably make programing easier
+all the internals of the services already exist so not sure how complicated it would be to change things now
+
+

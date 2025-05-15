@@ -1,0 +1,34 @@
+
+Login:
+show login tab only when logged out
+hide when logged in
+
+
+
+Profile:
+when logged in show Profile
+show ID
+show username
+have a button to change password (needs a seperate interface)
+
+have other information that can be changed ?
+show all the information as labels
+
+have a button to change information (seperate interface)
+have all the information as textboxes
+at bottom, have a button to change and a button to disacrd
+
+
+show basic match data (cant be changed)
+
+show Profile information on the left
+and match data on the right ?
+make table limited size and scrollable
+
+
+when viewed by other users:
+use same to show other users (dont show change buttons)
+
+
+
+

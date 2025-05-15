@@ -1,6 +1,10 @@
-
 import * as api from './API_Const.js';
+import * as nav from './navigator.js'
+import * as main from './main.js';
 import * as logIO from './logIO.js';
+import * as invite from './invite.js';
+import * as session from './Session.js';
+
 
 
 var ws:WebSocket | null = null;
@@ -20,12 +24,17 @@ function WebSocket_Connect()
 		console.log("socket closed:" + e.code + ":" + e.reason);
 		ws = null;
 		//WebSocket_Info("Server Connection Error");
+		nav.Navigator_Main_Hide();
+		main.MainDefault_ServerError();
+		session.End();
 	};
 	ws.onopen = function()
 	{
 		//WebSocket_Info();
 		logIO.AccountChangeLogOut();
+		invite.Invite_Set(-1);
 		//invite.borwser_users_invite_clear();
+		main.MainDefault_Reset();
 	};
 	ws.onmessage = function(e)
 	{
@@ -43,17 +52,55 @@ export function WebSocket_Send(text: string)
 	}
 	else
 	{
-		console.log("'", text, "'");
+		//console.log("'", text, "'");
 		ws.send(text);
 	}
 }
 
 
+
 function WebSocket_Message(text: string)
 {
+	const message_to_func = [
+		[api.USER_ACCOUNT_LOGIN,  logIO.AccountChangeLogIn],
+		[api.USER_ACCOUNT_LOGOUT, logIO.AccountChangeLogOut],
+		[api.SESSION_Start,       session.Start],
+		[api.SESSION_End,         session.End],
+	];
+	for (var i = 0; i < message_to_func.length; i++)
+	{
+		var header = message_to_func[i][0] as string;
+		var func = message_to_func[i][1] as Function;
+		if (text.startsWith(header))
+		{
+			func();
+			return;
+		}
+	}
+
+	const message_to_func_value = [
+		//[api.ALL_USERS_Table,          User_Table],
+		[api.ALL_USERS_Table,          main.UserTable_Online_Update],
+		[api.USER_ACCOUNT_LOG_INFO,    logIO.AccountChangeInfo],
+		[api.USER_INVITE_Table,        invite.Invite_Table_Update],
+		//[api.USER_SEARCH_USER_DATA,    user_data_show],
+		//[api.USER_SEARCH_SESSION_DATA, user_data_session_show],
+	];
+	for (var i = 0; i < message_to_func_value.length; i++)
+	{
+		var header = message_to_func_value[i][0] as string;
+		var func = message_to_func_value[i][1] as Function;
+		if (text.startsWith(header))
+		{
+			const value = text.substring(header.length);
+			func(value);
+			return;
+		}
+	}
+
 	const message_to_element = [
-		[api.USER_ACCOUNT_ID,   "logged-id-label"],
-		[api.USER_ACCOUNT_Name, "logged-name-label"],
+		[api.USER_ACCOUNT_ID,   "account-id"],
+		[api.USER_ACCOUNT_Name, "account-name"],
 
 
 
@@ -77,43 +124,12 @@ function WebSocket_Message(text: string)
 		{
 			var cut = text.substring(header.length);
 			var elem = document.getElementById(element) as HTMLElement;
+			if (elem == null)
+			{
+				console.log("element '" + element + "' not found");
+				return;
+			}
 			elem.textContent = cut;
-			return;
-		}
-	}
-
-	const message_to_func_value = [
-		//[api.ALL_USERS_Table,          User_Table],
-		[api.USER_ACCOUNT_LOG_INFO,    logIO.AccountChangeInfo],
-		//[api.USER_INVITE_Table,        invite.invite_users_table_ws_recv],
-		//[api.USER_SEARCH_USER_DATA,    user_data_show],
-		//[api.USER_SEARCH_SESSION_DATA, user_data_session_show],
-	];
-	for (var i = 0; i < message_to_func_value.length; i++)
-	{
-		var header = message_to_func_value[i][0] as string;
-		var func = message_to_func_value[i][1] as Function;
-		if (text.startsWith(header))
-		{
-			const value = text.substring(header.length);
-			func(value);
-			return;
-		}
-	}
-
-	const message_to_func = [
-		[api.USER_ACCOUNT_LOGIN,         logIO.AccountChangeLogIn],
-		[api.USER_ACCOUNT_LOGOUT,        logIO.AccountChangeLogOut],
-		//[api.SESSION_Start, Session_Start],
-		//[api.SESSION_End,   Session_End],
-	];
-	for (var i = 0; i < message_to_func.length; i++)
-	{
-		var header = message_to_func[i][0] as string;
-		var func = message_to_func[i][1] as Function;
-		if (text.startsWith(header))
-		{
-			func();
 			return;
 		}
 	}

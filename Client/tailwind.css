@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/*
+npx tailwindcss -i Client/tailwind.css -o Client/style.css --watch
+*/
+
 @theme {
 	--font-sans: "Montserrat", sans-serif;
 }
@@ -11,19 +15,40 @@
 
 @layer {
 	.button-main {
-		@apply bg-amber-300 text-xl text-black font-bold px-8 py-2 rounded-lg cursor-pointer
+		@apply bg-amber-300 text-xl text-black font-bold px-8 py-2 rounded-lg cursor-pointer;
 	}
 }
+
+
 
 .main-section {
 	@apply bg-neutral-800 text-white flex items-center justify-center text-center m-auto;
 }
 .main-section h1 {
-	@apply text-3xl bg-neutral-900
+	@apply text-3xl bg-neutral-900;
 }
 .main-section h2 {
-	@apply text-2xl
+	@apply text-2xl;
 }
 .main-section button {
-	@apply bg-neutral-400 text-xs text-black font-bold px-2 py-1 rounded-lg cursor-pointer justify-start
+	@apply bg-neutral-400 text-xs text-black font-bold px-2 py-1 rounded-lg cursor-pointer justify-start;
 }
+
+
+
+.user-table {
+	@apply mx-4 my-4;
+}
+.user-table th {
+	@apply px-2;
+}
+.user-table tr:nth-child(even) {
+	@apply bg-amber-600;
+}
+.user-table tr:nth-child(odd) {
+	@apply bg-amber-700;
+}
+.user-table tr.selected {
+	@apply bg-amber-900;
+}
+

@@ -1,5 +1,6 @@
 
 import * as api from './API_Const.js';
+import * as main from './main.js';
 import * as nav from './navigator.js';
 import * as ws from './WebSockert.js';
 
@@ -7,8 +8,9 @@ import * as ws from './WebSockert.js';
 
 export function LogIO_Show()
 {
+	main.MainDefault_Hide();
 	let section = document.getElementById("main-section-login") as HTMLElement;
-	nav.MainSections_Select(section);
+	section.style.display = "block";
 }
 export function LogIO_Hide()
 {
@@ -83,7 +85,7 @@ export function AccountLogIn()
 export function AccountLogOut()
 {
 	if (IsWaiting) { return; }
-	var InfoLabel = document.getElementById("login-info-field") as HTMLLabelElement;
+	var InfoLabel = document.getElementById("logged-info-field") as HTMLLabelElement;
 	InfoLabel.textContent = "";
 
 	IsWaiting = true;
@@ -108,7 +110,7 @@ var deleteRepeatPress = 0;
 export function AccountDeleteMe()
 {
 	if (IsWaiting) { return; }
-	var InfoLabel = document.getElementById("login-info-field") as HTMLLabelElement;
+	var InfoLabel = document.getElementById("logged-info-field") as HTMLLabelElement;
 	if (deleteRepeatPress == 0)
 	{
 		IsWaiting = true;
@@ -136,17 +138,20 @@ export function AccountChangeLogIn()
 	IsLoggedIn = true;
 
 	LogIO_Hide();
-	nav.MainNavigator_Show();
+	nav.Navigator_Main_Show();
 
 	deleteRepeatPress = 5;
 
-	var InfoLabel = document.getElementById("login-info-field") as HTMLLabelElement;
+	var InfoLabel = document.getElementById("logged-info-field") as HTMLLabelElement;
 	InfoLabel.textContent = "Logged In";
 }
 export function AccountChangeLogOut()
 {
 	IsWaiting = false;
 	IsLoggedIn = false;
+
+	nav.Navigator_Main_Hide();
+	main.MainDefault_Show();
 
 	var InfoLabel = document.getElementById("login-info-field") as HTMLLabelElement;
 	InfoLabel.textContent = "Logged Out";
@@ -156,9 +161,11 @@ export function AccountChangeLogOut()
 
 
 
-let button_login = document.getElementById("button-login") as HTMLButtonElement;
-button_login.onclick = AccountLogIn;
-let button_register = document.getElementById("button-register") as HTMLButtonElement;
-button_register.onclick = AccountRegister;
+(document.getElementById("button-login") as HTMLButtonElement).onclick = AccountLogIn;
+(document.getElementById("button-register") as HTMLButtonElement).onclick = AccountRegister;
+(document.getElementById("button-logout") as HTMLButtonElement).onclick = AccountLogOut;
+(document.getElementById("button-deleteme") as HTMLButtonElement).onclick = AccountDeleteMe;
+
+
 
 

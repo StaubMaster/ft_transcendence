@@ -1,8 +1,8 @@
 
 import * as api from './API_Const.js';
 import * as main from './main.js';
-import * as nav from './navigator.js';
 import * as ws from './WebSockert.js';
+import * as NavSec from './NavigationSections.js';
 
 
 
@@ -137,8 +137,9 @@ export function AccountChangeLogIn()
 	IsWaiting = false;
 	IsLoggedIn = true;
 
+	NavSec.Sections_Main_Hide();
+	NavSec.Bar_Main_Show();
 	LogIO_Hide();
-	nav.Navigator_Main_Show();
 
 	deleteRepeatPress = 5;
 
@@ -150,7 +151,8 @@ export function AccountChangeLogOut()
 	IsWaiting = false;
 	IsLoggedIn = false;
 
-	nav.Navigator_Main_Hide();
+	NavSec.Sections_Main_Hide();
+	NavSec.Bar_Main_Hide();
 	main.MainDefault_Show();
 
 	var InfoLabel = document.getElementById("login-info-field") as HTMLLabelElement;

@@ -1,9 +1,9 @@
 import * as api from './API_Const.js';
-import * as nav from './navigator.js';
 import * as main from './main.js';
 import * as logIO from './logIO.js';
 import * as invite from './invite.js';
 import * as session from './Session.js';
+import * as NavSec from './NavigationSections.js';
 var ws = null;
 WebSocket_Connect();
 function WebSocket_Connect() {
@@ -18,16 +18,15 @@ function WebSocket_Connect() {
     ws.onclose = function (e) {
         console.log("socket closed:" + e.code + ":" + e.reason);
         ws = null;
-        //WebSocket_Info("Server Connection Error");
-        nav.Navigator_Main_Hide();
+        NavSec.Sections_Main_Hide();
+        NavSec.Bar_Main_Hide();
         main.MainDefault_ServerError();
-        session.End();
+        document.getElementById("game-section").style.display = "none";
     };
     ws.onopen = function () {
-        //WebSocket_Info();
         logIO.AccountChangeLogOut();
         invite.Invite_Set(-1);
-        //invite.borwser_users_invite_clear();
+        NavSec.Bar_Main_Hide();
         main.MainDefault_Reset();
     };
     ws.onmessage = function (e) {
@@ -67,6 +66,7 @@ function WebSocket_Message(text) {
         [api.USER_INVITE_Table, invite.Invite_Table_Update],
         //[api.USER_SEARCH_USER_DATA,    user_data_show],
         //[api.USER_SEARCH_SESSION_DATA, user_data_session_show],
+        ["Simulation-Data: ", session.DataChange]
     ];
     for (var i = 0; i < message_to_func_value.length; i++) {
         var header = message_to_func_value[i][0];
@@ -113,7 +113,7 @@ function WebSocket_Message(text) {
     }
     else if (text.startsWith(cmd_SimulationData)) {
         var cut = text.substring(cmd_SimulationData.length);
-        //SimulationDataChangeFunc(cut);
+        //session.DataChange(cut);
     }
     else {
         //console.log("unrecognized message '" + text + "'");

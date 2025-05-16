@@ -2,6 +2,10 @@
 import * as logIO from './logIO.js';
 import * as invite from './invite.js';
 
+//	can get all elements at the start
+const main_login_button = document.getElementById("button-main-login") as HTMLButtonElement;
+main_login_button.onclick = logIO.LogIO_Show;
+
 export function MainDefault_Show()
 {
 	let main_default = document.getElementById("main-default") as HTMLElement;
@@ -23,11 +27,11 @@ export function MainDefault_Reset()
 {
 	let main_default_h1 = document.getElementById("main-default-h1") as HTMLElement;
 	let main_default_h2 = document.getElementById("main-default-h2") as HTMLElement;
-	main_default_h1.textContent = "HATE";
-	main_default_h2.textContent = "I have no time, and I must Pong";
+	main_default_h1.textContent = "Pong";
+	main_default_h2.textContent = "sample text";
 }
 
-(document.getElementById("button-main-login") as HTMLButtonElement).onclick = logIO.LogIO_Show;
+//(document.getElementById("button-main-login") as HTMLButtonElement).onclick = logIO.LogIO_Show;
 
 
 

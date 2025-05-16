@@ -22,7 +22,7 @@ npx tailwindcss -i Client/tailwind.css -o Client/style.css --watch
 
 
 .main-section {
-	@apply bg-neutral-800 text-white flex items-center justify-center text-center m-auto;
+	@apply bg-neutral-800 text-white relative w-full h-full flex flex-1 items-center justify-center text-center;
 }
 .main-section h1 {
 	@apply text-3xl bg-neutral-900;

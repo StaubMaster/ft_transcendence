@@ -6,6 +6,8 @@ import { Paddle2D } from './Paddle2D.js';
 import { TimeTicker, timeNs } from '../../Help/TimeTicker.js';
 import { TimeCountDown } from '../../Help/TimeCountDown.js';
 
+const WallX = 0.8;
+const WallY = 0.4;
 const WallTickness = 0.05;
 const PaddleSpeedAccel = 0.001;
 const PaddleSpeedLimit = 0.02;
@@ -38,27 +40,30 @@ export class SimPong
 	{
 		this.Session = session;
 
+		this.TimeStart = timeNs();
+		this.TimeTickCount = 0;
 		//	1.000	=	1s		1/s
 		//	0.100	=	0.1s	10/s
 		//	0.050	=	0.05s	20/s
 		//	0.025	=	0.025s	40/s
-		this.TimeStart = timeNs();
-		this.TimeTickCount = 0;
 		//this.TimeFrameTicker = new TimeTicker(1);
 		this.TimeFrameTicker = new TimeTicker(0.025);
 		this.TimeFrameMeasure = timeNs();
 
-		this.LimitBox = new Box2D(new Point2D(-1.0 + WallTickness, -0.5 + WallTickness), new Point2D(+1.0 - WallTickness, +0.5 - WallTickness));
+		this.LimitBox = new Box2D(
+			new Point2D(-WallX + WallTickness, -WallY + WallTickness),
+			new Point2D(+WallX - WallTickness, +WallY - WallTickness)
+		);
 
-		this.Wall0 = new Box2D(new Point2D(+1.0 - WallTickness, -0.5), new Point2D(+1.0, +0.5));
-		this.Wall1 = new Box2D(new Point2D(-1.0, -0.5), new Point2D(-1.0 + WallTickness, +0.5));
-		this.Wall2 = new Box2D(new Point2D(-1.0, +0.5 - WallTickness), new Point2D(+1.0, +0.5));
-		this.Wall3 = new Box2D(new Point2D(-1.0, -0.5), new Point2D(+1.0, -0.5 + WallTickness));
+		this.Wall0 = new Box2D(new Point2D(+WallX - WallTickness, -WallY), new Point2D(+WallX, +WallY));
+		this.Wall1 = new Box2D(new Point2D(-WallX, -WallY), new Point2D(-WallX + WallTickness, +WallY));
+		this.Wall2 = new Box2D(new Point2D(-WallX, +WallY - WallTickness), new Point2D(+WallX, +WallY));
+		this.Wall3 = new Box2D(new Point2D(-WallX, -WallY), new Point2D(+WallX, -WallY + WallTickness));
 
 		this.Ball = new VelBox2D(new Box2D(new Point2D(-0.01, -0.01), new Point2D(+0.01, +0.01)), new Point2D(0.01, 0.005));
 
-		this.PaddleL = new Paddle2D(-0.8, 0.01, 0.1, PaddleSpeedAccel, PaddleSpeedLimit);
-		this.PaddleR = new Paddle2D(+0.8, 0.01, 0.1, PaddleSpeedAccel, PaddleSpeedLimit);
+		this.PaddleL = new Paddle2D(-0.65, 0.01, 0.1, PaddleSpeedAccel, PaddleSpeedLimit);
+		this.PaddleR = new Paddle2D(+0.65, 0.01, 0.1, PaddleSpeedAccel, PaddleSpeedLimit);
 
 		this.isServing = false;
 
@@ -110,16 +115,14 @@ export class SimPong
 	{
 		if (this.Wall0.Intersect(this.Ball.Box))
 		{
+			this.Session.ScoreLInc();
 			this.Ball.Vel.X = -Math.abs(this.Ball.Vel.X);
-			this.Session.ScoreL++;
-			this.Session.SendScoreAll();
 			this.ServeBall(false);
 		}
 		if (this.Wall1.Intersect(this.Ball.Box))
 		{
+			this.Session.ScoreRInc();
 			this.Ball.Vel.X = +Math.abs(this.Ball.Vel.X);
-			this.Session.ScoreR++;
-			this.Session.SendScoreAll();
 			this.ServeBall(true);
 		}
 		if (this.Wall2.Intersect(this.Ball.Box))
@@ -184,8 +187,8 @@ export class SimPong
 
 		this.BallWallUpdate();
 
-		this.PaddleL.Update(this.Session.UserL.PressUP, this.Session.UserL.PressDW);
-		this.PaddleR.Update(this.Session.UserR.PressUP, this.Session.UserR.PressDW);
+		this.PaddleL.Update(this.Session.InputUpL, this.Session.InputDwL);
+		this.PaddleR.Update(this.Session.InputUpR, this.Session.InputDwR);
 
 		this.PaddleL.LimitVel();
 		this.PaddleR.LimitVel();

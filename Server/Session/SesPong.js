@@ -23,6 +23,11 @@ export class SessionPong
 	CountDownCheckActive;
 	CountDownShowResult;
 
+	InputUpL;
+	InputDwL;
+	InputUpR;
+	InputDwR;
+
 	Sim;
 
 	Tournament;
@@ -50,6 +55,11 @@ export class SessionPong
 
 		this.CountDownCheckActive = new TimeCountDown(1, 10);
 		this.CountDownShowResult = null;
+
+		this.InputUpL = false;
+		this.InputDwL = false;
+		this.InputUpR = false;
+		this.InputDwR = false;
 
 		this.Sim = new SimPong(this);
 
@@ -100,6 +110,16 @@ export class SessionPong
 	SendSimData(name, data)
 	{
 		this.SendTextAll('Simulation-Data: { "name": "' + name + '", "data": ' + data + ' }');
+	}
+	ScoreLInc()
+	{
+		this.ScoreL++;
+		this.SendScoreAll();
+	}
+	ScoreRInc()
+	{
+		this.ScoreR++;
+		this.SendScoreAll();
 	}
 
 
@@ -229,6 +249,26 @@ export class SessionPong
 
 
 
+	Update_Input()
+	{
+		if (this.UserL.Temp_ID != this.UserR.Temp_ID)
+		{
+			this.InputUpL = this.UserL.InputUpL || this.UserL.InputUpR;
+			this.InputDwL = this.UserL.InputDwL || this.UserL.InputDwR;
+			this.InputUpR = this.UserR.InputUpL || this.UserR.InputUpR;
+			this.InputDwR = this.UserR.InputDwL || this.UserR.InputDwR;
+		}
+		else
+		{
+			this.InputUpL = this.UserL.InputUpL;
+			this.InputDwL = this.UserL.InputDwL;
+			this.InputUpR = this.UserR.InputUpR;
+			this.InputDwR = this.UserR.InputDwR;
+		}
+	}
+
+
+
 	Update()
 	{
 		if (this.IsDone) { return; }
@@ -238,6 +278,7 @@ export class SessionPong
 			return;
 		}
 		if (this.CheckConnection()) { return; }
+		this.Update_Input();
 		if (this.CountDownCheckActive != null)
 		{
 			this.CheckActive();

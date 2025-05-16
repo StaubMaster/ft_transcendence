@@ -104,18 +104,5 @@ function WebSocket_Message(text) {
             return;
         }
     }
-    var cmd_ID = "ID: ";
-    var cmd_SimulationData = "Simulation-Data: ";
-    if (text.startsWith(cmd_ID)) {
-        var cut = text.substring(cmd_ID.length);
-        //ID = cut;
-        //WebSocket_ShowID();
-    }
-    else if (text.startsWith(cmd_SimulationData)) {
-        var cut = text.substring(cmd_SimulationData.length);
-        //session.DataChange(cut);
-    }
-    else {
-        //console.log("unrecognized message '" + text + "'");
-    }
+    //console.log("unrecognized message '" + text + "'");
 }

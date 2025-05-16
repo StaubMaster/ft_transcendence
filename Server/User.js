@@ -18,8 +18,10 @@ export class User
 	InvitedUser;
 	InvitesList;
 
-	PressUP;
-	PressDW;
+	InputUpL;
+	InputDwL;
+	InputUpR;
+	InputDwR;
 
 	IsInSession;
 	IsInTournament;
@@ -38,8 +40,10 @@ export class User
 		this.InvitedUser = null;
 		this.InvitesList = null;
 
-		this.PressUP = false;
-		this.PressDW = false;
+		this.InputUpL = false;
+		this.InputDwL = false;
+		this.InputUpR = false;
+		this.InputDwR = false;
 
 		this.IsInSession = false;
 		this.IsInTournament = false;
@@ -125,10 +129,14 @@ export class User
 		{
 			this.IsActive = true;
 			const value = text.substr(api.API_USER_SESSION.length);
-			if      (value == api.USER_INPUT_UP_PRESS) { this.PressUP = true; }
-			else if (value == api.USER_INPUT_DW_PRESS) { this.PressDW = true; }
-			else if (value == api.USER_INPUT_UP_RELEASE) { this.PressUP = false; }
-			else if (value == api.USER_INPUT_DW_RELEASE) { this.PressDW = false; }
+			if      (value == api.USER_INPUT_L_UP_PRESS) { this.InputUpL = true; }
+			else if (value == api.USER_INPUT_L_DW_PRESS) { this.InputDwL = true; }
+			else if (value == api.USER_INPUT_R_UP_PRESS) { this.InputUpR = true; }
+			else if (value == api.USER_INPUT_R_DW_PRESS) { this.InputDwR = true; }
+			else if (value == api.USER_INPUT_L_UP_RELEASE) { this.InputUpL = false; }
+			else if (value == api.USER_INPUT_L_DW_RELEASE) { this.InputDwL = false; }
+			else if (value == api.USER_INPUT_R_UP_RELEASE) { this.InputUpR = false; }
+			else if (value == api.USER_INPUT_R_DW_RELEASE) { this.InputDwR = false; }
 			else
 			{
 				console.log("Unknown Session Input '" + value + "'");

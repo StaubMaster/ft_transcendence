@@ -2,7 +2,7 @@ import * as api from './API_Const.js';
 import * as invite from './invite.js'
 import * as ws from './WebSockert.js';
 import * as NavSec from './NavigationSections.js';
-import * as BABYLON from '../node_modules/@babylonjs/core/index.js';
+//import * as BABYLON from '../node_modules/@babylonjs/core/index.js';
 
 
 
@@ -20,6 +20,8 @@ export function End()
 	(document.getElementById("game-section") as HTMLElement).style.display = "none";
 }
 
+/*
+
 const canvas = document.getElementById("game-canvas") as HTMLCanvasElement;
 
 const engine = new BABYLON.Engine(canvas);
@@ -35,7 +37,7 @@ const createScene = function()
 {
 	const scene = new BABYLON.Scene(engine);
 
-	scene.createDefaultCameraOrLight(true, false, true);
+	scene.createDefaultCameraOrLight(true, false, false);
 
 	ball = BABYLON.MeshBuilder.CreateBox("ball");
 	wall0 = BABYLON.MeshBuilder.CreateBox("wall0");
@@ -131,8 +133,10 @@ export function DataChange(str: string)
 
 const scene = createScene();
 
-var MoveUpKeyPressed = false;
-var MoveDwKeyPressed = false;
+var InputLUpKeyPressed = false;
+var InputLDwKeyPressed = false;
+var InputRUpKeyPressed = false;
+var InputRDwKeyPressed = false;
 
 function CheckKeyChangedPress(key: string, key_check: string, pressed: boolean, api_press: string)
 {
@@ -163,13 +167,17 @@ scene.onKeyboardObservable.add(function(key_info)
 {
 	if (key_info.type == BABYLON.KeyboardEventTypes.KEYDOWN)
 	{
-		MoveUpKeyPressed = CheckKeyChangedPress(key_info.event.key, "w", MoveUpKeyPressed, api.USER_INPUT_UP_PRESS);
-		MoveDwKeyPressed = CheckKeyChangedPress(key_info.event.key, "s", MoveDwKeyPressed, api.USER_INPUT_DW_PRESS);
+		InputLUpKeyPressed = CheckKeyChangedPress(key_info.event.key, "w", InputLUpKeyPressed, api.USER_INPUT_L_UP_PRESS);
+		InputLDwKeyPressed = CheckKeyChangedPress(key_info.event.key, "s", InputLDwKeyPressed, api.USER_INPUT_L_DW_PRESS);
+		InputRUpKeyPressed = CheckKeyChangedPress(key_info.event.key, "o", InputRUpKeyPressed, api.USER_INPUT_R_UP_PRESS);
+		InputRDwKeyPressed = CheckKeyChangedPress(key_info.event.key, "l", InputRDwKeyPressed, api.USER_INPUT_R_DW_PRESS);
 	}
 	else if (key_info.type == BABYLON.KeyboardEventTypes.KEYUP)
 	{
-		MoveUpKeyPressed = CheckKeyChangedRelease(key_info.event.key, "w", MoveUpKeyPressed, api.USER_INPUT_UP_RELEASE);
-		MoveDwKeyPressed = CheckKeyChangedRelease(key_info.event.key, "s", MoveDwKeyPressed, api.USER_INPUT_DW_RELEASE);
+		InputLUpKeyPressed = CheckKeyChangedRelease(key_info.event.key, "w", InputLUpKeyPressed, api.USER_INPUT_L_UP_RELEASE);
+		InputLDwKeyPressed = CheckKeyChangedRelease(key_info.event.key, "s", InputLDwKeyPressed, api.USER_INPUT_L_DW_RELEASE);
+		InputRUpKeyPressed = CheckKeyChangedRelease(key_info.event.key, "o", InputRUpKeyPressed, api.USER_INPUT_R_UP_RELEASE);
+		InputRDwKeyPressed = CheckKeyChangedRelease(key_info.event.key, "l", InputRDwKeyPressed, api.USER_INPUT_R_DW_RELEASE);
 	}
 });
 
@@ -183,4 +191,4 @@ window.addEventListener('resize', function()
 	engine.resize();
 });
 
-
+*/

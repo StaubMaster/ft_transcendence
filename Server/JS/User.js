@@ -85,7 +85,7 @@ export class User
 		else if (text.startsWith(api.SEARCH_SESSION_DETAIL))
 		{
 			const value = text.substr(api.SEARCH_SESSION_DETAIL.length);
-			//this.SendText(api.SEARCH_SESSION_DETAIL + SessionPong.All_SearchByUserID(value));
+			this.SendText(api.SEARCH_SESSION_DETAIL + SessionPong.All_SearchDetail(value));
 		}
 		else if (text.startsWith(api.USER_ACCOUNT_LOGIN))
 		{

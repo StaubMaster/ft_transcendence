@@ -5,7 +5,10 @@ import * as api from './Help/API_Const.js';
 const database = new SQLite.DatabaseSync('DataBase/DataBase');
 
 
-
+/*
+	add a function to make sure no invalid characters are user
+	(only AlphaNumeric)
+*/
 
 
 database.exec(`
@@ -117,4 +120,8 @@ export function FindSearchUserID(data)
 	return database.prepare(query).all();
 }
 
-
+export function SessionSearchDetail(id)
+{
+	var query = "SELECT * FROM session WHERE ID=" + id;
+	return database.prepare(query).all();
+}

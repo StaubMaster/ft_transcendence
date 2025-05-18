@@ -82,13 +82,11 @@ function WebSocket_Message(text: string)
 	}
 
 	const message_to_func_value = [
-		//[api.ALL_USERS_Table,          User_Table],
 		[api.ALL_USERS_Table,            main.UserTable_Online_Update],
 		[api.USER_ACCOUNT_LOG_INFO,      logIO.AccountChangeInfo],
 		[api.USER_INVITE_Table,          invite.Invite_Table_Update],
-		//[api.USER_SEARCH_USER_DATA,    user_data_show],
 		[api.SEARCH_SESSION_TABLE,       SearchSes.Browse_Table_Update],
-		//["Simulation-Data: ",            session.DataChange]
+		[api.SEARCH_SESSION_DETAIL,      SearchSes.Detail_Update],
 	];
 	for (var i = 0; i < message_to_func_value.length; i++)
 	{

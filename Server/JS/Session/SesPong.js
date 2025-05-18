@@ -315,4 +315,8 @@ export class SessionPong
 	{
 		return JSON.stringify(database.FindSearchUserID(data));
 	}
+	static All_SearchDetail(id)
+	{
+		return JSON.stringify(database.SessionSearchDetail(id));
+	}
 }

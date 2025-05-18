@@ -174,34 +174,34 @@
 										</table>
 									</div>
 								</div>
-								<div>
+								<div class="w-96">
 									<div class="flex flex-row">
-										<div class="flex flex-col text-center">
+										<div class="flex flex-col text-center w-1/2">
 											<label>ID: </label>
 											<label>End Reason: </label>
 											<label>Winner: </label>
 										</div>
-										<div class="flex flex-col text-center">
-											<label id="1v1-search-detail-id">1</label>
-											<label id="1v1-search-detail-reason">reason</label>
-											<label id="1v1-search-detail-winner">L</label>
+										<div class="flex flex-col text-center w-1/2">
+											<label id="1v1-search-detail-id"></label>
+											<label id="1v1-search-detail-reason"></label>
+											<label id="1v1-search-detail-winner"></label>
 										</div>
 									</div>
 									<div class="flex flex-row">
-										<div class="bg-red-800 flex flex-col text-center">
-											<label id="1v1-search-detail-l-user">name 1</label>
-											<label id="1v1-search-detail-l-state">asd</label>
-											<label id="1v1-search-detail-l-score">231</label>
+										<div class="bg-red-800 flex flex-col text-center w-2/5">
+											<label id="1v1-search-detail-l-user"></label>
+											<label id="1v1-search-detail-l-state"></label>
+											<label id="1v1-search-detail-l-score"></label>
 										</div>
-										<div class="flex flex-col text-center">
+										<div class="flex flex-col text-center w-1/5">
 											<label>User</label>
-											<label>End State</label>
+											<label>State</label>
 											<label>Score</label>
 										</div>
-										<div class="bg-blue-800 flex flex-col text-center">
-											<label id="1v1-search-detail-r-user">name 1</label>
-											<label id="1v1-search-detail-r-state">asd</label>
-											<label id="1v1-search-detail-r-score">231</label>
+										<div class="bg-blue-800 flex flex-col text-center w-2/5">
+											<label id="1v1-search-detail-r-user"></label>
+											<label id="1v1-search-detail-r-state"></label>
+											<label id="1v1-search-detail-r-score"></label>
 										</div>
 									</div>
 								</div>
@@ -220,8 +220,11 @@
 			<strong>Friends</strong>
 			<nav id="friends-nav">
 				<ul>
-					<li id="friends-nav-requests">
-						REQUESTS
+					<li id="friends-nav-requests-recv">
+						REQUESTS RECEIVED
+					</li>
+					<li id="friends-nav-requests-send">
+						SEND REQUEST
 					</li>
 					<li id="friends-nav-list">
 						LIST
@@ -230,14 +233,14 @@
 			</nav>
 		</header>
 
-		<!--Friends Requests-->
-		<section class="tab-section" style="display: none;" id="friends-section-requests">
+		<!--Friends Requests Recv-->
+		<section class="tab-section" style="display: none;" id="friends-section-requests-recv">
 			<div class="tab-middle">
 				<div>
-					<h1>Requests</h1>
+					<h1>Requests Received</h1>
 					<div class="m-2">
 						<div class="table">
-							<table id="friends-request-table">
+							<table id="friends-request-recv-table">
 								<thead>
 									<tr>
 										<th class="w-1/5">ID</th>
@@ -252,6 +255,55 @@
 						<div class="flex justify-between">
 							<button id="friends-request-accept">Accept</button>
 							<button id="friends-request-decline">Decline</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!--Friends Requests Send-->
+		<section class="tab-section" style="display: none;" id="friends-section-requests-send">
+			<div class="tab-middle">
+				<div>
+					<h1>Send Requests</h1>
+					<div class="m-2">
+						<div class="flex flex-row">
+							<div class="flex flex-col">
+								<div class="table">
+									<table id="friends-request-all-table">
+										<thead>
+											<tr>
+												<th class="w-1/5">ID</th>
+												<th class="w-2/5">NAME</th>
+												<th class="w-2/5">STATUS</th>
+											</tr>
+										</thead>
+										<tbody style="height: 30vh;">
+										</tbody>
+									</table>
+								</div>
+								<div class="flex justify-center">
+									<button id="friends-request-send">Send Request</button>
+								</div>
+							</div>
+							<div class="flex flex-col">
+								<div class="table">
+									<table id="friends-request-send-table">
+										<thead>
+											<tr>
+												<th class="w-1/5">ID</th>
+												<th class="w-2/5">NAME</th>
+												<th class="w-2/5">STATUS</th>
+											</tr>
+										</thead>
+										<tbody style="height: 30vh;">
+										</tbody>
+									</table>
+								</div>
+								<div class="flex justify-center">
+									<button id="friends-request-cancel">Cancel</button>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>

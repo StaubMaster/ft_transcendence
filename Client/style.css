@@ -223,6 +223,9 @@
   .h-full {
     height: 100%;
   }
+  .w-1\/2 {
+    width: calc(1/2 * 100%);
+  }
   .w-1\/5 {
     width: calc(1/5 * 100%);
   }
@@ -240,6 +243,9 @@
   }
   .w-72 {
     width: calc(var(--spacing) * 72);
+  }
+  .w-96 {
+    width: calc(var(--spacing) * 96);
   }
   .w-\[50rem\] {
     width: 50rem;

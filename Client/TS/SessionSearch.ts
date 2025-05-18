@@ -52,7 +52,7 @@ const detail_r_score = document.getElementById("1v1-search-detail-r-score") as H
 function Detail_Search(id: number)
 {
 	if (id == -1) { return; }
-	ws.WebSocket_Send(api.SEARCH_SESSION_TABLE + id.toString());
+	ws.WebSocket_Send(api.SEARCH_SESSION_DETAIL + id.toString());
 }
 function Detail_None()
 {
@@ -70,17 +70,17 @@ function Detail_None()
 }
 export function Detail_Update(text: string)
 {
-	const data = JSON.parse(text);
+	const data = JSON.parse(text)[0];
 
 	detail_id.textContent = data.ID;
 	detail_reason.textContent = data.EndReason;
 	detail_winner.textContent = data.Winner;
 
-	detail_l_user.textContent = "";
-	detail_l_state.textContent = "";
-	detail_l_score.textContent = "";
+	detail_l_user.textContent = data.L_ID;
+	detail_l_state.textContent = data.L_EndState;
+	detail_l_score.textContent = data.L_Score;
 
-	detail_r_user.textContent = "";
-	detail_r_state.textContent = "";
-	detail_r_score.textContent = "";
+	detail_r_user.textContent = data.R_ID;
+	detail_r_state.textContent = data.L_EndState;
+	detail_r_score.textContent = data.R_Score;
 }

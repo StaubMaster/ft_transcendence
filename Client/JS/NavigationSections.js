@@ -38,7 +38,8 @@ export const Bar1v1 = new BarNavigationSections("1v1-nav", [
     ["1v1-nav-search", "1v1-section-search"],
 ]);
 export const BarFriends = new BarNavigationSections("friends-nav", [
-    ["friends-nav-requests", "friends-section-requests"],
+    ["friends-nav-requests-recv", "friends-section-requests-recv"],
+    ["friends-nav-requests-send", "friends-section-requests-send"],
     ["friends-nav-list", "friends-section-list"],
 ]);
 export const BarProfile = new BarNavigationSections("profile-nav", [

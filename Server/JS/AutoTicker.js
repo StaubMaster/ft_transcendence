@@ -1,6 +1,6 @@
 
-import * as api from '../Help/API_Const.js';
-import { TimeTicker } from "../Help/TimeTicker.js";
+import * as api from './Help/API_Const.js';
+import { TimeTicker } from "./Help/TimeTicker.js";
 import { User } from "./User.js";
 import { SessionPong } from "./Session/SesPong.js";
 

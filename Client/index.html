@@ -11,7 +11,7 @@
 
 	<link href="./style.css" rel="stylesheet">
 
-	<script type="module" src="/main.js"></script>
+	<script type="module" src="/JS/main.js"></script>
 </head>
 <body class="bg-red-900 tab-header-section-preamble">
 	<header class="tab-nav-1">
@@ -148,28 +148,63 @@
 					<div>
 						<h1>Search</h1>
 						<div class="m-2">
-							<div class="flex flex-col justify-start">
-								<input type="text" id="1v1-search-id-input" placeholder="User ID"><br>
-								<div class="flex justify-start">
-									<input type="checkbox" id="1v1-search-only-valid"><label>Only Winnig Scores</label><br>
+							<div class="flex flex-row">
+								<div>
+									<div class="flex flex-col justify-start">
+										<input type="text" id="1v1-search-id-input" placeholder="User ID"><br>
+										<div class="flex justify-start">
+											<input type="checkbox" id="1v1-search-only-valid"><label>Only Winnig Scores</label><br>
+										</div>
+										<div class="flex justify-start">
+											<input type="checkbox" id="1v1-search-only-other"><label>Only Against Others</label><br>
+										</div>
+										<button id="1v1-search-button">Search</button><br>
+									</div>
+									<div class="table">
+										<table id="1v1-search-table">
+											<thead>
+												<tr>
+													<th class="w-1/6">ID</th>
+													<th class="w-3/6">EndReason</th>
+													<th class="w-2/6">Winner</th>
+												</tr>
+											</thead>
+											<tbody class="w-72" style="height: 50vh;">
+											</tbody>
+										</table>
+									</div>
 								</div>
-								<div class="flex justify-start">
-									<input type="checkbox" id="1v1-search-only-other"><label>Only Against Others</label><br>
+								<div>
+									<div class="flex flex-row">
+										<div class="flex flex-col text-center">
+											<label>ID: </label>
+											<label>End Reason: </label>
+											<label>Winner: </label>
+										</div>
+										<div class="flex flex-col text-center">
+											<label id="1v1-search-detail-id">1</label>
+											<label id="1v1-search-detail-reason">reason</label>
+											<label id="1v1-search-detail-winner">L</label>
+										</div>
+									</div>
+									<div class="flex flex-row">
+										<div class="bg-red-800 flex flex-col text-center">
+											<label id="1v1-search-detail-l-user">name 1</label>
+											<label id="1v1-search-detail-l-state">asd</label>
+											<label id="1v1-search-detail-l-score">231</label>
+										</div>
+										<div class="flex flex-col text-center">
+											<label>User</label>
+											<label>End State</label>
+											<label>Score</label>
+										</div>
+										<div class="bg-blue-800 flex flex-col text-center">
+											<label id="1v1-search-detail-r-user">name 1</label>
+											<label id="1v1-search-detail-r-state">asd</label>
+											<label id="1v1-search-detail-r-score">231</label>
+										</div>
+									</div>
 								</div>
-								<button id="1v1-search-button">Search</button><br>
-							</div>
-							<div class="table">
-								<table id="session-search-table">
-									<thead>
-										<tr>
-											<th class="w-1/6">ID</th>
-											<th class="w-3/6">EndReason</th>
-											<th class="w-2/6">Winner</th>
-										</tr>
-									</thead>
-									<tbody class="w-72" style="height: 50vh;">
-									</tbody>
-								</table>
 							</div>
 						</div>
 					</div>

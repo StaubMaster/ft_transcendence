@@ -1,8 +1,8 @@
 import * as SQLite from 'node:sqlite';
-import { sha256 } from '../Help/SHA256.js';
-import * as api from '../Help/API_Const.js';
+import { sha256 } from './Help/SHA256.js';
+import * as api from './Help/API_Const.js';
 
-const database = new SQLite.DatabaseSync('DataBase');
+const database = new SQLite.DatabaseSync('DataBase/DataBase');
 
 
 

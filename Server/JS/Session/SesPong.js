@@ -1,6 +1,6 @@
-import * as api from '../../Help/API_Const.js';
+import * as api from '../Help/API_Const.js';
 import * as database from '../DataBase.js';
-import { TimeCountDown } from '../../Help/TimeCountDown.js';
+import { TimeCountDown } from '../Help/TimeCountDown.js';
 import { SimPong } from '../Simulation/SimPong.js';
 
 

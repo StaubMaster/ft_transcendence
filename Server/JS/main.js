@@ -4,8 +4,8 @@ const fastify = require('fastify')(
 {
 	logger: true,
 	https: {
-		key: fs.readFileSync('./Cert/server.key'),
-		cert: fs.readFileSync('./Cert/server.crt')
+		key: fs.readFileSync('./Server/Cert/server.key'),
+		cert: fs.readFileSync('./Server/Cert/server.crt')
 	}
 });
 fastify.register(require('@fastify/websocket'));

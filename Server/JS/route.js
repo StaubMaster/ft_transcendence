@@ -31,19 +31,6 @@ async function routes(fastify, options)
 		//ws.WS.All_Add(socket);
 	});
 
-	fastify.get('/BrowseUsersTable/:id?', async function (request, reply)
-	{
-		var id = -1;
-		if (request.params.id)
-		{
-			//id = request.params.id;
-		}
-		console.log("ID: " + request.params.id);
-		reply.code(200);
-		reply.header('Content-Type', 'text/html');
-		reply.send(user.User.All_Table(id));
-	});
-
 	fastify.get('/:file', async function (request, reply)
 	{
 		var rel_path = './Client/';
@@ -59,9 +46,9 @@ async function routes(fastify, options)
 		}
 	});
 
-	fastify.get('/Help/:file', async function (request, reply)
+	fastify.get('/JS/:file', async function (request, reply)
 	{
-		var rel_path = './Help/';
+		var rel_path = './Client/JS/';
 		if (request.params.file)
 		{
 			get_file(reply, rel_path + request.params.file);

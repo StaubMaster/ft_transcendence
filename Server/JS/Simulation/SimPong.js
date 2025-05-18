@@ -1,10 +1,10 @@
-import * as api from '../../Help/API_Const.js';
+import * as api from '../Help/API_Const.js';
 import { Point2D } from './Point2D.js';
 import { Box2D } from './Box2D.js';
 import { VelBox2D } from './VelBox2D.js';
 import { Paddle2D } from './Paddle2D.js';
-import { TimeTicker, timeNs } from '../../Help/TimeTicker.js';
-import { TimeCountDown } from '../../Help/TimeCountDown.js';
+import { TimeTicker, timeNs } from '../Help/TimeTicker.js';
+import { TimeCountDown } from '../Help/TimeCountDown.js';
 
 const WallX = 0.8;
 const WallY = 0.4;

@@ -1,4 +1,4 @@
-import * as api from '../Help/API_Const.js';
+import * as api from './Help/API_Const.js';
 import * as database from './DataBase.js';
 import { SessionPong } from './Session/SesPong.js';
 

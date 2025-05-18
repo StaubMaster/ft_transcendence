@@ -9,7 +9,7 @@ services:
     expose:
       - "5000"
     volumes:
-      - database_vol:/
+      - database_vol:/DataBase
 
 volumes:
   database_vol:
@@ -18,7 +18,7 @@ volumes:
     driver_opts:
       o: bind
       type: none
-      device: /e/Programmieren/github/ft_transcendence
+      device: ./DataBase
 
 #docker compose up --build -d
 #docker compose ps

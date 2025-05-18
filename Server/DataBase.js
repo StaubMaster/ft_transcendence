@@ -1,5 +1,6 @@
 import * as SQLite from 'node:sqlite';
 import { sha256 } from '../Help/SHA256.js';
+import * as api from '../Help/API_Const.js';
 
 const database = new SQLite.DatabaseSync('DataBase');
 
@@ -69,9 +70,6 @@ export function FindUser(id)
 	return;
 }
 
-const query_user = database.prepare("SELECT * FROM user ORDER BY id");
-console.log(query_user.all());
-
 
 
 
@@ -102,11 +100,21 @@ export function InsertSession(endReason, winner, tour_id, l_id, l_score, l_endSt
 	console.log("++++ DataBase Session");
 }
 
-export function FindSearchUserID(user_id)
+export function FindSearchUserID(data)
 {
-	const query = database.prepare("SELECT * FROM session WHERE L_ID=" + user_id + " OR R_ID=" + user_id);
-	return query.all();
+	var query = "SELECT ";
+	query += "*";
+	query += " FROM session WHERE ";
+	query += "(L_ID = " + data.ID + " OR R_ID = " + data.ID + ")";
+	if (data.OnlyValid)
+	{
+		query += " AND EndReason = '" + api.SESSION_SCORE_END_REASON + "'";
+	}
+	if (data.OnlyOther)
+	{
+		query += " AND (L_ID != R_ID)";
+	}
+	return database.prepare(query).all();
 }
 
-const query_session = database.prepare("SELECT * FROM session ORDER BY ID");
-console.log(query_session.all());
+

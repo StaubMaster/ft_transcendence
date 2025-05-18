@@ -1,14 +1,18 @@
-import * as invite from './invite.js';
+import * as invite from './SessionInvite.js';
 import * as NavSec from './NavigationSections.js';
 //import * as BABYLON from '../node_modules/@babylonjs/core/index.js';
 export function Start() {
-    NavSec.Bar_Main_Hide();
-    NavSec.Sections_Main_Hide();
+    //NavSec.Bar_Main_Hide();
+    //NavSec.Sections_Main_Hide();
+    NavSec.BarMain.Sections_Hide();
+    NavSec.BarMain.Hide();
     document.getElementById("game-section").style.display = "block";
 }
 export function End() {
-    NavSec.Sections_Main_Hide();
-    NavSec.Bar_Main_Show();
+    //NavSec.Sections_Main_Hide();
+    //NavSec.Bar_Main_Show();
+    NavSec.BarMain.Sections_Hide();
+    NavSec.BarMain.Show();
     invite.Invite_Set(-1);
     document.getElementById("game-section").style.display = "none";
 }

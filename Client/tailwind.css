@@ -8,6 +8,7 @@ npx tailwindcss -i Client/tailwind.css -o Client/style.css --watch
 	--font-sans: "Montserrat", sans-serif;
 }
 
+/*
 @utility container {
 	margin-inline: auto;
 	padding-inline: 1.5rem;
@@ -33,22 +34,87 @@ npx tailwindcss -i Client/tailwind.css -o Client/style.css --watch
 .main-section button {
 	@apply bg-neutral-400 text-xs text-black font-bold px-2 py-1 rounded-lg cursor-pointer justify-start;
 }
+*/
 
 
 
-.user-table {
-	@apply mx-4 my-4;
+input {
+	@apply bg-neutral-400 px-2 py-1 mx-2 my-1 text-black;
 }
-.user-table th {
-	@apply px-2;
+button {
+	@apply bg-neutral-400 px-2 py-1 mx-2 my-1 text-black font-bold rounded-lg cursor-pointer;
 }
-.user-table tr:nth-child(even) {
-	@apply bg-amber-600;
+label {
+	@apply text-white mx-2 my-1;
 }
-.user-table tr:nth-child(odd) {
-	@apply bg-amber-700;
+
+
+
+.tab-header-section-preamble {
+	@apply flex flex-1 flex-col w-full h-full;
 }
-.user-table tr.selected {
-	@apply bg-amber-900;
+.tab-nav-1 {
+	@apply bg-neutral-900 px-6 py-6 flex items-center justify-between text-white;
+	nav {
+		ul {
+			@apply flex items-center gap-4;
+			li {
+				@apply cursor-pointer hover:underline;
+			}
+		}
+	}
 }
+.tab-nav-2 {
+	@apply bg-neutral-800 px-6 py-6 flex items-center justify-between text-white;
+	nav {
+		ul {
+			@apply flex items-center gap-4;
+			li {
+				@apply cursor-pointer hover:underline;
+			}
+		}
+	}
+}
+
+.tab-section {
+	@apply bg-neutral-700 text-white w-full h-full flex flex-1 items-center justify-center text-center;
+}
+
+.tab-middle {
+	@apply h-full flex flex-1 justify-center items-center;
+	div {
+		@apply bg-neutral-500 text-start;
+		h1 {
+			@apply bg-neutral-600 p-2 text-white text-center font-bold;
+		}
+		div {
+			/*@apply ;*/
+		}
+	}
+}
+
+
+
+.table {
+	@apply flex mx-2 my-1;
+	table {
+		@apply w-full;
+		thead {
+			@apply bg-neutral-700 flex w-full;
+			tr {
+				@apply flex w-full gap-2 px-2 text-center;
+			}
+		}
+		tbody {
+			@apply bg-neutral-600 flex flex-col overflow-y-scroll;
+			tr {
+				@apply flex w-full gap-2 px-2 text-center;
+			}
+		}
+		.selected {
+			@apply bg-neutral-400;
+		}
+	}
+}
+
 

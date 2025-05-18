@@ -311,30 +311,8 @@ export class SessionPong
 			}
 		}
 	}
-	static All_SearchByUserID(user_id)
+	static All_SearchByUserID(data)
 	{
-		const found = database.FindSearchUserID(user_id);
-		/*var str = '[';
-		var notFirst = false;
-		for (var i = 0; i < found.length; i++)
-		{
-			const ses = found[i];
-			if (notFirst) { str += ','; }
-			else { notFirst = true; }
-			str += '{';
-			str += '"ID":'        + ses.ID + ',';
-			str += '"Result":"'   + ses.Result + '",';
-			str += '"Tour_ID":'   + ses.Tour_ID + ',';
-			str += '"L_ID":'      + ses.L_ID + ',';
-			str += '"L_Score":'   + ses.L_Score + ',';
-			str += '"L_Result":"' + ses.L_Result + '",';
-			str += '"R_ID":'      + ses.R_ID + ',';
-			str += '"R_Score":'   + ses.R_Score + ',';
-			str += '"R_Result":"' + ses.R_Result + '"';
-			str += '}';
-		}
-		str += ']';
-		return str;*/
-		return JSON.stringify(found);
+		return JSON.stringify(database.FindSearchUserID(data));
 	}
 }

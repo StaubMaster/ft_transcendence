@@ -105,8 +105,10 @@ export function AccountChangeInfo(text) {
 export function AccountChangeLogIn() {
     IsWaiting = false;
     IsLoggedIn = true;
-    NavSec.Sections_Main_Hide();
-    NavSec.Bar_Main_Show();
+    //NavSec.Sections_Main_Hide();
+    //NavSec.Bar_Main_Show();
+    NavSec.BarMain.Sections_Hide();
+    NavSec.BarMain.Show();
     LogIO_Hide();
     deleteRepeatPress = 5;
     var InfoLabel = document.getElementById("logged-info-field");
@@ -115,8 +117,10 @@ export function AccountChangeLogIn() {
 export function AccountChangeLogOut() {
     IsWaiting = false;
     IsLoggedIn = false;
-    NavSec.Sections_Main_Hide();
-    NavSec.Bar_Main_Hide();
+    //NavSec.Sections_Main_Hide();
+    //NavSec.Bar_Main_Hide();
+    NavSec.BarMain.Sections_Hide();
+    NavSec.BarMain.Hide();
     main.MainDefault_Show();
     var InfoLabel = document.getElementById("login-info-field");
     InfoLabel.textContent = "Logged Out";

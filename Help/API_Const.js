@@ -105,7 +105,7 @@ export const SESSION_INACTIVITY_END_REASON = "InActivity";
 export const SESSION_INACTIVITY_END_STATE_GOOD = "was here";
 export const SESSION_INACTIVITY_END_STATE_BAD = "wasn't here";
 
-export const SESSION_DISCONNECT_END_REASON = "DiConnection";
+export const SESSION_DISCONNECT_END_REASON = "DisConnection";
 export const SESSION_DISCONNECT_END_STATE_GOOD = "connected";
 export const SESSION_DISCONNECT_END_STATE_BAD = "disconnected";
 
@@ -116,6 +116,13 @@ export const SESSION_SCORE_END_STATE_NEUTRAL = "tie";
 
 export const SESSION_INFO_ACTIVITY_TIMER = "Waiting for user input ";
 export const SESSION_INFO_RESULT_TIMER = "This Session will Self-Destruct in ";
+
+
+
+
+
+export const SEARCH_SESSION_TABLE = "Search-Session-Table: ";
+export const SEARCH_SESSION_DETAIL = "Search-Session-Detail: ";
 
 
 

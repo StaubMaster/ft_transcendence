@@ -1,9 +1,10 @@
 import * as api from './API_Const.js';
 import * as main from './main.js';
 import * as logIO from './logIO.js';
-import * as invite from './invite.js';
+import * as invite from './SessionInvite.js';
 import * as session from './Session.js';
 import * as NavSec from './NavigationSections.js';
+import * as SearchSes from './SessionSearch.js';
 
 
 
@@ -23,8 +24,10 @@ function WebSocket_Connect()
 	{
 		console.log("socket closed:" + e.code + ":" + e.reason);
 		ws = null;
-		NavSec.Sections_Main_Hide();
-		NavSec.Bar_Main_Hide();
+		//NavSec.Sections_Main_Hide();
+		//NavSec.Bar_Main_Hide();
+		NavSec.BarMain.Sections_Hide();
+		NavSec.BarMain.Hide();
 		main.MainDefault_ServerError();
 		(document.getElementById("game-section") as HTMLElement).style.display = "none";
 	};
@@ -32,7 +35,8 @@ function WebSocket_Connect()
 	{
 		logIO.AccountChangeLogOut();
 		invite.Invite_Set(-1);
-		NavSec.Bar_Main_Hide();
+		//NavSec.Bar_Main_Hide();
+		NavSec.BarMain.Hide();
 		main.MainDefault_Reset();
 	};
 	ws.onmessage = function(e)
@@ -83,8 +87,8 @@ function WebSocket_Message(text: string)
 		[api.USER_ACCOUNT_LOG_INFO,      logIO.AccountChangeInfo],
 		[api.USER_INVITE_Table,          invite.Invite_Table_Update],
 		//[api.USER_SEARCH_USER_DATA,    user_data_show],
-		//[api.USER_SEARCH_SESSION_DATA, user_data_session_show],
-		["Simulation-Data: ",            session.DataChange]
+		[api.SEARCH_SESSION_TABLE,       SearchSes.Browse_Table_Update],
+		//["Simulation-Data: ",            session.DataChange]
 	];
 	for (var i = 0; i < message_to_func_value.length; i++)
 	{

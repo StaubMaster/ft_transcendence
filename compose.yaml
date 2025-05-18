@@ -1,12 +1,26 @@
 
 services:
   server:
+    container_name: node
     image: node-server
     build: .
     ports:
       - "5000:5000"
+    expose:
+      - "5000"
+    volumes:
+      - database_vol:/
 
-#docker compose up -d
+volumes:
+  database_vol:
+    name: database_volume
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /e/Programmieren/github/ft_transcendence
+
+#docker compose up --build -d
 #docker compose ps
 #docker compose stop
 #docker compose down

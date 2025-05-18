@@ -1,6 +1,6 @@
 
 import * as logIO from './logIO.js';
-import * as invite from './invite.js';
+import * as invite from './SessionInvite.js';
 
 //	can get all elements at the start
 const main_login_button = document.getElementById("button-main-login") as HTMLButtonElement;

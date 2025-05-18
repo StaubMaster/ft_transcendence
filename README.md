@@ -4,7 +4,7 @@ subject changed
 # run ?
 to run "correctly"
 ```
-docker compose up --build
+docker compose up --build -d
 ```
 However, due to Babylon having a lot of files, this can take a bit.
 

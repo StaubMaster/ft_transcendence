@@ -77,11 +77,15 @@ export class User
 	}
 	RecvText(text)
 	{
-		if (text.startsWith(api.USER_SEARCH_ID))
+		if (text.startsWith(api.SEARCH_SESSION_TABLE))
 		{
-			const value = text.substr(api.USER_SEARCH_ID.length);
-			this.SendText(api.USER_SEARCH_USER_DATA + User.All_SearchUserData(value));
-			this.SendText(api.USER_SEARCH_SESSION_DATA + SessionPong.All_SearchByUserID(value));
+			const data = JSON.parse(text.substr(api.SEARCH_SESSION_TABLE.length));
+			this.SendText(api.SEARCH_SESSION_TABLE + SessionPong.All_SearchByUserID(data));
+		}
+		else if (text.startsWith(api.SEARCH_SESSION_DETAIL))
+		{
+			const value = text.substr(api.SEARCH_SESSION_DETAIL.length);
+			//this.SendText(api.SEARCH_SESSION_DETAIL + SessionPong.All_SearchByUserID(value));
 		}
 		else if (text.startsWith(api.USER_ACCOUNT_LOGIN))
 		{

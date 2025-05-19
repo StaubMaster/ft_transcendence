@@ -9,7 +9,7 @@ docker compose up --build -d
 However, due to Babylon having a lot of files, this can take a bit.
 
 ```
-node Server/server.js
+node Server/JS/main.js
 ```
 For faster testing.
 

@@ -2,29 +2,23 @@ import * as api from './API_Const.js';
 import * as invite from './SessionInvite.js'
 import * as ws from './WebSockert.js';
 import * as NavSec from './NavigationSections.js';
-//import * as BABYLON from '../node_modules/@babylonjs/core/index.js';
+import * as BABYLON from '../../node_modules/@babylonjs/core/index.js';
 
 
 
 export function Start()
 {
-	//NavSec.Bar_Main_Hide();
-	//NavSec.Sections_Main_Hide();
 	NavSec.BarMain.Sections_Hide();
 	NavSec.BarMain.Hide();
 	(document.getElementById("game-section") as HTMLElement).style.display = "block";
 }
 export function End()
 {
-	//NavSec.Sections_Main_Hide();
-	//NavSec.Bar_Main_Show();
 	NavSec.BarMain.Sections_Hide();
 	NavSec.BarMain.Show();
 	invite.Invite_Set(-1);
 	(document.getElementById("game-section") as HTMLElement).style.display = "none";
 }
-
-/*
 
 const canvas = document.getElementById("game-canvas") as HTMLCanvasElement;
 
@@ -195,4 +189,4 @@ window.addEventListener('resize', function()
 	engine.resize();
 });
 
-*/
+

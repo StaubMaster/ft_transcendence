@@ -1,0 +1,179 @@
+
+this is how I assume this is supposed to work
+
+
+
+REST API
+	HTTP Requests ?
+
+Broker.
+	Service sends HTTP Request to do something
+	figure out where message should go
+	send to API of next Service
+
+every Service only needs to know the Broker
+the Broker knows all
+
+
+
+
+
+	Service1			Broker				Service2	.
+														.
+	Request												.
+	|													.
+	|------------------>|								.
+		get me stuff	|								.
+						|hmm, to get this stuff			.
+						|I need to ask S2				.
+						|								.
+						|	get me stuff				.
+						|------------------>|			.
+											|			.
+						|<------------------|			.
+		here is stuff	|	here is stuff				.
+	|<------------------|								.
+	|													.
+	Response											.
+
+Problem.
+infinite Loop ?
+no Queue
+
+
+
+
+
+<Prepare>
+	Broker		Service1	Service2	Service3	Service4
+	.			.			.			.			.
+	.			.			.			.			|
+	|<----------------------------------------------| I can give X
+	|			.			.			.			.
+</Prepare>
+
+<GET Requests>
+	Broker		Service1	Service2	Service3	Service4
+	.			.			.			.			.
+	.			|			.			.			.
+	|<----------| hey get me X			.			.
+	| add to queue			.			.			.
+	|---------->| yeah sure	.			.			.
+	.			|			.			.			.
+	.			.			|			.			.
+	|<----------------------| hey get me Y			.
+	| add to queue			.			.			.
+	|---------------------->| yeah sure	.			.
+	.			.			|			.			.
+	.			.			.			|			.
+	|<----------------------------------| hey get me X
+	| add to queue			.			.			.
+	|---------------------------------->| yeah sure	.
+	.			.			.			|			.
+	.			.			.			.			.
+</GET Requests>
+
+<Update>
+	Broker		Service1	Service2	Service3	Service4
+	.			.			.			.			.
+	| go through queue		.			.			.
+	| someone wants X		.			.			.
+	| I get X from Service4	.			.			.
+	|---------------------------------------------->| give me X
+	.			.			.			.			|
+	|<----------------------------------------------| here is X
+	| who wantes X			.			.			.
+	|---------->| here is X	.			.			.
+	|			.			.			.			.
+	|---------------------------------->| here is X	.
+	|			.			.			.			.
+	.			.			.			.			.
+</Update>
+
+Problem:
+why would it wait to Update ?
+
+
+
+
+
+<Prepare>
+	Broker		Service1	Service2	Service3	Service4
+	.			.			.			.			.
+	.			.			.			.			|
+	|<----------------------------------------------| I can give X
+	.			.			.			.			.
+</Prepare>
+
+<GET Requests>
+	Broker		Service1	Service2	Service3	Service4
+	.			.			.			.			.
+	.			|			.			.			.
+	|<----------| hey get me X			.			.
+	|			.			.			.			.
+	|---------------------------------------------->| give me X
+	.			.			.			.			|
+	|<----------------------------------------------| here is X
+	|			.			.			.			.
+	|---------->| here is X	.			.			.
+	.			.			.			.			.
+</GET Requests>
+
+<POST Requests>
+	Broker		Service1	Service2	Service3	Service4
+	.			.			.			.			.
+	.			|			.			.			.
+	|<----------| here is a message		.			.
+	| this should go to Service4		.			.
+	|---------------------------------------------->| here is a message
+	.			.			.			.			.
+	.			.			.			.			.
+</POST Requests>
+
+Problem:
+	infinite Loop ?
+Solution:
+	when a Service answers a Request,
+	it shouldn't Request something from another Service
+
+Problem:
+	no Queue ?
+Solution:
+	does fastify already queue Requests ?
+
+everything seems fine with POST
+but I'm not sure about GET
+is the requesting Service supposed to wait ?
+or should it just keep doing its thing
+and then eventually it gets a Response back ?
+
+
+
+this is kind of what I'm currently doing
+how to I do simple stuff with Requests ?
+
+
+Problem:
+	how to get Referances
+	when a Session is created, it gets Referances of the Users
+	how do I do that with the Broker ?
+just dont user Referances ?
+	Session knows ID of Users
+	when Session needs User Input,
+		it requests it from User,
+		which requests it from Client ?
+			this seems slow
+	Client sends Input change to User,
+		User knows that it's part of a Session
+		and send Input to Session ?
+		this would mean
+		{
+			User creates Session
+			User gets Session ID
+			User gets Input and sends it to Session ID
+			Session needs to find ID
+			Session gets Input
+		}
+		the "finding Session" part would get slow with scale
+
+

@@ -17,7 +17,7 @@ For faster testing.
 * W is Left Up
 * S is Left Down
 * O is Right Up
-* I is Right Down
+* L is Right Down
 
 Left and Right only matters when playing against self, otherwise both work.
 

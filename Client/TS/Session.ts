@@ -20,6 +20,8 @@ export function End()
 	(document.getElementById("game-section") as HTMLElement).style.display = "none";
 }
 
+
+
 const canvas = document.getElementById("game-canvas") as HTMLCanvasElement;
 
 const engine = new BABYLON.Engine(canvas);

@@ -14,6 +14,7 @@ function get_file(reply, file_path)
 		if (file_path.endsWith(".js")) { type = 'text/javascript'; }
 		if (type) { reply.header('Content-Type', type); }
 
+		console.log(".... ", file_path);
 		var text = fs.readFileSync(file_path, 'utf-8');
 		reply.send(text);
 	}
@@ -33,6 +34,8 @@ async function routes(fastify, options)
 
 	fastify.get('/:file', async function (request, reply)
 	{
+		console.log(".... ", request.ip);
+		console.log("body", request.body);
 		var rel_path = './Client/';
 		if (request.params.file)
 		{
@@ -48,6 +51,7 @@ async function routes(fastify, options)
 
 	fastify.get('/JS/:file', async function (request, reply)
 	{
+		console.log(".... ", request.ip);
 		var rel_path = './Client/JS/';
 		if (request.params.file)
 		{

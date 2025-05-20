@@ -1,0 +1,10 @@
+
+fastify listen on port
+
+https://localhost/register:port
+{
+	add new route
+	
+}
+
+

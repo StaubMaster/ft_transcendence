@@ -14,7 +14,6 @@ function get_file(reply, file_path)
 		if (file_path.endsWith(".js")) { type = 'text/javascript'; }
 		if (type) { reply.header('Content-Type', type); }
 
-		console.log(".... ", file_path);
 		var text = fs.readFileSync(file_path, 'utf-8');
 		reply.send(text);
 	}
@@ -29,13 +28,10 @@ async function routes(fastify, options)
 	fastify.get('/wss', { websocket: true }, async function (socket, request)
 	{
 		user.User.All_Add(socket);
-		//ws.WS.All_Add(socket);
 	});
 
 	fastify.get('/:file', async function (request, reply)
 	{
-		console.log(".... ", request.ip);
-		console.log("body", request.body);
 		var rel_path = './Client/';
 		if (request.params.file)
 		{
@@ -51,7 +47,6 @@ async function routes(fastify, options)
 
 	fastify.get('/JS/:file', async function (request, reply)
 	{
-		console.log(".... ", request.ip);
 		var rel_path = './Client/JS/';
 		if (request.params.file)
 		{
@@ -65,103 +60,15 @@ async function routes(fastify, options)
 		}
 	});
 
-	const node_path = './node_modules/';
-	fastify.get('/node_modules/:dir1/:dir2/:file', async function (request, reply)
+	fastify.get('/node_modules/*', async function (request, reply)
 	{
-		var rel_path = node_path
-			+ request.params.dir1 + '/'
-			+ request.params.dir2 + '/';
-		if (request.params.file)
+		if (!request.url.endsWith("/"))
 		{
-			get_file(reply, rel_path + request.params.file);
+			get_file(reply, "." + request.url);
 		}
 		else
 		{
-			var index_file = 'index';
-			index_file += ".js";
-			get_file(reply, rel_path + index_file);
-		}
-	});
-
-	fastify.get('/node_modules/:dir1/:dir2/:dir3/:file', async function (request, reply)
-	{
-		var rel_path = node_path
-			+ request.params.dir1 + '/'
-			+ request.params.dir2 + '/'
-			+ request.params.dir3 + '/'
-		;
-		if (request.params.file)
-		{
-			get_file(reply, rel_path + request.params.file);
-		}
-		else
-		{
-			var index_file = 'index';
-			index_file += ".js";
-			get_file(reply, rel_path + index_file);
-		}
-	});
-
-	fastify.get('/node_modules/:dir1/:dir2/:dir3/:dir4/:file', async function (request, reply)
-	{
-		var rel_path = node_path
-			+ request.params.dir1 + '/'
-			+ request.params.dir2 + '/'
-			+ request.params.dir3 + '/'
-			+ request.params.dir4 + '/'
-		;
-		if (request.params.file)
-		{
-			get_file(reply, rel_path + request.params.file);
-		}
-		else
-		{
-			var index_file = 'index';
-			index_file += ".js";
-			get_file(reply, rel_path + index_file);
-		}
-	});
-
-	fastify.get('/node_modules/:dir1/:dir2/:dir3/:dir4/:dir5/:file', async function (request, reply)
-	{
-		var rel_path = node_path
-			+ request.params.dir1 + '/'
-			+ request.params.dir2 + '/'
-			+ request.params.dir3 + '/'
-			+ request.params.dir4 + '/'
-			+ request.params.dir5 + '/'
-		;
-		if (request.params.file)
-		{
-			get_file(reply, rel_path + request.params.file);
-		}
-		else
-		{
-			var index_file = 'index';
-			index_file += ".js";
-			get_file(reply, rel_path + index_file);
-		}
-	});
-
-	fastify.get('/node_modules/:dir1/:dir2/:dir3/:dir4/:dir5/:dir6/:file', async function (request, reply)
-	{
-		var rel_path = node_path
-			+ request.params.dir1 + '/'
-			+ request.params.dir2 + '/'
-			+ request.params.dir3 + '/'
-			+ request.params.dir4 + '/'
-			+ request.params.dir5 + '/'
-			+ request.params.dir6 + '/'
-		;
-		if (request.params.file)
-		{
-			get_file(reply, rel_path + request.params.file);
-		}
-		else
-		{
-			var index_file = 'index';
-			index_file += ".js";
-			get_file(reply, rel_path + index_file);
+			get_file(reply, "." + request.url + "index.js");
 		}
 	});
 }

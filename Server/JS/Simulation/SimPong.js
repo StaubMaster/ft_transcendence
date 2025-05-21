@@ -6,8 +6,8 @@ import { Paddle2D } from './Paddle2D.js';
 import { TimeTicker, timeNs } from '../Help/TimeTicker.js';
 import { TimeCountDown } from '../Help/TimeCountDown.js';
 
-const WallX = 0.8;
-const WallY = 0.4;
+const WallX = 0.8375;
+const WallY = 0.425;
 const WallTickness = 0.05;
 const PaddleSpeedAccel = 0.001;
 const PaddleSpeedLimit = 0.02;

@@ -1,10 +1,10 @@
-
+import * as ws from './WebSockert.js';
 import * as logIO from './logIO.js';
 import * as invite from './SessionInvite.js';
 
 //	can get all elements at the start
-const main_login_button = document.getElementById("button-main-login") as HTMLButtonElement;
-main_login_button.onclick = logIO.LogIO_Show;
+(document.getElementById("button-main-login") as HTMLButtonElement).onclick = logIO.LogIO_Show;
+(document.getElementById("button-main-reconnect") as HTMLButtonElement).onclick = Reconnect;
 
 export function MainDefault_Show()
 {
@@ -18,20 +18,19 @@ export function MainDefault_Hide()
 }
 export function MainDefault_ServerError()
 {
-	let main_default_h1 = document.getElementById("main-default-h1") as HTMLElement;
-	let main_default_h2 = document.getElementById("main-default-h2") as HTMLElement;
-	main_default_h1.textContent = "SERVER ERROR";
-	main_default_h2.textContent = "An Error occured with the Server Connection";
+	let main_default = document.getElementById("main-server-error") as HTMLElement;
+	main_default.style.display = "block";
 }
 export function MainDefault_Reset()
 {
-	let main_default_h1 = document.getElementById("main-default-h1") as HTMLElement;
-	let main_default_h2 = document.getElementById("main-default-h2") as HTMLElement;
-	main_default_h1.textContent = "Pong";
-	main_default_h2.textContent = "sample text";
+	let main_default = document.getElementById("main-server-error") as HTMLElement;
+	main_default.style.display = "none";
 }
 
-//(document.getElementById("button-main-login") as HTMLButtonElement).onclick = logIO.LogIO_Show;
+function Reconnect()
+{
+	ws.WebSocket_Connect();
+}
 
 
 

@@ -7,7 +7,7 @@ import * as NavSec from './NavigationSections.js';
 import * as SearchSes from './SessionSearch.js';
 var ws = null;
 WebSocket_Connect();
-function WebSocket_Connect() {
+export function WebSocket_Connect() {
     if (ws != null) {
         return;
     }
@@ -69,6 +69,7 @@ function WebSocket_Message(text) {
         [api.USER_INVITE_Table, invite.Invite_Table_Update],
         [api.SEARCH_SESSION_TABLE, SearchSes.Browse_Table_Update],
         [api.SEARCH_SESSION_DETAIL, SearchSes.Detail_Update],
+        ["Simulation-Data: ", session.DataChange],
     ];
     for (var i = 0; i < message_to_func_value.length; i++) {
         var header = message_to_func_value[i][0];
@@ -106,5 +107,5 @@ function WebSocket_Message(text) {
             return;
         }
     }
-    //console.log("unrecognized message '" + text + "'");
+    console.log("unrecognized message '" + text + "'");
 }

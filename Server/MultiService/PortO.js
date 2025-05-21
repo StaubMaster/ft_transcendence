@@ -13,6 +13,10 @@ export class PortO
 		this.port = port;
 	}
 
+	post(path, body)
+	{
+		this.request('POST', path, body);
+	}
 	request(method, path, body)
 	{
 		if (typeof body === 'object')
@@ -28,16 +32,16 @@ export class PortO
 		};
 
 		const req = http.request(options, (res) => {
-			console.log(".... StatusCode", res.statusCode);
+			//console.log(".... StatusCode", res.statusCode);
 
 			res.setEncoding('utf-8');
 
 			res.on('data', (chunk) => {
-				console.log(".... chunk", chunk);
+				//console.log(".... chunk", chunk);
 			});
 
 			res.on('end', () => {
-				console.log(".... END");
+				//console.log(".... END");
 			});
 
 		});

@@ -12,7 +12,7 @@ export class PortI
 	constructor(host, port)
 	{
 		this.fastify = Fastify({
-			logger: true,
+			//logger: true,
 		});
 
 		this.host = host;

@@ -1,6 +1,83 @@
 import * as api from './Help/API_Const.js';
 import * as database from './DataBase.js';
-import { SessionPong } from './Session/SesPong.js';
+//import { SessionPong } from './Session/SesPong.js';
+import { PortI } from '../MultiService/PortI.js';
+import { PortO } from '../MultiService/PortO.js';
+
+/*
+	for now, when the user is part of a session and changes
+	tell the session all relevent info about the user
+	in the future, only tell the stuff that changed
+
+what information sent to Sessions
+
+	IsConnected
+	IsLoggedIn
+	IsActive
+
+	InputUpL
+	InputDwL
+	InputUpR
+	InputDwR
+
+	(DB_User)
+		only for displaying stats
+
+what information sent from Sessions
+	stuff to send with the WebSocket
+*/
+
+const portI = new PortI('localhost', 3000);
+const portO = new PortO('localhost', 1000);
+
+portO.post('/register', { host: portI.host, port: portI.port, path: '/UserSessionAdd' });
+portO.post('/register', { host: portI.host, port: portI.port, path: '/UserSocketSend' });
+
+portI.fastify.post('/:path', async function (request, reply)
+{
+	//console.log("path'" + request.params.path + "'");
+	//console.log("body'" + request.body + "'");
+	if (request.params.path == "UserSessionAdd")
+	{
+		const data = JSON.parse(request.body);
+		const user_id = data.user_id;
+		const session_id = data.session_id;
+
+		const user = User.All_GetByID(user_id);
+		user.SessionID = session_id;
+
+		reply.code(200);
+		reply.send("OK");
+	}
+	else if (request.params.path == "UserSocketSend")
+	{
+		const data = JSON.parse(request.body);
+		const user_id = data.user_id;
+		const message = data.message;
+
+		const user = User.All_GetByID(user_id);
+		if (user.IsConnected)
+		{
+			user.socket.send(message)
+		}
+
+		reply.code(200);
+		reply.send("OK");
+	}
+	else
+	{
+		reply.code(500);
+		reply.send("Cannot Provide '" + request.params.path + "'");
+	}
+});
+portI.run();
+
+
+
+function SendUser(user)
+{
+	portO.request('POST', '/SessionUser', user.ToSessionObject());
+}
 
 
 
@@ -26,6 +103,8 @@ export class User
 	IsInSession;
 	IsInTournament;
 
+	SessionID;
+
 	constructor(temp_id, socket)
 	{
 		this.Temp_ID = temp_id;
@@ -47,6 +126,8 @@ export class User
 
 		this.IsInSession = false;
 		this.IsInTournament = false;
+
+		this.SessionID = -1;
 
 		const self_referance = this;
 		this.socket.onerror = function(e)
@@ -79,13 +160,17 @@ export class User
 	{
 		if (text.startsWith(api.SEARCH_SESSION_TABLE))
 		{
-			const data = JSON.parse(text.substr(api.SEARCH_SESSION_TABLE.length));
-			this.SendText(api.SEARCH_SESSION_TABLE + SessionPong.All_SearchByUserID(data));
+			console.log(api.SEARCH_SESSION_TABLE, "is out of Service");
+			//const data = JSON.parse(text.substr(api.SEARCH_SESSION_TABLE.length));
+			//this.SendText(api.SEARCH_SESSION_TABLE + SessionPong.All_SearchByUserID(data));	//	SessionPong
+			this.SendText(api.SEARCH_SESSION_TABLE);
 		}
 		else if (text.startsWith(api.SEARCH_SESSION_DETAIL))
 		{
-			const value = text.substr(api.SEARCH_SESSION_DETAIL.length);
-			this.SendText(api.SEARCH_SESSION_DETAIL + SessionPong.All_SearchDetail(value));
+			console.log(api.SEARCH_SESSION_DETAIL, "is out of Service");
+			//const value = text.substr(api.SEARCH_SESSION_DETAIL.length);
+			//this.SendText(api.SEARCH_SESSION_DETAIL + SessionPong.All_SearchDetail(value));	//	SessionPong
+			this.SendText(api.SEARCH_SESSION_DETAIL);
 		}
 		else if (text.startsWith(api.USER_ACCOUNT_LOGIN))
 		{
@@ -126,7 +211,17 @@ export class User
 			var user = this.InvitesList_Find(value);
 			if (user != null)
 			{
-				SessionPong.All_Add(this, user);
+				console.log("Request new Session");
+				//SessionPong.All_Add(this, user);	//	SessionPong
+				/*
+					should return new session ID
+					User should remember the session that it is a part of
+				*/
+				const data = {
+					L: this.ToSessionObject(),
+					R: user.ToSessionObject(),
+				};
+				portO.request('POST', '/SessionAdd', data);
 			}
 		}
 		else if (text.startsWith(api.API_USER_SESSION))
@@ -145,11 +240,32 @@ export class User
 			{
 				console.log("Unknown Session Input '" + value + "'");
 			}
+			/*
+				this should tell the session that the input changed
+			*/
+			portO.request('POST', '/SessionUser', { session_id: this.SessionID, user: this.ToSessionObject()});
 		}
 		else
 		{
 			console.log("Unidentified Message: '" + text + "'");
 		}
+	}
+
+	ToSessionObject()
+	{
+		return {
+			user_id: this.DB_User.id,
+			user_name: this.DB_User.UserName,
+
+			IsConnected: this.IsConnected,
+			IsLoggedIn: this.IsLoggedIn,
+			IsActive: this.IsActive,
+
+			InputUpL: this.InputUpL,
+			InputDwL: this.InputDwL,
+			InputUpR: this.InputUpR,
+			InputDwR: this.InputDwR,
+		};
 	}
 
 
@@ -167,6 +283,7 @@ export class User
 
 
 
+	//#region LOG IO
 	AccountLogIn(UserName, PassWord)
 	{
 		if (this.IsLoggedIn)
@@ -230,9 +347,9 @@ export class User
 		database.RemoveUser(this.DB_User.UserName, this.DB_User.PassWord);
 		this.AccountLogOut();
 	}
+	//#endregion
 
-
-
+	//#region Invite
 	InvitesList_Add(user)
 	{
 		console.log("++++ Invite", this.DB_User.id, user.DB_User.id);
@@ -271,6 +388,7 @@ export class User
 		}
 		return table + ']';
 	}
+	//#endregion
 
 
 

@@ -4,11 +4,9 @@ import { PortO } from './PortO.js';
 
 
 /*	how2run
-
 node start Broker
 node start Services
 node start Host
-
 */
 
 /*	what do
@@ -74,6 +72,10 @@ class ServiceProvider
 		this.paths = [];
 	}
 
+	CheckHostPort(host, port)
+	{
+		return (this.host == host && this.port == port);
+	}
 	checkPath(path)
 	{
 		for (let i = 0; i < this.paths.length; i++)
@@ -85,6 +87,7 @@ class ServiceProvider
 		}
 		return false;
 	}
+
 	register(path)
 	{
 		const i = this.paths.push(path);
@@ -96,7 +99,7 @@ function FindProvider(host, port)
 {
 	for (let i = 0; i < providers.length; i++)
 	{
-		if (providers[i].host == host && providers[i].port == port)
+		if (providers[i].CheckHostPort(host, port))
 		{
 			return providers[i];
 		}
@@ -114,17 +117,18 @@ function FindRegisteredPath(path)
 	}
 	return null;
 }
+
 function register(host, port, path)
 {
-	for (let i = 0; i < providers.length; i++)
+	let prov;
+
+	prov = FindRegisteredPath(path);
+	if (prov)
 	{
-		if (providers[i].checkPath(path))
-		{
-			return "Path already registered";
-		}
+		return "Path already registered";
 	}
 
-	let prov = FindProvider(host, port);
+	prov = FindProvider(host, port);
 	if (!prov)
 	{
 		prov = new ServiceProvider(host, port);

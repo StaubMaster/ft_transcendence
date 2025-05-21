@@ -2,11 +2,74 @@ import * as api from '../Help/API_Const.js';
 import * as database from '../DataBase.js';
 import { TimeCountDown } from '../Help/TimeCountDown.js';
 import { SimPong } from '../Simulation/SimPong.js';
+import { PortI } from '../../MultiService/PortI.js';
+import { PortO } from '../../MultiService/PortO.js';
+
+/*	what does SessionPong want from the outside ?
+
+User Update
+WebSocket send
+
+*/
+
+const portI = new PortI('localhost', 2000);
+const portO = new PortO('localhost', 1000);
+
+portO.post('/register', { host: portI.host, port: portI.port, path: '/SessionAdd' });
+portO.post('/register', { host: portI.host, port: portI.port, path: '/SessionUser' });
+
+portI.fastify.post('/:path', async function (request, reply)
+{
+	//console.log("path'" + request.params.path + "'");
+	//console.log("body'" + request.body + "'");
+	if (request.params.path == "SessionAdd")
+	{
+		const data = JSON.parse(request.body);
+		const UserL = data.L;
+		const UserR = data.R;
+
+		SessionPong.All_Add(UserL, UserR);
+
+		reply.code(200);
+		reply.send("OK");
+	}
+	else if (request.params.path == "SessionUser")
+	{
+		const data = JSON.parse(request.body);
+		const user = data.user;
+		const session_id = data.session_id;
+
+		const session = SessionPong.All_FindSessionID(session_id);
+		if (session)
+		{
+			if (session.UserL.user_id == user.user_id) { session.UserL = user; }
+			if (session.UserR.user_id == user.user_id) { session.UserR = user; }
+		}
+
+		reply.code(200);
+		reply.send("OK");
+	}
+	else
+	{
+		reply.code(500);
+		reply.send("Cannot Provide");
+	}
+});
+portI.run();
+
+
+
+setInterval(function ()
+{
+	SessionPong.All_Update();
+}, 1);
 
 
 
 export class SessionPong
 {
+	Temp_ID;
+
 	IsDone;
 
 	UserL;
@@ -32,8 +95,10 @@ export class SessionPong
 
 	Tournament;
 
-	constructor(userL, userR, tour)
+	constructor(temp_id, userL, userR, tour)
 	{
+		this.Temp_ID = temp_id;
+
 		this.IsDone = false;
 
 		this.UserL = userL;
@@ -44,6 +109,9 @@ export class SessionPong
 
 		this.UserL.IsInSession = true;
 		this.UserR.IsInSession = true;
+
+		portO.request('POST', '/UserSessionAdd', { user_id: this.UserL.user_id, session_id: temp_id });
+		portO.request('POST', '/UserSessionAdd', { user_id: this.UserR.user_id, session_id: temp_id });
 
 		this.ScoreL = 0;
 		this.ScoreR = 0;
@@ -71,11 +139,11 @@ export class SessionPong
 
 		this.SendTextAll(api.SESSION_State + api.SESSION_INFO_ACTIVITY_TIMER + this.CountDownCheckActive.TickRemaining);
 
-		this.SendTextAll(api.SESSION_L_ID + this.UserL.DB_User.id);
-		this.SendTextAll(api.SESSION_R_ID + this.UserR.DB_User.id);
+		this.SendTextAll(api.SESSION_L_ID + this.UserL.user_id);
+		this.SendTextAll(api.SESSION_R_ID + this.UserR.user_id);
 
-		this.SendTextAll(api.SESSION_L_Name + this.UserL.DB_User.UserName);
-		this.SendTextAll(api.SESSION_R_Name + this.UserR.DB_User.UserName);
+		this.SendTextAll(api.SESSION_L_Name + this.UserL.user_name);
+		this.SendTextAll(api.SESSION_R_Name + this.UserR.user_name);
 
 		this.SendTextAll(api.SESSION_L_State + this.EndStateL);
 		this.SendTextAll(api.SESSION_R_State + this.EndStateR);
@@ -92,14 +160,18 @@ export class SessionPong
 			//	SendTextAll in Tournament
 		}
 
-		if (this.UserL.Temp_ID == this.UserR.Temp_ID)
+		//if (this.UserL.Temp_ID == this.UserR.Temp_ID)
+		if (this.UserL.user_id == this.UserR.user_id)
 		{
-			this.UserL.SendText(text);
+			//this.UserL.SendText(text);
+			portO.request('POST', '/UserSocketSend', { user_id: this.UserL.user_id, message: text });
 		}
 		else
 		{
-			this.UserL.SendText(text);
-			this.UserR.SendText(text);
+			//this.UserL.SendText(text);
+			//this.UserR.SendText(text);
+			portO.request('POST', '/UserSocketSend', { user_id: this.UserL.user_id, message: text });
+			portO.request('POST', '/UserSocketSend', { user_id: this.UserR.user_id, message: text });
 		}
 	}
 	SendScoreAll()
@@ -129,13 +201,15 @@ export class SessionPong
 		console.log("Session End");
 		console.log("Reason: " + this.EndReason);
 		console.log("Winner: " + this.Winner);
-		console.log("L:", this.UserL.DB_User.id, this.ScoreL, this.EndStateL);
-		console.log("R:", this.UserR.DB_User.id, this.ScoreR, this.EndStateR);
+		//console.log("L:", this.UserL.DB_User.id, this.ScoreL, this.EndStateL);
+		//console.log("R:", this.UserR.DB_User.id, this.ScoreR, this.EndStateR);
+		console.log("L:", this.UserL.user_id, this.ScoreL, this.EndStateL);
+		console.log("R:", this.UserR.user_id, this.ScoreR, this.EndStateR);
 
-		database.InsertSession(this.EndReason, this.Winner, -1,
+		/*database.InsertSession(this.EndReason, this.Winner, -1,
 			this.UserL.DB_User.id, this.ScoreL, this.EndStateL,
 			this.UserR.DB_User.id, this.ScoreR, this.EndStateR
-		);
+		);*/
 		this.CountDownShowResult = new TimeCountDown(1, 5);
 
 		this.SendTextAll(api.SESSION_L_State + this.EndStateL);
@@ -215,7 +289,7 @@ export class SessionPong
 
 	CheckConnection()
 	{
-		if (!this.UserL.CheckIsHere() || !this.UserR.CheckIsHere())
+		/*if (!this.UserL.CheckIsHere() || !this.UserR.CheckIsHere())
 		{
 			this.EndReason = api.SESSION_DISCONNECT_END_REASON;
 			if (!this.UserL.CheckIsHere()) { this.EndStateL = api.SESSION_DISCONNECT_END_STATE_BAD; } else { this.EndStateL = api.SESSION_DISCONNECT_END_STATE_GOOD; }
@@ -224,7 +298,7 @@ export class SessionPong
 			if (!this.UserL.CheckIsHere() && this.UserR.CheckIsHere()) { this.Winner = api.SESSION_WINNER_R; }
 			this.GameOver();
 			return true;
-		}
+		}*/
 		return false;
 	}
 
@@ -251,7 +325,7 @@ export class SessionPong
 
 	Update_Input()
 	{
-		if (this.UserL.Temp_ID != this.UserR.Temp_ID)
+		if (this.UserL.user_id != this.UserR.user_id)
 		{
 			this.InputUpL = this.UserL.InputUpL || this.UserL.InputUpR;
 			this.InputDwL = this.UserL.InputDwL || this.UserL.InputDwR;
@@ -292,24 +366,38 @@ export class SessionPong
 
 
 
+	static Temp_ID = 0;
 	static AllSessionsPong = [];
 	static All_Add(userL, userR)
 	{
 		console.log("++++ Session Pong ++++");
-		this.AllSessionsPong.push(new SessionPong(userL, userR));
+		this.AllSessionsPong.push(new SessionPong(this.Temp_ID, userL, userR));
+		this.Temp_ID++;
 	}
 	static All_Update()
 	{
 		for (var i = 0; i < this.AllSessionsPong.length; i++)
 		{
 			this.AllSessionsPong[i].Update();
-			if (this.AllSessionsPong[i].IsGameOver)
+			if (this.AllSessionsPong[i].IsDone)
 			{
 				console.log("---- Session Pong ----");
 				this.AllSessionsPong.splice(i, 1);
 				i--;
 			}
 		}
+	}
+	static All_FindSessionID(id)
+	{
+		for (var i = 0; i < this.AllSessionsPong.length; i++)
+		{
+			this.AllSessionsPong[i].Update();
+			if (this.AllSessionsPong[i].Temp_ID == id)
+			{
+				return this.AllSessionsPong[i];
+			}
+		}
+		return null;
 	}
 	static All_SearchByUserID(data)
 	{

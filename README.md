@@ -2,16 +2,22 @@
 subject changed
 
 # run ?
-to run "correctly"
-```
-docker compose up --build -d
-```
-However, due to Babylon having a lot of files, this can take a bit.
 
 ```
-node Server/JS/main.js
+node Server/MultiService/Broker.js
 ```
-For faster testing.
+wait a few seconds for it to start, then
+```
+node Server/JS/Session/SesPong.js
+node Server/JS/main.js 
+```
+
+Right now only the Boker and Sessions are a seperate Service,
+Performance feels slower, even with all logging turned off.
+It should still work for everything else,
+but the gameplay stuff needs to be transmitted faster.
+
+Or maybe my code sucks. :(
 
 # Controls
 * W is Left Up

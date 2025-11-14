@@ -23,5 +23,5 @@ function (err, address)
 
 
 
-const autoTicker = require('./AutoTicker.js');
-const database = require('./DataBase.js');
+//const autoTicker = require('./AutoTicker.js');
+//const database = require('./DataBase.js');

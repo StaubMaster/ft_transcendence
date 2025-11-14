@@ -1,3 +1,7 @@
+
+# Not Full Project
+Ended up doing the project on Repository of someone else.
+
 # ft_transcendence
 subject changed
 

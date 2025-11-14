@@ -1,5 +1,5 @@
 
-FROM node:latest
+FROM node:24-alpine
 COPY node_modules node_modules
 COPY Server Server
 COPY Client Client
